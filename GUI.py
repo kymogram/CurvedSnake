@@ -1,5 +1,5 @@
 from tkinter import *
-from random import randint
+from random import randint, random
 from math import cos, sin, pi
 
 from Snake import Snake
@@ -12,39 +12,20 @@ class GUI:
         self.canvas.pack(fill='both', expand=1)
 
         self.w = 8
-        self.createSnakeHead(randint(0, 480), randint(0, 480))
+        self.snake = Snake(self.canvas, randint(0, 480),
+                           randint(0, 480), random()*2*pi)
+        self.snake.move()
         self.canvas.focus_set()
-        self.canvas.bind('<Key>', self.turning)
+        self.canvas.bind('<Key>', self.keyPressed)
 
-    def createSnakeHead(self,x,y):
-        self.pos = [x, y]
-        self.direction = randint(0,360)
-        r = self.w//2
-        self.head = self.canvas.create_rectangle(x-r, y-r, x+r, y+r,
-                                                fill='white')
-
-        self.goDirection(self.head, 90, 4)
-
-    def goDirection(self, obj, direction=0, speed=0):
-        x, y = self.pos
-        dir_rad = direction*pi/180
-        x += speed*cos(dir_rad)
-        y += speed*sin(dir_rad) 
-        self.pos = [x, y]
-        r = self.w//2
-        self.canvas.coords(obj, x-r, y-r, x+r, y+r)
-        #y_dep = obj['y']
-
-    def turning(self, e):
+    def keyPressed(self, e):
         touche = e.keysym
-        if touche == 'Right':
-            self.direction += 10
-        elif touche == 'Left':
-            self.direction -= 10
-        self.goDirection(self.head, self.direction, 4)
+        if touche in ('Right', 'Left'):
+            self.snake.angle += 0.15 * {'Right': 1, 'Left': -1}[touche]
+        self.snake.move()
     
-    def mainloop(self):
+    def start(self):
         self.fenetre.mainloop()
 
 if __name__ == '__main__':
-    GUI().mainloop()
+    GUI().start()
