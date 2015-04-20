@@ -13,9 +13,6 @@ class Snake:
         self.canvas = canvas
         self.thickness = thickness
         self.move()
-        # self.head_id = self.canvas.create_rectangle(
-                        # x_head - thickness, y_head - thickness,
-                        # x_head + thickness, y_head + thickness, fill='white')
     
     def move(self):
         x, y = self.head_coord
@@ -24,4 +21,4 @@ class Snake:
         self.head_coord = [x, y]
         r = self.thickness // 2
         self.canvas.create_rectangle(x-r, y-r, x+r, y+r, fill='white', outline='white')
-        # self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
+

@@ -28,7 +28,6 @@ class GUI:
             self.snake.angle += 0.15 * {'Right': 1, 'Left': -1}[touche]
         elif touche == 'q':
             self.fenetre.after_cancel(self.current_loop)
-        # self.snake.move()
     
     def start(self):
         self.fenetre.mainloop()
