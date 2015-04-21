@@ -5,7 +5,7 @@ from math import cos, sin, pi
 from Snake import Snake
 
 class GUI:
-    DEFAULT_REFRESH_TIMER = 25
+    DEFAULT_REFRESH_TIMER = 30
     def __init__(self):
         self.fenetre = Tk()
         self.fenetre.geometry('480x480')
