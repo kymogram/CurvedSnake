@@ -19,7 +19,8 @@ class GUI:
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
     BONUS_DIRECTORY = './sprites/'
     BONUS_FILES = ['self_speedup.gif', 'all_speedup.gif',
-                   'self_speeddown.gif', 'all_speeddown.gif']
+                   'self_speeddown.gif', 'all_speeddown.gif',
+                   'reversed_commands.gif', 'right_angles.gif']
     def __init__(self):
         self.window = Tk()
         self.window.geometry('{}x{}'.format(GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT))
@@ -75,10 +76,10 @@ class GUI:
             if touche in self.commands_list[i]:
                 if touche == self.commands_list[i][0] and not self.snakes[i].inversed_commands or \
                    self.snakes[i].inversed_commands and touche == self.commands_list[i][1]:
-                    self.snakes[i].angle -= 0.15
+                    self.snakes[i].angle -= self.snakes[i].rotating_angle
                 elif touche == self.commands_list[i][1] and not self.snakes[i].inversed_commands or \
                    self.snakes[i].inversed_commands and touche == self.commands_list[i][0]:
-                    self.snakes[i].angle += 0.15
+                    self.snakes[i].angle += self.snakes[i].rotating_angle
             elif touche.lower() == 'q':
                 self.quitCurrentPlay()
     
@@ -202,6 +203,15 @@ class GUI:
                 if snake.speed > 1:
                     snake.speed -= 1
                     snake.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
+        elif bonus_type == 'reversed_commands':
+            for snake in others:
+                snake.inversed_commands = True
+                snake.events_queue.append(['snake.inversed_commands = False', GUI.BONUS_TIME])
+        elif bonus_type == 'right_angles':
+            for snake in others:
+                snake.previous_angles.append(snake.rotating_angle)
+                snake.rotating_angle = pi/2
+                snake.events_queue.append(['snake.rotating_angle = snake.previous_angles.pop(0)', GUI.BONUS_TIME])
 
 if __name__ == '__main__':
     GUI()

@@ -9,6 +9,7 @@ DEFAULT_MAX_HOLE_LENGTH = 20
 DEFAULT_MIN_HOLE_LENGTH = 5
 
 class Snake:
+    DEFAULT_ROTATION_ANGLE = 0.15 #rad
     def __init__(self, parent, name, x_head, y_head, angle, color,
                             moveCommandL, moveCommandR,
                             hole_proba=DEFAULT_CHANCE_HOLE,
@@ -30,7 +31,9 @@ class Snake:
         self.hole_probability = hole_proba
         self.max_hole_length = max_hole_length
         self.min_hole_length = min_hole_length
-        self.inversed_commands = True
+        self.inversed_commands = False
+        self.rotating_angle = Snake.DEFAULT_ROTATION_ANGLE
+        self.previous_angles = list()
         r = self.thickness//2
         self.head_id = self.canvas.create_oval(x_head-r, y_head-r, x_head+r, y_head+r,
                                         fill=self.color, outline=self.color,
