@@ -11,7 +11,7 @@ class GUI:
     DEFAULT_HEIGHT = 800       #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
-    BONUS_PROBABILITY = 1
+    BONUS_PROBABILITY = 0.01
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -30,6 +30,9 @@ class GUI:
         self.snakeColor = 'Yellow'
         self.moveCommandL = 'Left'
         self.moveCommandR = 'Right'
+        self.allColorIG = []
+        self.allCommandIG = []
+        self.allNameIG = []
         self.menuStart()
         self.window.mainloop()
     
@@ -98,23 +101,31 @@ class GUI:
                         command=lambda:self.modifBgColor('R')
                     )
         self.buttonRight.pack()
+        self.color = ttk.Combobox(self.window, exportselection=0)
+        self.color['values'] = ('Yellow', 'Pink', 'Red', 'Blue', 'Green', 'Orange')
+        self.color.current(0)
+        self.color.bind('<<ComboboxSelected>>', self.newSelection)
+        self.color.pack()
+        self.newPlayer = Button(self.window, text='Add player', command=self.addPlayer)
+        self.newPlayer.pack()
         playButton = Button(
                     self.window,
                     text='Play!',
                     command=self.playPressed
                 ).pack()
-        self.color = ttk.Combobox(self.window, exportselection=0)
-        self.color['values'] = ('Yellow', 'Pink', 'Red', 'Blue', 'Green', 'Orange')
-        self.color.current(0)
-        self.color.bind('<<ComboboxSelected>>', self.newselection)
-        self.color.pack()
 
-    def newselection(self, e):
-        self.snakeColor = self.color.get()
+    def addPlayer(self):
+        #ajouter couleur, contrôle, etc
+        self.allColorIG.append(self.snakeColor)
+        self.allNameIG.append(self.strVar.get())
+        self.allCommandIG.append((self.moveCommandL, self.moveCommandR))
+        
+    def newSelection(self, e):
+        self.snakeColor = self.color.get().lower()
         
     def playPressed(self):
         self.clearWindow()
-        self.window.after(1000, self.multifunctions)
+        self.window.after(1000, self.play)
         
     def modifBgColor(self, side):
         """
@@ -142,10 +153,6 @@ class GUI:
             self.buttonRight.configure(bg="white")
             self.Rcommand = False
         self.window.unbind('<Key>')
-        
-    def multifunctions(self):
-        #save |__NOT_YET__|
-        self.play()
 
     def play(self):
         self.canvas = Canvas(self.window, bg='grey', highlightthickness=0)
@@ -153,9 +160,10 @@ class GUI:
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT
         self.snakes = list()
-        self.snakes.append(Snake(self, self.strVar.get(), randint(xmin, xmax-xmin),
-                           randint(ymin, ymax-ymin), random()*2*pi, self.snakeColor,
-                           self.moveCommandL, self.moveCommandR))
+        for i in range(len(self.allNameIG)):
+            self.snakes.append(Snake(self, self.allNameIG[i], randint(xmin, xmax-xmin),
+                               randint(ymin, ymax-ymin), random()*2*pi, self.allColorIG[i],
+                               self.allCommandIG[i][0], self.allCommandIG[i][1]))
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
