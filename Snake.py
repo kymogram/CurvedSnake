@@ -1,11 +1,12 @@
-DEFAULT_SPEED = 3
-DEFAULT_THICKNESS = 6
+from tkinter import *
+from math import cos, sin
+from random import random, randint
+
+DEFAULT_SPEED = 2
+DEFAULT_THICKNESS = 4
 DEFAULT_CHANCE_HOLE = 0.02
 DEFAULT_MAX_HOLE_LENGTH = 20
 DEFAULT_MIN_HOLE_LENGTH = 5
-
-from math import cos, sin
-from random import random, randint
 
 class Snake:
     def __init__(self, canvas, x_head, y_head, angle, color='white',
@@ -28,15 +29,18 @@ class Snake:
         self.min_hole_length = min_hole_length
         r = self.thickness//2
         self.head_id = self.canvas.create_oval(x_head-r, y_head-r, x_head+r, y_head+r,
-                                        fill=self.color, outline=self.color, tag='-1')
+                                        fill=self.color, outline=self.color,
+                                        tag='snake,{},{}'.format(self.color, -1))
     
     def isCollision(self, collisions, step):
         res = False
         if len(collisions) != 0:
             first_elem = int(collisions[0])
-            appearance_step = int(self.canvas.gettags(first_elem)[0])
-            if appearance_step != -1 and appearance_step < step-self.thickness:
-                res = True
+            tags = self.canvas.gettags(first_elem)
+            if len(tags) != 0 and tags[0][:5] == 'snake':
+                appearance_step = int(tags[0].split(',')[2])
+                if appearance_step != -1 and appearance_step < step-self.thickness*2:
+                    res = True
         return res
     
     def isInScreen(self, x, y):
@@ -77,7 +81,8 @@ class Snake:
                 self.in_hole = False
                 self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
             self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
-                                        outline=self.color, tag=str(step))
+                                        outline=self.color,
+                                        tag='snake,{},{}'.format(self.color, step))
             if random() < self.hole_probability:
                 self.in_hole = True
                 self.hole = randint(self.min_hole_length, self.max_hole_length)
