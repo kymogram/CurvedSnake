@@ -11,7 +11,7 @@ class GUI:
     DEFAULT_HEIGHT = 800       #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
-    BONUS_PROBABILITY = 0.01
+    BONUS_PROBABILITY = 0.02
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -33,6 +33,7 @@ class GUI:
         self.allColorIG = []
         self.allCommandIG = []
         self.allNameIG = []
+        self.step = 0
         self.menuStart()
         self.window.mainloop()
     
@@ -62,7 +63,8 @@ class GUI:
                     del snake.events_queue[0]
         if random() < GUI.BONUS_PROBABILITY:
             self.generateBonus()
-        self.snakes[0].move(self.current_loop)
+        self.snakes[0].move(self.step)
+        self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
     
     def keyPressed(self, e):
@@ -113,7 +115,7 @@ class GUI:
                     text='Play!',
                     command=self.playPressed
                 ).pack()
-
+    
     def addPlayer(self):
         #ajouter couleur, contrôle, etc
         self.allColorIG.append(self.snakeColor)

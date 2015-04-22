@@ -14,7 +14,8 @@ class Snake:
                             hole_proba=DEFAULT_CHANCE_HOLE,
                             max_hole_length=DEFAULT_MAX_HOLE_LENGTH,
                             min_hole_length=DEFAULT_MIN_HOLE_LENGTH,
-                            speed=DEFAULT_SPEED, thickness=DEFAULT_THICKNESS):
+                            speed=DEFAULT_SPEED,
+                            thickness=DEFAULT_THICKNESS):
         #list and not tuple because tuples can't be modified
         self.head_coord = [x_head, y_head]
         self.speed = speed
@@ -76,10 +77,6 @@ class Snake:
         #stop moving if snake is dead
         if not self.alive:
             return
-        #step is used to handle collisions
-        if not isinstance(step, int):
-            #if it is under form 'after#<step>', remove 'after#'
-            step = int(step[step.find('#')+1:])
         #find new coordinates
         x, y = self.head_coord
         x += self.speed * cos(self.angle)
