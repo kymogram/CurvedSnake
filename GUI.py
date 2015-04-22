@@ -11,7 +11,9 @@ class GUI:
     DEFAULT_HEIGHT = 800       #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
-    BONUS_PROBABILITY = 0.02
+    BONUS_PROBABILITY = 0.01
+    DEFAULT_NAME = 'GueestMooh'
+    DEFAULT_COLORS = ('Yellow', 'Pink', 'Red', 'Blue', 'Green', 'Orange')
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -89,31 +91,30 @@ class GUI:
     def menuStart(self):
         self.clearWindow()
         Label(self.window, width=100, text='Curved Snake').pack()
-        self.strVar = StringVar()
-        self.name = Entry(self.window, textvariable=self.strVar)
+        self.current_name = StringVar()
+        self.name = Entry(self.window, textvariable=self.current_name)
         self.name.pack()
-        self.strVar.set('GuestMooh')
-        self.buttonLeft = Button(
+        self.current_name.set(GUI.DEFAULT_NAME)
+        self.button_left = Button(
                         self.window,
                         text='Left',
                         bg='white',
                         command=lambda:self.modifBgColor('L')
                     )
-        self.buttonLeft.pack()
-        self.buttonRight = Button(
+        self.button_left.pack()
+        self.button_right = Button(
                         self.window,
                         text='Right',
                         bg='white',
                         command=lambda:self.modifBgColor('R')
                     )
-        self.buttonRight.pack()
+        self.button_right.pack()
         self.color = ttk.Combobox(self.window, exportselection=0)
-        self.color['values'] = ('Yellow', 'Pink', 'Red', 'Blue', 'Green', 'Orange')
+        self.color['values'] = GUI.DEFAULT_COLORS
         self.color.current(0)
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
-        self.newPlayer = Button(self.window, text='Add player', command=self.addPlayer)
-        self.newPlayer.pack()
+        Button(self.window, text='Add player', command=self.addPlayer).pack()
         playButton = Button(
                     self.window,
                     text='Play!',
@@ -123,7 +124,7 @@ class GUI:
     def addPlayer(self):
         #ajouter couleur, contrôle, etc
         self.snakes_colors.append(self.current_color)
-        self.snakes_names.append(self.strVar.get())
+        self.snakes_names.append(self.current_name.get())
         self.commands_list.append((self.move_command_left, self.move_command_right))
         
     def newSelection(self, e):
@@ -140,23 +141,23 @@ class GUI:
         sur une touche pour changer ses préférences de directions
         """
         if side == 'L':
-            self.buttonLeft.configure(bg = "red")
+            self.button_left.configure(bg = "red")
             self.left_key = True
         else:
-            self.buttonRight.configure(bg = "red")
+            self.button_right.configure(bg = "red")
             self.right_key = True
         self.window.bind('<Key>', self.setCommand)
         
     def setCommand(self, e):
         if self.left_key:
             self.move_command_left = e.keysym
-            self.buttonLeft.configure(text=self.move_command_left)
-            self.buttonLeft.configure(bg="white")
+            self.button_left.configure(text=self.move_command_left)
+            self.button_left.configure(bg="white")
             self.left_key = False
         elif self.right_key:
             self.move_command_right = e.keysym
-            self.buttonRight.configure(text=self.move_command_right)
-            self.buttonRight.configure(bg="white")
+            self.button_right.configure(text=self.move_command_right)
+            self.button_right.configure(bg="white")
             self.right_key = False
         self.window.unbind('<Key>')
 
