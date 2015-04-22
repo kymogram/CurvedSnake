@@ -9,7 +9,8 @@ DEFAULT_MAX_HOLE_LENGTH = 20
 DEFAULT_MIN_HOLE_LENGTH = 5
 
 class Snake:
-    def __init__(self, parent, name, x_head, y_head, angle, color='white',
+    def __init__(self, parent, name, x_head, y_head, angle, color,
+                            moveCommandL, moveCommandR,
                             hole_proba=DEFAULT_CHANCE_HOLE,
                             max_hole_length=DEFAULT_MAX_HOLE_LENGTH,
                             min_hole_length=DEFAULT_MIN_HOLE_LENGTH,
@@ -29,9 +30,11 @@ class Snake:
         self.max_hole_length = max_hole_length
         self.min_hole_length = min_hole_length
         r = self.thickness//2
+        self.moveCommandL = moveCommandL
+        self.moveCommandR = moveCommandR
         self.head_id = self.canvas.create_oval(x_head-r, y_head-r, x_head+r, y_head+r,
                                         fill=self.color, outline=self.color,
-                                        tag='snake,{},{}'.format(self.color, -1))
+                                        tag='snake,{},{}'.format(self.name, -1))
         self.events_queue = list()
     
     def isInScreen(self, x, y):
@@ -88,10 +91,16 @@ class Snake:
         if self.hole == 0:
             self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
                                         outline=self.color,
-                                        tag='snake,{},{}'.format(self.color, step))
+                                        tag='snake,{},{}'.format(self.name, step))
             if random() < self.hole_probability:
                 self.hole = randint(self.min_hole_length, self.max_hole_length)
         else:
             self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
+    
+    def getMoveCommandL(self):
+        return self.moveCommandL
+        
+    def getMoveCommandR(self):
+        return self.moveCommandR
     #
