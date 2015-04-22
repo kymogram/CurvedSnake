@@ -1,10 +1,17 @@
-DEFAULT_SPEED = 4
+DEFAULT_SPEED = 3
 DEFAULT_THICKNESS = 6
+DEFAULT_CHANCE_HOLE = 0.02
+DEFAULT_MAX_HOLE_LENGTH = 20
+DEFAULT_MIN_HOLE_LENGTH = 5
 
 from math import cos, sin
+from random import random, randint
 
 class Snake:
     def __init__(self, canvas, x_head, y_head, angle, color='white',
+                            hole_proba=DEFAULT_CHANCE_HOLE,
+                            max_hole_length=DEFAULT_MAX_HOLE_LENGTH,
+                            min_hole_length=DEFAULT_MIN_HOLE_LENGTH,
                             speed=DEFAULT_SPEED, thickness=DEFAULT_THICKNESS):
         #list and not tuple because tuples can't be modified
         self.head_coord = [x_head, y_head]
@@ -14,13 +21,21 @@ class Snake:
         self.thickness = thickness
         self.color = color
         self.alive = True
+        self.hole = 0
+        self.in_hole = False
+        self.hole_probability = hole_proba
+        self.max_hole_length = max_hole_length
+        self.min_hole_length = min_hole_length
+        r = self.thickness//2
+        self.head_id = self.canvas.create_oval(x_head-r, y_head-r, x_head+r, y_head+r,
+                                        fill=self.color, outline=self.color, tag='-1')
     
     def isCollision(self, collisions, step):
         res = False
         if len(collisions) != 0:
             first_elem = int(collisions[0])
             appearance_step = int(self.canvas.gettags(first_elem)[0])
-            if appearance_step < step-self.thickness:
+            if appearance_step != -1 and appearance_step < step-self.thickness:
                 res = True
         return res
     
@@ -55,6 +70,19 @@ class Snake:
         #so step of appearance is written as a tag.
         if self.isCollision(collisions, step) or self.isOutOfScreen(*self.head_coord):
             self.alive = False
-        self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
-                                     outline=self.color, tag=str(step))
+        if self.hole == 0:
+            #if hole is just over, do not forget to move the head
+            #or it will disappear on next hole
+            if self.in_hole:
+                self.in_hole = False
+                self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
+            self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
+                                        outline=self.color, tag=str(step))
+            if random() < self.hole_probability:
+                self.in_hole = True
+                self.hole = randint(self.min_hole_length, self.max_hole_length)
+        else:
+            self.hole -= 1
+            self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
+            
     #
