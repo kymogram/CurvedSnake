@@ -5,10 +5,13 @@ from math import cos, sin, pi
 from Snake import Snake
 
 class GUI:
+    DEFAULT_WIDTH = 480
+    DEFAULT_HEIGHT = 480
+    DEFAULT_SPAWN_OFFSET = 60
     DEFAULT_REFRESH_TIMER = 25
     def __init__(self):
         self.window = Tk()
-        self.window.geometry('480x480')
+        self.window.geometry('{}x{}'.format(GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT))
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         self.current_loop = 0
         self.menuStart()
@@ -24,7 +27,7 @@ class GUI:
             self.snake.angle += 0.15 * {'R': 1, 'L': -1}[touche[0]]
         elif touche.lower() == 'q':
             self.quitCurrentPlay()
-        
+    
     def quitCurrentPlay(self):
         self.window.after_cancel(self.current_loop)
         self.menuStart()
@@ -45,8 +48,10 @@ class GUI:
     def play(self):
         self.canvas = Canvas(self.window, bg='black', highlightthickness=0)
         self.canvas.pack(fill='both', expand=1)
-        self.snake = Snake(self.canvas, randint(0, 480),
-                           randint(0, 480), random()*2*pi)
+        xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
+        xmax, ymax = GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT
+        self.snake = Snake(self.canvas, randint(xmin, xmax-xmin),
+                           randint(ymin, ymax-ymin), random()*2*pi, 'orange')
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)

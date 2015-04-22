@@ -1,4 +1,4 @@
-DEFAULT_SPEED = 2
+DEFAULT_SPEED = 3
 DEFAULT_THICKNESS = 4
 
 from math import cos, sin, pi
@@ -14,6 +14,23 @@ class Snake:
         self.thickness = thickness
         self.color = color
         self.alive = True
+    
+    def isCollision(self, collisions, step):
+        res = False
+        if len(collisions) != 0:
+            first_elem = int(collisions[0])
+            appearance_step = int(self.canvas.gettags(first_elem)[0])
+            if appearance_step < step-self.thickness:
+                res = True
+        return res
+    
+    def isInScreen(self, x, y):
+        self.canvas.update()
+        return 0 <= x < self.canvas.winfo_width() and \
+               0 <= y < self.canvas.winfo_height()
+    
+    def isOutOfScreen(self, x, y):
+        return not self.isInScreen(x, y)
     
     def move(self, step):
         #stop moving if snake is dead
@@ -36,9 +53,8 @@ class Snake:
         #if there is contact, snake is dead
         #WARNING: when the snake moves, it always touches its previous position
         #so step of appearance is written as a tag.
-        if len(collisions) != 0 and int(self.canvas.gettags(int(collisions[0]))[0]) < step-self.thickness:
+        if self.isCollision(collisions, step) or self.isOutOfScreen(*self.head_coord):
             self.alive = False
-        self.canvas.create_rectangle(x-r, y-r, x+r, y+r,
-                                    fill=self.color, outline=self.color,
-                                    tag=str(step))
+        self.canvas.create_rectangle(x-r, y-r, x+r, y+r, fill=self.color,
+                                     outline=self.color, tag=str(step))
     #
