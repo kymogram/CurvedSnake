@@ -77,10 +77,6 @@ class Snake:
         #stop moving if snake is dead
         if not self.alive:
             return
-        #step is used to handle collisions
-        if not isinstance(step, int):
-            #if it is under form 'after#<step>', remove 'after#'
-            step = int(step[step.find('#')+1:])
         #find new coordinates
         x, y = self.head_coord
         x += self.speed * cos(self.angle)
