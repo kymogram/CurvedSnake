@@ -14,7 +14,8 @@ class Snake:
                             hole_proba=DEFAULT_CHANCE_HOLE,
                             max_hole_length=DEFAULT_MAX_HOLE_LENGTH,
                             min_hole_length=DEFAULT_MIN_HOLE_LENGTH,
-                            speed=DEFAULT_SPEED, thickness=DEFAULT_THICKNESS):
+                            speed=DEFAULT_SPEED,
+                            thickness=DEFAULT_THICKNESS):
         #list and not tuple because tuples can't be modified
         self.head_coord = [x_head, y_head]
         self.speed = speed

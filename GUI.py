@@ -11,7 +11,7 @@ class GUI:
     DEFAULT_HEIGHT = 800       #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
-    BONUS_PROBABILITY = 1
+    BONUS_PROBABILITY = 0.02
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -30,6 +30,7 @@ class GUI:
         self.snakeColor = 'Yellow'
         self.moveCommandL = 'Left'
         self.moveCommandR = 'Right'
+        self.step = 0
         self.menuStart()
         self.window.mainloop()
     
@@ -59,7 +60,8 @@ class GUI:
                     del snake.events_queue[0]
         if random() < GUI.BONUS_PROBABILITY:
             self.generateBonus()
-        self.snakes[0].move(self.current_loop)
+        self.snakes[0].move(self.step)
+        self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
     
     def keyPressed(self, e):
@@ -110,11 +112,11 @@ class GUI:
         self.color.pack()
 
     def newselection(self, e):
-        self.snakeColor = self.color.get()
+        self.snakeColor = self.color.get().lower()
         
     def playPressed(self):
         self.clearWindow()
-        self.window.after(1000, self.multifunctions)
+        self.window.after(1000, self.play)
         
     def modifBgColor(self, side):
         """
@@ -142,10 +144,6 @@ class GUI:
             self.buttonRight.configure(bg="white")
             self.Rcommand = False
         self.window.unbind('<Key>')
-        
-    def multifunctions(self):
-        #save |__NOT_YET__|
-        self.play()
 
     def play(self):
         self.canvas = Canvas(self.window, bg='grey', highlightthickness=0)
