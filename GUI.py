@@ -163,9 +163,14 @@ class GUI:
         xmax, ymax = GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT
         self.snakes = list()
         for i in range(len(self.allNameIG)):
-            self.snakes.append(Snake(self, self.allNameIG[i], randint(xmin, xmax-xmin),
-                               randint(ymin, ymax-ymin), random()*2*pi, self.allColorIG[i],
-                               self.allCommandIG[i][0], self.allCommandIG[i][1]))
+            self.snakes.append(Snake(self,
+                                     self.allNameIG[i],
+                                     randint(xmin, xmax-xmin),
+                                     randint(ymin, ymax-ymin),
+                                     random()*2*pi,
+                                     self.allColorIG[i],
+                                     self.allCommandIG[i][0],
+                                     self.allCommandIG[i][1]))
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)

@@ -1,6 +1,7 @@
 # CurvedSnake
 adaptation de CurveFever en Python avec un Canevas Tkinter
-IDEES BONUS
+
+#IDEES BONUS
 
 1. bloque les controles de tout les joueurs(risque de tous les tuer donc un peu cheaté ^^)
 2. change les couleurs de chaque joueurs
