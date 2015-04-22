@@ -12,8 +12,8 @@ class GUI:
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
     BONUS_PROBABILITY = 0.01
-    DEFAULT_NAME = 'GueestMooh'
-    DEFAULT_COLORS = ('Yellow', 'Pink', 'Red', 'Blue', 'Green', 'Orange')
+    DEFAULT_NAME = 'GuestMooh'
+    DEFAULT_COLORS = ('yellow', 'pink', 'red', 'blue', 'green', 'orange')
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -29,7 +29,7 @@ class GUI:
         self.loadBonusImages()
         self.left_key = False
         self.right_key = False
-        self.current_color = 'Yellow'
+        self.current_color = 'yellow'
         self.move_command_left = 'Left'
         self.move_command_right = 'Right'
         self.snakes_colors = []
@@ -91,10 +91,14 @@ class GUI:
     def menuStart(self):
         self.clearWindow()
         Label(self.window, width=100, text='Curved Snake').pack()
+        Label(self.window, width=250, text='New player').pack()
         self.current_name = StringVar()
         self.name = Entry(self.window, textvariable=self.current_name)
         self.name.pack()
         self.current_name.set(GUI.DEFAULT_NAME)
+        Label(self.window, width=250, text='Already played ?').pack()
+        self.player_known = Listbox(self.window, selectmode=SINGLE)
+        self.player_known.pack()
         self.button_left = Button(
                         self.window,
                         text='Left',
@@ -115,7 +119,9 @@ class GUI:
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
+        Label(self.window, width=250, text='Player ready to play').pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
+        self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_ingame.pack()
         Button(self.window, text='Play!', command=self.playPressed).pack()
     
@@ -127,8 +133,21 @@ class GUI:
         self.commands_list.append((self.move_command_left, self.move_command_right))
         
     def newSelection(self, e):
+        if len(self.player_ingame.curselection()) > 0:
+            self.snakes_colors[self.id] = self.color.get().lower()
         self.current_color = self.color.get().lower()
         
+    def showInfoPlayer(self, e):
+        selected = list(map(int, e.widget.curselection()))
+        if selected:
+            self.id = self.snakes_names.index(e.widget.get(selected[0]))
+            self.left_key = True
+            self.button_left.configure(text=self.commands_list[self.id][0])
+            self.right_key = True
+            self.button_right.configure(text=self.commands_list[self.id][1])
+            self.colors_list = list(self.color.cget('values'))
+            self.color.current(self.colors_list.index(self.snakes_colors[self.id]))
+            
     def playPressed(self):
         self.clearWindow()
         self.window.after(1000, self.play)
