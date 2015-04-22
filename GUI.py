@@ -1,17 +1,18 @@
 from tkinter import *
 from random import randint, random
-from math import cos, sin, pi
+from math import pi
 
 from Snake import Snake
 
 class GUI:
-    DEFAULT_WIDTH = 480
-    DEFAULT_HEIGHT = 480
-    DEFAULT_SPAWN_OFFSET = 60
-    DEFAULT_REFRESH_TIMER = 25
+    DEFAULT_WIDTH = 640        #pixels
+    DEFAULT_HEIGHT = 640       #pixels
+    DEFAULT_SPAWN_OFFSET = 60  #pixels
+    DEFAULT_REFRESH_TIMER = 25 #ms
     def __init__(self):
         self.window = Tk()
         self.window.geometry('{}x{}'.format(GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT))
+        self.window.resizable(width=FALSE, height=FALSE)
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         self.current_loop = 0
         self.menuStart()

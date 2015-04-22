@@ -1,7 +1,7 @@
-DEFAULT_SPEED = 3
-DEFAULT_THICKNESS = 4
+DEFAULT_SPEED = 4
+DEFAULT_THICKNESS = 6
 
-from math import cos, sin, pi
+from math import cos, sin
 
 class Snake:
     def __init__(self, canvas, x_head, y_head, angle, color='white',
@@ -55,6 +55,6 @@ class Snake:
         #so step of appearance is written as a tag.
         if self.isCollision(collisions, step) or self.isOutOfScreen(*self.head_coord):
             self.alive = False
-        self.canvas.create_rectangle(x-r, y-r, x+r, y+r, fill=self.color,
+        self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
                                      outline=self.color, tag=str(step))
     #
