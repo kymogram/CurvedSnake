@@ -30,9 +30,8 @@ class Snake:
         self.hole_probability = hole_proba
         self.max_hole_length = max_hole_length
         self.min_hole_length = min_hole_length
+        self.inversed_commands = True
         r = self.thickness//2
-        self.moveCommandL = moveCommandL
-        self.moveCommandR = moveCommandR
         self.head_id = self.canvas.create_oval(x_head-r, y_head-r, x_head+r, y_head+r,
                                         fill=self.color, outline=self.color,
                                         tag='snake,{},{}'.format(self.name, -1))
@@ -97,9 +96,4 @@ class Snake:
             self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
     
-    def getMoveCommandL(self):
-        return self.moveCommandL
-        
-    def getMoveCommandR(self):
-        return self.moveCommandR
     #

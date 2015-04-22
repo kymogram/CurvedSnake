@@ -72,10 +72,12 @@ class GUI:
     def keyPressed(self, e):
         touche = e.keysym
         for i in range(len(self.commands_list)):
-            if touche in (self.commands_list[i][0], self.commands_list[i][1]):
-                if touche == self.commands_list[i][0]:
+            if touche in self.commands_list[i]:
+                if touche == self.commands_list[i][0] and not self.snakes[i].inversed_commands or \
+                   self.snakes[i].inversed_commands and touche == self.commands_list[i][1]:
                     self.snakes[i].angle -= 0.15
-                else:
+                elif touche == self.commands_list[i][1] and not self.snakes[i].inversed_commands or \
+                   self.snakes[i].inversed_commands and touche == self.commands_list[i][0]:
                     self.snakes[i].angle += 0.15
             elif touche.lower() == 'q':
                 self.quitCurrentPlay()
@@ -115,11 +117,7 @@ class GUI:
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
-        playButton = Button(
-                    self.window,
-                    text='Play!',
-                    command=self.playPressed
-                ).pack()
+        Button(self.window, text='Play!', command=self.playPressed).pack()
     
     def addPlayer(self):
         #ajouter couleur, contrôle, etc
