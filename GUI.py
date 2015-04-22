@@ -69,10 +69,14 @@ class GUI:
     
     def keyPressed(self, e):
         touche = e.keysym
-        if touche in ('Right', 'Left'):
-            self.snakes[0].angle += 0.15 * {'R': 1, 'L': -1}[touche[0]]
-        elif touche.lower() == 'q':
-            self.quitCurrentPlay()
+        for i in range(len(self.allCommandIG)):
+            if touche in (self.allCommandIG[i][0], self.allCommandIG[i][1]):
+                if touche == self.allCommandIG[i][0]:
+                    self.snakes[i].angle -= 0.15
+                else:
+                    self.snakes[i].angle += 0.15
+            elif touche.lower() == 'q':
+                self.quitCurrentPlay()
     
     def quitCurrentPlay(self):
         self.window.after_cancel(self.current_loop)
