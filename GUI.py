@@ -25,14 +25,14 @@ class GUI:
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         self.current_loop = 0
         self.loadBonusImages()
-        self.Lcommand = False
-        self.Rcommand = False
-        self.snakeColor = 'Yellow'
-        self.moveCommandL = 'Left'
-        self.moveCommandR = 'Right'
-        self.allColorIG = []
-        self.allCommandIG = []
-        self.allNameIG = []
+        self.left_key = False
+        self.right_key = False
+        self.current_color = 'Yellow'
+        self.move_command_left = 'Left'
+        self.move_command_right = 'Right'
+        self.snakes_colors = []
+        self.commands_list = []
+        self.snakes_names = []
         self.step = 0
         self.menuStart()
         self.window.mainloop()
@@ -69,9 +69,9 @@ class GUI:
     
     def keyPressed(self, e):
         touche = e.keysym
-        for i in range(len(self.allCommandIG)):
-            if touche in (self.allCommandIG[i][0], self.allCommandIG[i][1]):
-                if touche == self.allCommandIG[i][0]:
+        for i in range(len(self.commands_list)):
+            if touche in (self.commands_list[i][0], self.commands_list[i][1]):
+                if touche == self.commands_list[i][0]:
                     self.snakes[i].angle -= 0.15
                 else:
                     self.snakes[i].angle += 0.15
@@ -122,12 +122,12 @@ class GUI:
     
     def addPlayer(self):
         #ajouter couleur, contrôle, etc
-        self.allColorIG.append(self.snakeColor)
-        self.allNameIG.append(self.strVar.get())
-        self.allCommandIG.append((self.moveCommandL, self.moveCommandR))
+        self.snakes_colors.append(self.current_color)
+        self.snakes_names.append(self.strVar.get())
+        self.commands_list.append((self.move_command_left, self.move_command_right))
         
     def newSelection(self, e):
-        self.snakeColor = self.color.get().lower()
+        self.current_color = self.color.get().lower()
         
     def playPressed(self):
         self.clearWindow()
@@ -141,23 +141,23 @@ class GUI:
         """
         if side == 'L':
             self.buttonLeft.configure(bg = "red")
-            self.Lcommand = True
+            self.left_key = True
         else:
             self.buttonRight.configure(bg = "red")
-            self.Rcommand = True
+            self.right_key = True
         self.window.bind('<Key>', self.setCommand)
         
     def setCommand(self, e):
-        if self.Lcommand:
-            self.moveCommandL = e.keysym
-            self.buttonLeft.configure(text=self.moveCommandL)
+        if self.left_key:
+            self.move_command_left = e.keysym
+            self.buttonLeft.configure(text=self.move_command_left)
             self.buttonLeft.configure(bg="white")
-            self.Lcommand = False
-        elif self.Rcommand:
-            self.moveCommandR = e.keysym
-            self.buttonRight.configure(text=self.moveCommandR)
+            self.left_key = False
+        elif self.right_key:
+            self.move_command_right = e.keysym
+            self.buttonRight.configure(text=self.move_command_right)
             self.buttonRight.configure(bg="white")
-            self.Rcommand = False
+            self.right_key = False
         self.window.unbind('<Key>')
 
     def play(self):
@@ -166,15 +166,15 @@ class GUI:
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT
         self.snakes = list()
-        for i in range(len(self.allNameIG)):
+        for i in range(len(self.snakes_names)):
             self.snakes.append(Snake(self,
-                                     self.allNameIG[i],
+                                     self.snakes_names[i],
                                      randint(xmin, xmax-xmin),
                                      randint(ymin, ymax-ymin),
                                      random()*2*pi,
-                                     self.allColorIG[i],
-                                     self.allCommandIG[i][0],
-                                     self.allCommandIG[i][1]))
+                                     self.snakes_colors[i],
+                                     self.commands_list[i][0],
+                                     self.commands_list[i][1]))
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
