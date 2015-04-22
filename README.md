@@ -11,3 +11,6 @@ adaptation de CurveFever en Python avec un Canevas Tkinter
 6. mode yolo : images d'arc-en-ciel, musique psychédélique avec extrait de charlie the unicorn :P
 7. la carte grandis.
 
+#TODO
+
+Refaire les graphismes des bonus
