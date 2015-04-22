@@ -114,6 +114,8 @@ class GUI:
         self.color.pack()
         self.newPlayer = Button(self.window, text='Add player', command=self.addPlayer)
         self.newPlayer.pack()
+        self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
+        self.player_ingame.pack()
         playButton = Button(
                     self.window,
                     text='Play!',
@@ -124,6 +126,7 @@ class GUI:
         #ajouter couleur, contrôle, etc
         self.snakes_colors.append(self.current_color)
         self.snakes_names.append(self.strVar.get())
+        self.player_ingame.insert(END, self.strVar.get())
         self.commands_list.append((self.move_command_left, self.move_command_right))
         
     def newSelection(self, e):
