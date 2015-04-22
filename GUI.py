@@ -27,6 +27,9 @@ class GUI:
         self.loadBonusImages()
         self.Lcommand = False
         self.Rcommand = False
+        self.snakeColor = 'Yellow'
+        self.moveCommandL = 'Left'
+        self.moveCommandR = 'Right'
         self.menuStart()
         self.window.mainloop()
     
@@ -111,7 +114,7 @@ class GUI:
         
     def playPressed(self):
         self.clearWindow()
-        self.window.after(1000, self.play)
+        self.window.after(1000, self.multifunctions)
         
     def modifBgColor(self, side):
         """
@@ -141,10 +144,8 @@ class GUI:
         self.window.unbind('<Key>')
         
     def multifunctions(self):
-        #setSettings ou alors appel directement la classe Snake ?
-        setSettings(self.moveCommandL, self.moveCommandR, self.color, self.strVar)
         #save |__NOT_YET__|
-        play()
+        self.play()
 
     def play(self):
         self.canvas = Canvas(self.window, bg='grey', highlightthickness=0)
@@ -152,8 +153,9 @@ class GUI:
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT
         self.snakes = list()
-        self.snakes.append(Snake(self, 0, randint(xmin, xmax-xmin),
-                           randint(ymin, ymax-ymin), random()*2*pi, 'orange'))
+        self.snakes.append(Snake(self, self.strVar.get(), randint(xmin, xmax-xmin),
+                           randint(ymin, ymax-ymin), random()*2*pi, self.snakeColor,
+                           self.moveCommandL, self.moveCommandR))
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
