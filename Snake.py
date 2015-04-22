@@ -31,7 +31,7 @@ class Snake:
         r = self.thickness//2
         self.head_id = self.canvas.create_oval(x_head-r, y_head-r, x_head+r, y_head+r,
                                         fill=self.color, outline=self.color,
-                                        tag='snake,{},{}'.format(self.color, -1))
+                                        tag='snake,{},{}'.format(self.name, -1))
         self.events_queue = list()
     
     def isInScreen(self, x, y):
@@ -45,7 +45,9 @@ class Snake:
         if len(tags) != 0:
             info = tags[0].split(',')
             if info[0] == 'snake':
-                self.alive = int(info[2]) >= step-self.thickness*2
+                self.alive = int(info[2]) >= step-self.thickness*3
+                if not self.alive:
+                    print('dead')
             elif info[0] == 'bonus':
                 self.canvas.delete(first_elem)
                 self.parent.handleBonus(self.name, info[1])
@@ -88,7 +90,7 @@ class Snake:
         if self.hole == 0:
             self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
                                         outline=self.color,
-                                        tag='snake,{},{}'.format(self.color, step))
+                                        tag='snake,{},{}'.format(self.name, step))
             if random() < self.hole_probability:
                 self.hole = randint(self.min_hole_length, self.max_hole_length)
         else:

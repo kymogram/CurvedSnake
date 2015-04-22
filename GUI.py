@@ -11,7 +11,7 @@ class GUI:
     DEFAULT_HEIGHT = 800       #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
-    BONUS_PROBABILITY = 0.02
+    BONUS_PROBABILITY = 1
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -174,12 +174,14 @@ class GUI:
                 snake.speed += 1
                 snake.events_queue.append(['snake.speed -= 1', GUI.BONUS_TIME])
         elif bonus_type == 'self_speeddown':
-            sender.speed -= 1
-            sender.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
+            if sender.speed > 1:
+                sender.speed -= 1
+                sender.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
         elif bonus_type == 'all_speeddown':
             for snake in others:
-                snake.speed -= 1
-                snake.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
+                if snake.speed > 1:
+                    snake.speed -= 1
+                    snake.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
 
 if __name__ == '__main__':
     GUI()
