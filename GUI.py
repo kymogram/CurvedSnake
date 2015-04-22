@@ -1,6 +1,7 @@
 from tkinter import *
 from random import randint, random, choice
 from math import pi
+import tkinter.ttk as ttk
 
 from Snake import Snake
 from Bonus import Bonus
@@ -24,6 +25,8 @@ class GUI:
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         self.current_loop = 0
         self.loadBonusImages()
+        self.Lcommand = False
+        self.Rcommand = False
         self.menuStart()
         self.window.mainloop()
     
@@ -74,12 +77,75 @@ class GUI:
     def menuStart(self):
         self.clearWindow()
         Label(self.window, width=100, text='Curved Snake').pack()
-        playButton = Button(self.window, text='Play!', command=self.playPressed).pack()
-    
+        self.strVar = StringVar()
+        self.name = Entry(self.window, textvariable=self.strVar)
+        self.name.pack()
+        self.strVar.set('GuestMooh')
+        self.buttonLeft = Button(
+                        self.window,
+                        text='Left',
+                        bg='white',
+                        command=lambda:self.modifBgColor('L')
+                    )
+        self.buttonLeft.pack()
+        self.buttonRight = Button(
+                        self.window,
+                        text='Right',
+                        bg='white',
+                        command=lambda:self.modifBgColor('R')
+                    )
+        self.buttonRight.pack()
+        playButton = Button(
+                    self.window,
+                    text='Play!',
+                    command=self.playPressed
+                ).pack()
+        self.color = ttk.Combobox(self.window, exportselection=0)
+        self.color['values'] = ('Yellow', 'Pink', 'Red', 'Blue', 'Green', 'Orange')
+        self.color.current(0)
+        self.color.bind('<<ComboboxSelected>>', self.newselection)
+        self.color.pack()
+
+    def newselection(self, e):
+        self.snakeColor = self.color.get()
+        
     def playPressed(self):
         self.clearWindow()
         self.window.after(1000, self.play)
-    
+        
+    def modifBgColor(self, side):
+        """
+        Change la couleur de fond du boutton lorsque l'on clique dessus,
+        ansi l'utilisateur sait qu'il a cliqué dessus et peut appuyer
+        sur une touche pour changer ses préférences de directions
+        """
+        if side == 'L':
+            self.buttonLeft.configure(bg = "red")
+            self.Lcommand = True
+        else:
+            self.buttonRight.configure(bg = "red")
+            self.Rcommand = True
+        self.window.bind('<Key>', self.setCommand)
+        
+    def setCommand(self, e):
+        if self.Lcommand:
+            self.moveCommandL = e.keysym
+            self.buttonLeft.configure(text=self.moveCommandL)
+            self.buttonLeft.configure(bg="white")
+            self.Lcommand = False
+        elif self.Rcommand:
+            self.moveCommandR = e.keysym
+            self.buttonRight.configure(text=self.moveCommandR)
+            self.buttonRight.configure(bg="white")
+            self.Rcommand = False
+        self.window.unbind('<Key>')
+        
+    def multifunctions(self):
+        #setSettings ou alors appel directement la classe Snake ?
+        setSettings(self.moveCommandL, self.moveCommandR, self.color, self.strVar)
+        #save |__NOT_YET__|
+        play()
+
     def play(self):
         self.canvas = Canvas(self.window, bg='grey', highlightthickness=0)
         self.canvas.pack(fill='both', expand=1)
