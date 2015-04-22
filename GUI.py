@@ -12,9 +12,11 @@ class GUI:
     DEFAULT_REFRESH_TIMER = 15 #ms
     BONUS_PROBABILITY = 0.02
     
+    BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
     BONUS_DIRECTORY = './sprites/'
-    BONUS_FILES = ['speedup.gif']
+    BONUS_FILES = ['self_speedup.gif', 'all_speedup.gif',
+                   'self_speeddown.gif', 'all_speeddown.gif']
     def __init__(self):
         self.window = Tk()
         self.window.geometry('{}x{}'.format(GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT))
@@ -35,13 +37,20 @@ class GUI:
         xmax, ymax = GUI.DEFAULT_WIDTH-xmin, GUI.DEFAULT_HEIGHT-ymin
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
         bonus = choice(self.bonus_list)
-        tmp = self.canvas.create_image(x, y, image=bonus.image)
-        self.bonus.append(tmp)
+        self.canvas.create_image(x, y, image=bonus.image,
+                                 tags='bonus,{}'.format(bonus.name))
     
     def findRandomFreePosition(self, xmin, xmax, ymin, ymax):
         return randint(xmin, xmax), randint(ymin, ymax) 
     
     def refresh(self):
+        for snake in self.snakes:
+            if len(snake.events_queue) != 0:
+                for event in snake.events_queue:
+                    event[1] -= 1
+                if snake.events_queue[0][1] == 0:
+                    exec(snake.events_queue[0][0])
+                    del snake.events_queue[0]
         if random() < GUI.BONUS_PROBABILITY:
             self.generateBonus()
         self.snakes[0].move(self.current_loop)
@@ -76,13 +85,35 @@ class GUI:
         self.canvas.pack(fill='both', expand=1)
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT
-        self.bonus = list()
         self.snakes = list()
-        self.snakes.append(Snake(self.canvas, randint(xmin, xmax-xmin),
+        self.snakes.append(Snake(self, 0, randint(xmin, xmax-xmin),
                            randint(ymin, ymax-ymin), random()*2*pi, 'orange'))
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
+    
+    def handleBonus(self, sender_name, bonus_type):
+        sender = None
+        others = list()
+        for snake in self.snakes:
+            if snake.name == sender_name:
+                sender = snake
+            else:
+                others.append(snake)
+        if bonus_type == 'self_speedup':
+            sender.speed += 1
+            sender.events_queue.append(['snake.speed -= 1', GUI.BONUS_TIME])
+        elif bonus_type == 'all_speedup':
+            for snake in others:
+                snake.speed += 1
+                snake.events_queue.append(['snake.speed -= 1', GUI.BONUS_TIME])
+        elif bonus_type == 'self_speeddown':
+            sender.speed -= 1
+            sender.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
+        elif bonus_type == 'all_speeddown':
+            for snake in others:
+                snake.speed -= 1
+                snake.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
 
 if __name__ == '__main__':
     GUI()
