@@ -25,6 +25,7 @@ class GUI:
         self.window = Tk()
         self.window.geometry('{}x{}'.format(GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT))
         self.window.resizable(width=FALSE, height=FALSE)
+        self.window.wm_title('Curved Snake')
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         self.current_loop = 0
         self.loadBonusImages()
@@ -102,19 +103,11 @@ class GUI:
         Label(self.window, width=250, text='Already played ?').pack()
         self.player_known = Listbox(self.window, selectmode=SINGLE)
         self.player_known.pack()
-        self.button_left = Button(
-                        self.window,
-                        text='Left',
-                        bg='white',
-                        command=lambda:self.modifBgColor('L')
-                    )
+        self.button_left = Button(self.window, text='Left', bg='white',
+                                  command=lambda:self.modifBgColor('L'))
         self.button_left.pack()
-        self.button_right = Button(
-                        self.window,
-                        text='Right',
-                        bg='white',
-                        command=lambda:self.modifBgColor('R')
-                    )
+        self.button_right = Button(self.window, text='Right', bg='white',
+                                   command=lambda:self.modifBgColor('R'))
         self.button_right.pack()
         self.color = ttk.Combobox(self.window, exportselection=0)
         self.color['values'] = GUI.DEFAULT_COLORS
@@ -195,9 +188,7 @@ class GUI:
                                      randint(xmin, xmax-xmin),
                                      randint(ymin, ymax-ymin),
                                      random()*2*pi,
-                                     self.snakes_colors[i],
-                                     self.commands_list[i][0],
-                                     self.commands_list[i][1]))
+                                     self.snakes_colors[i]))
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)

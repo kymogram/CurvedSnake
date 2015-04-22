@@ -11,7 +11,6 @@ DEFAULT_MIN_HOLE_LENGTH = 5
 class Snake:
     DEFAULT_ROTATION_ANGLE = 0.15 #rad
     def __init__(self, parent, name, x_head, y_head, angle, color,
-                            moveCommandL, moveCommandR,
                             hole_proba=DEFAULT_CHANCE_HOLE,
                             max_hole_length=DEFAULT_MAX_HOLE_LENGTH,
                             min_hole_length=DEFAULT_MIN_HOLE_LENGTH,
