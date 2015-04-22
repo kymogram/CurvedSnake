@@ -118,12 +118,15 @@ class GUI:
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
+        self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
+        self.player_ingame.pack()
         Button(self.window, text='Play!', command=self.playPressed).pack()
     
     def addPlayer(self):
         #ajouter couleur, contrôle, etc
         self.snakes_colors.append(self.current_color)
         self.snakes_names.append(self.current_name.get())
+        self.player_ingame.insert(END, self.current_name.get())
         self.commands_list.append((self.move_command_left, self.move_command_right))
         
     def newSelection(self, e):
@@ -139,6 +142,7 @@ class GUI:
         ansi l'utilisateur sait qu'il a cliqué dessus et peut appuyer
         sur une touche pour changer ses préférences de directions
         """
+        self.window.focus()
         if side == 'L':
             self.button_left.configure(bg = "red")
             self.left_key = True
