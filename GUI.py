@@ -37,6 +37,9 @@ class GUI:
         self.snakes_colors = []
         self.commands_list = []
         self.snakes_names = []
+        self.regular_player = []
+        self.regular_colors = []
+        self.regular_commands = []
         self.step = 0
         self.menuStart()
         self.window.mainloop()
@@ -87,6 +90,9 @@ class GUI:
     def quitCurrentPlay(self):
         self.window.after_cancel(self.current_loop)
         self.menuStart()
+        self.snakes_colors = []
+        self.commands_list = []
+        self.snakes_names = []
     
     def clearWindow(self):
         for child in self.window.winfo_children():
@@ -102,6 +108,8 @@ class GUI:
         self.current_name.set(GUI.DEFAULT_NAME)
         Label(self.window, width=250, text='Already played ?').pack()
         self.player_known = Listbox(self.window, selectmode=SINGLE)
+        self.player_known.insert(END, *self.snakes_names)
+        self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
         self.button_left = Button(self.window, text='Left', bg='white',
                                   command=lambda:self.modifBgColor('L'))
@@ -109,7 +117,7 @@ class GUI:
         self.button_right = Button(self.window, text='Right', bg='white',
                                    command=lambda:self.modifBgColor('R'))
         self.button_right.pack()
-        self.color = ttk.Combobox(self.window, exportselection=0)
+        self.color = ttk.Combobox(self.window, state='readonly')
         self.color['values'] = GUI.DEFAULT_COLORS
         self.color.current(0)
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
@@ -120,23 +128,37 @@ class GUI:
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_ingame.pack()
         Button(self.window, text='Play!', command=self.playPressed).pack()
-    
+        
     def addPlayer(self):
         #ajouter couleur, contrôle, etc
+        if len(self.player_known.curselection()) > 0:
+            self.snakes_names.append(self.regular_player[self.id])
+            self.player_ingame.insert(END, self.regular_player[self.id])
+            
+        else:
+            self.snakes_names.append(self.current_name.get())
+            self.player_ingame.insert(END, self.current_name.get())
         self.snakes_colors.append(self.current_color)
-        self.snakes_names.append(self.current_name.get())
-        self.player_ingame.insert(END, self.current_name.get())
-        self.commands_list.append((self.move_command_left, self.move_command_right))
+        self.commands_list.append([self.move_command_left, self.move_command_right])
         
     def newSelection(self, e):
-        if len(self.player_ingame.curselection()) > 0:
+        if len(self.player_ingame.curselection()) > 0 or len(self.player_known.curselection()) > 0:
             self.snakes_colors[self.id] = self.color.get().lower()
         self.current_color = self.color.get().lower()
+        self.color.selection_clear()
+        
+    def setCurrentSelection(self, e):
+        if len(self.player_known.curselection()) > 0:
+            self.regular_list = 'regular_player'
+        showInfoPlayer(e)
         
     def showInfoPlayer(self, e):
         selected = list(map(int, e.widget.curselection()))
         if selected:
-            self.id = self.snakes_names.index(e.widget.get(selected[0]))
+            if self.regular_list:
+                self.id = self.regular_list.index(e.widget.get(selected[0]))
+            else:
+                self.id = self.snakes_names.index(e.widget.get(selected[0]))
             self.left_key = True
             self.button_left.configure(text=self.commands_list[self.id][0])
             self.right_key = True
@@ -146,6 +168,11 @@ class GUI:
             
     def playPressed(self):
         self.clearWindow()
+        for i in range(len(self.snakes_names)):
+            if self.snakes_names[i] not in self.regular_player:
+                self.regular_player.append(self.snakes_names[i])
+                self.regular_colors.append(self.snakes_colors[i])
+                self.regular_commands.append(self.commands_list[i])
         self.window.after(1000, self.play)
         
     def modifBgColor(self, side):
@@ -165,11 +192,15 @@ class GUI:
         
     def setCommand(self, e):
         if self.left_key:
+            if len(self.player_ingame.curselection()) > 0 or len(self.player_known.curselection()) > 0:
+                self.commands_list[self.id][0] = e.keysym
             self.move_command_left = e.keysym
             self.button_left.configure(text=self.move_command_left)
             self.button_left.configure(bg="white")
             self.left_key = False
         elif self.right_key:
+            if len(self.player_ingame.curselection()) > 0:
+                self.commands_list[self.id][1] = e.keysym
             self.move_command_right = e.keysym
             self.button_right.configure(text=self.move_command_right)
             self.button_right.configure(bg="white")
