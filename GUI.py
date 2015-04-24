@@ -125,6 +125,7 @@ class GUI:
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
+        Button(self.window, text='Remove player', command=self.removePlayer).pack()
         Label(self.window, width=250, text='Player ready to play').pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
@@ -132,7 +133,17 @@ class GUI:
         Button(self.window, text='Play!', command=self.playPressed).pack()
         
     def removePlayer(self):
-        pass
+        if len(self.player_ingame.curselection()) > 0:
+            self.player_ingame.delete(self.selected[0])
+            print(self.selected)
+            try:
+                del self.snakes_names[self.selected[0]]
+                del self.snakes_colors[self.selected[0]]
+                del self.commands_list[self.selected[0]]
+            except:
+                showwarning('No one to remove', 'You have no one to remove')
+        else:
+            showwarning('No one chosen', 'Choose a player to remove')
         
     def addPlayer(self):
         if len(self.player_known.curselection()) > 0:
@@ -141,7 +152,6 @@ class GUI:
                 self.commands_list.append(self.regular_commands[self.id])
                 self.snakes_names.append(self.regular_player[self.id])
                 self.player_ingame.insert(END, self.regular_player[self.id])
-                Button(self.window, text='x', command=self.removePlayer).pack()
             else:
                 showwarning('Added player', 'This player is already going to play!')
         else:
@@ -150,7 +160,6 @@ class GUI:
                 self.player_ingame.insert(END, self.current_name.get())
                 self.snakes_colors.append(self.current_color)
                 self.commands_list.append([self.move_command_left, self.move_command_right])
-                Button(self.window, text='x', command=self.removePlayer).pack()
             else:
                 showwarning('Added player', 'This player is already going to play!')
         
@@ -167,16 +176,16 @@ class GUI:
             self.regular_list = 'regular_player'
         elif len(self.player_ingame.curselection()) > 0:
             self.regular_list = None
-        selected = list(map(int, e.widget.curselection()))
-        if selected:
+        self.selected = list(map(int, e.widget.curselection()))
+        if self.selected:
             self.colors_list = list(self.color.cget('values'))
             if self.regular_list:
-                self.id = self.regular_player.index(e.widget.get(selected[0]))
+                self.id = self.regular_player.index(e.widget.get(self.selected[0]))
                 self.button_left.configure(text=self.regular_commands[self.id][0])
                 self.button_right.configure(text=self.regular_commands[self.id][1])
                 self.color.current(self.colors_list.index(self.regular_colors[self.id]))
             else:
-                self.id = self.snakes_names.index(e.widget.get(selected[0]))
+                self.id = self.snakes_names.index(e.widget.get(self.selected[0]))
                 self.button_left.configure(text=self.commands_list[self.id][0])
                 self.button_right.configure(text=self.commands_list[self.id][1])
                 self.color.current(self.colors_list.index(self.snakes_colors[self.id]))
