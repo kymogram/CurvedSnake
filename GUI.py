@@ -15,6 +15,7 @@ class GUI:
     BONUS_PROBABILITY = 0.01
     DEFAULT_NAME = 'GuestMooh'
     DEFAULT_COLORS = ('yellow', 'pink', 'red', 'blue', 'green', 'orange')
+    DEFAULT_COMMANDS = (('Left', 'Right'), ('s', 'd'), ('o', 'p'), ('b', 'n'), ('1', '2'), ('asterisk', 'minus'))
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -33,15 +34,14 @@ class GUI:
         self.left_key = False
         self.right_key = False
         self.regular_list = None
-        self.current_color = 'yellow'
-        self.move_command_left = 'Left'
-        self.move_command_right = 'Right'
         self.snakes_colors = []
         self.commands_list = []
         self.snakes_names = []
         self.regular_player = []
         self.regular_colors = []
         self.regular_commands = []
+        self.random_colors_used = []
+        self.random_commands_used = []
         self.step = 0
         self.menuStart()
         self.window.mainloop()
@@ -91,10 +91,12 @@ class GUI:
     
     def quitCurrentPlay(self):
         self.window.after_cancel(self.current_loop)
+        self.random_colors_used = []
+        self.snakes_names = []
+        self.random_commands_used = []
         self.menuStart()
         self.snakes_colors = []
         self.commands_list = []
-        self.snakes_names = []
     
     def clearWindow(self):
         for child in self.window.winfo_children():
@@ -106,22 +108,25 @@ class GUI:
         Label(self.window, width=250, text='New player').pack()
         self.current_name = StringVar()
         self.name = Entry(self.window, textvariable=self.current_name)
+        self.name.bind('<Button-1>', self.removeFocus)
         self.name.pack()
-        self.current_name.set(GUI.DEFAULT_NAME)
+        self.selectRandomName()
         Label(self.window, width=250, text='Already played ?').pack()
         self.player_known = Listbox(self.window, selectmode=SINGLE)
-        self.player_known.insert(END, *self.snakes_names)
+        self.player_known.insert(END, *self.regular_player)
+        #self.player_known.insert(END, *self.snakes_names)
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
-        self.button_left = Button(self.window, text='Left', bg='white',
+        self.button_left = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][0], bg='white',
                                   command=lambda:self.modifBgColor('L'))
         self.button_left.pack()
-        self.button_right = Button(self.window, text='Right', bg='white',
+        self.button_right = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][1], bg='white',
                                    command=lambda:self.modifBgColor('R'))
         self.button_right.pack()
+        self.selectRandomCommands()
         self.color = ttk.Combobox(self.window, state='readonly', exportselection=0)
         self.color['values'] = GUI.DEFAULT_COLORS
-        self.color.current(0)
+        self.selectRandomColor()
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
@@ -131,11 +136,52 @@ class GUI:
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_ingame.pack()
         Button(self.window, text='Play!', command=self.playPressed).pack()
+    
+    def selectRandomColor(self):
+        if len(self.random_colors_used) != len(GUI.DEFAULT_COLORS):
+            self.color.current(randint(0,len(GUI.DEFAULT_COLORS)-1))
+            while self.color.get() in self.random_colors_used:
+                self.color.current(randint(0,len(GUI.DEFAULT_COLORS)-1))
+            self.current_color = self.color.get()
+            self.color.set(self.current_color)
+            
+            
+    def selectRandomCommands(self):
+        if len(self.random_commands_used) == 0:
+            random_left_button = GUI.DEFAULT_COMMANDS[0][0]
+            random_right_button = GUI.DEFAULT_COMMANDS[0][1]
+            self.button_left.configure(text=random_left_button)
+            self.move_command_left = random_left_button
+            self.button_right.configure(text=random_right_button)
+            self.move_command_right = random_right_button
+        else:
+            if len(self.random_commands_used) != len(GUI.DEFAULT_COMMANDS):
+                idx = randint(0,len(GUI.DEFAULT_COMMANDS)-1)
+                random_left_button = GUI.DEFAULT_COMMANDS[idx][0]
+                random_right_button = GUI.DEFAULT_COMMANDS[idx][1]
+                while [random_left_button, random_right_button] in self.random_commands_used:
+                    idx = randint(0,len(GUI.DEFAULT_COMMANDS)-1)
+                    random_left_button = GUI.DEFAULT_COMMANDS[idx][0]
+                    random_right_button = GUI.DEFAULT_COMMANDS[idx][1]
+                self.button_left.configure(text=random_left_button)
+                self.move_command_left = random_left_button
+                self.button_right.configure(text=random_right_button)
+                self.move_command_right = random_right_button
+                
+    def selectRandomName(self):
+        if len(self.snakes_names) == 0:
+            self.current_name.set(GUI.DEFAULT_NAME)
+        else:
+            nb_guest = randint(0, 666)
+            self.current_name.set(str(GUI.DEFAULT_NAME) + '_' + str(nb_guest))
+        
+    def removeFocus(self, e):
+        self.player_ingame.selection_clear(0,END)
+        self.player_known.selection_clear(0,END)
         
     def removePlayer(self):
         if len(self.player_ingame.curselection()) > 0:
             self.player_ingame.delete(self.selected[0])
-            print(self.selected)
             try:
                 del self.snakes_names[self.selected[0]]
                 del self.snakes_colors[self.selected[0]]
@@ -147,19 +193,44 @@ class GUI:
         
     def addPlayer(self):
         if len(self.player_known.curselection()) > 0:
-            if self.regular_player[self.id] not in snakes_names:
-                self.snakes_colors.append(self.regular_colors[self.id])
-                self.commands_list.append(self.regular_commands[self.id])
-                self.snakes_names.append(self.regular_player[self.id])
-                self.player_ingame.insert(END, self.regular_player[self.id])
+            if self.regular_player[self.id] not in self.snakes_names:
+                if self.regular_colors[self.id] not in self.snakes_colors:
+                    if [self.move_command_left, self.move_command_right] not in self.commands_list:
+                        self.snakes_colors.append(self.regular_colors[self.id])
+                        self.commands_list.append(self.regular_commands[self.id])
+                        self.snakes_names.append(self.regular_player[self.id])
+                        self.player_ingame.insert(END, self.regular_player[self.id])
+                        self.random_colors_used.append(self.regular_colors[self.id])
+                        self.random_commands_used.append(self.regular_commands[self.id])
+                    else:
+                        showwarning('Commands', 'Another player has already those commands')
+                else:
+                    showwarning('Color', 'The color chosen is already taken')
             else:
                 showwarning('Added player', 'This player is already going to play!')
         else:
             if self.current_name.get() not in self.snakes_names:
-                self.snakes_names.append(self.current_name.get())
-                self.player_ingame.insert(END, self.current_name.get())
-                self.snakes_colors.append(self.current_color)
-                self.commands_list.append([self.move_command_left, self.move_command_right])
+                if len(self.current_name.get()) <= 16:
+                    if self.current_name.get() not in self.regular_player:
+                        if self.current_color not in self.snakes_colors:
+                            if [self.move_command_left, self.move_command_right] not in self.commands_list: 
+                                self.snakes_names.append(self.current_name.get())
+                                self.player_ingame.insert(END, self.current_name.get())
+                                self.snakes_colors.append(self.current_color)
+                                self.commands_list.append([self.move_command_left, self.move_command_right])
+                                self.random_colors_used.append(self.current_color)
+                                self.random_commands_used.append([self.move_command_left, self.move_command_right])
+                                self.selectRandomCommands()
+                                self.selectRandomColor()
+                                self.selectRandomName()
+                            else:
+                                showwarning('Commands', 'Another player has already those commands')
+                        else:
+                            showwarning('Color', 'The color chosen is already taken')
+                    else:
+                        showwarning('Name player', 'This name is already taken')
+                else:
+                    showwarning('Name player', 'Your name is too long. Pick a new one')
             else:
                 showwarning('Added player', 'This player is already going to play!')
         
