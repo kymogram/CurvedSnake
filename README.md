@@ -13,4 +13,4 @@ adaptation de CurveFever en Python avec tkinter
 
 #TODO
 
-Refaire les graphismes des bonus
+None

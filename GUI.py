@@ -4,7 +4,7 @@ from random import randint, random, choice
 from math import pi
 from tkinter.ttk import Combobox
 
-from Snake import Snake
+from Snake import *
 from Bonus import Bonus
 
 class GUI:
@@ -27,7 +27,8 @@ class GUI:
     BONUS_DIRECTORY = './sprites/'
     BONUS_FILES = ['self_speedup.gif', 'all_speedup.gif',
                    'self_speeddown.gif', 'all_speeddown.gif',
-                   'reversed_commands.gif', 'right_angles.gif']
+                   'reversed_commands.gif', 'right_angles.gif',
+                   'thickness_up.gif']
     def __init__(self):
         #window
         self.window = Tk()
@@ -355,6 +356,10 @@ class GUI:
                 snake.previous_angles.append(snake.rotating_angle)
                 snake.rotating_angle = pi/2
                 snake.events_queue.append(['snake.rotating_angle = snake.previous_angles.pop(0)', GUI.BONUS_TIME])
+        elif bonus_type == 'thickness_up':
+            for snake in others:
+                snake.thickness += DEFAULT_THICKNESS
+                snake.events_queue.append(['snake.thickness -= DEFAULT_THICKNESS', GUI.BONUS_TIME])
 
 if __name__ == '__main__':
     GUI()
