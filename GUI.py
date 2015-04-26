@@ -14,8 +14,13 @@ class GUI:
     DEFAULT_REFRESH_TIMER = 15 #ms
     BONUS_PROBABILITY = 0.01
     DEFAULT_NAME = 'GuestMooh'
-    DEFAULT_COLORS = ('yellow', 'pink', 'red', 'blue', 'green', 'orange')
-    DEFAULT_COMMANDS = (('Left', 'Right'), ('s', 'd'), ('o', 'p'), ('b', 'n'), ('1', '2'), ('asterisk', 'minus'))
+    DEFAULT_COLORS = ['yellow', 'pink', 'red', 'blue', 'green', 'orange']
+    DEFAULT_COMMANDS = [('Left', 'Right'),
+                        ('s', 'd'),
+                        ('o', 'p'),
+                        ('b', 'n'),
+                        ('1', '2'),
+                        ('asterisk', 'minus')]
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -24,16 +29,13 @@ class GUI:
                    'self_speeddown.gif', 'all_speeddown.gif',
                    'reversed_commands.gif', 'right_angles.gif']
     def __init__(self):
+        #window
         self.window = Tk()
         self.window.geometry('{}x{}'.format(GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT))
         self.window.resizable(width=FALSE, height=FALSE)
         self.window.wm_title('Curved Snake')
         self.timer = GUI.DEFAULT_REFRESH_TIMER
-        self.current_loop = 0
-        self.loadBonusImages()
-        self.left_key = False
-        self.right_key = False
-        self.regular_list = None
+        #GUI variables
         self.snakes_colors = []
         self.commands_list = []
         self.snakes_names = []
@@ -42,7 +44,13 @@ class GUI:
         self.regular_commands = []
         self.random_colors_used = []
         self.random_commands_used = []
+        self.left_key = self.right_key = False
+        self.is_regular_list = False
+        #other variables
+        self.current_loop = 0
         self.step = 0
+        #init
+        self.loadBonusImages()
         self.menuStart()
         self.window.mainloop()
     
@@ -80,13 +88,15 @@ class GUI:
         touche = e.keysym
         if touche.lower() == 'q':
             self.quitCurrentPlay()
+        #move the correct player(s) when key is pressed
         for i in range(len(self.commands_list)):
             if touche in self.commands_list[i]:
-                if touche == self.commands_list[i][0] and not self.snakes[i].inversed_commands or \
-                   self.snakes[i].inversed_commands and touche == self.commands_list[i][1]:
+                inversed = self.snakes[i].inversed_commands
+                if   (touche == self.commands_list[i][0] and not inversed) or \
+                     (inversed and touche == self.commands_list[i][1]):
                     self.snakes[i].angle -= self.snakes[i].rotating_angle
-                elif touche == self.commands_list[i][1] and not self.snakes[i].inversed_commands or \
-                   self.snakes[i].inversed_commands and touche == self.commands_list[i][0]:
+                elif (touche == self.commands_list[i][1] and not inversed) or \
+                     (inversed and touche == self.commands_list[i][0]):
                     self.snakes[i].angle += self.snakes[i].rotating_angle
     
     def quitCurrentPlay(self):
@@ -138,42 +148,30 @@ class GUI:
         Button(self.window, text='Play!', command=self.playPressed).pack()
     
     def selectRandomColor(self):
-        if len(self.random_colors_used) != len(GUI.DEFAULT_COLORS):
-            self.color.current(randint(0,len(GUI.DEFAULT_COLORS)-1))
-            while self.color.get() in self.random_colors_used:
-                self.color.current(randint(0,len(GUI.DEFAULT_COLORS)-1))
+        availables = [color for color in GUI.DEFAULT_COLORS \
+                                if color not in self.random_colors_used]
+        if len(availables) > 0:
+            self.color.set(choice(availables))
             self.current_color = self.color.get()
-            self.color.set(self.current_color)
-            
             
     def selectRandomCommands(self):
-        if len(self.random_commands_used) == 0:
-            random_left_button = GUI.DEFAULT_COMMANDS[0][0]
-            random_right_button = GUI.DEFAULT_COMMANDS[0][1]
-            self.button_left.configure(text=random_left_button)
-            self.move_command_left = random_left_button
-            self.button_right.configure(text=random_right_button)
-            self.move_command_right = random_right_button
-        else:
-            if len(self.random_commands_used) != len(GUI.DEFAULT_COMMANDS):
-                idx = randint(0,len(GUI.DEFAULT_COMMANDS)-1)
-                random_left_button = GUI.DEFAULT_COMMANDS[idx][0]
-                random_right_button = GUI.DEFAULT_COMMANDS[idx][1]
-                while [random_left_button, random_right_button] in self.random_commands_used:
-                    idx = randint(0,len(GUI.DEFAULT_COMMANDS)-1)
-                    random_left_button = GUI.DEFAULT_COMMANDS[idx][0]
-                    random_right_button = GUI.DEFAULT_COMMANDS[idx][1]
-                self.button_left.configure(text=random_left_button)
-                self.move_command_left = random_left_button
-                self.button_right.configure(text=random_right_button)
-                self.move_command_right = random_right_button
+        commands = None
+        i = 0
+        while i < len(GUI.DEFAULT_COMMANDS) and commands is None:
+            print(commands, i, GUI.DEFAULT_COMMANDS[i])
+            if GUI.DEFAULT_COMMANDS[i] not in self.random_commands_used:
+                commands = GUI.DEFAULT_COMMANDS[i]
+                left_button, right_button = commands
+                self.button_left.configure(text=left_button)
+                self.move_command_left = left_button
+                self.button_right.configure(text=right_button)
+                self.move_command_right = right_button
+            i += 1
                 
     def selectRandomName(self):
-        if len(self.snakes_names) == 0:
-            self.current_name.set(GUI.DEFAULT_NAME)
-        else:
-            nb_guest = randint(0, 666)
-            self.current_name.set(str(GUI.DEFAULT_NAME) + '_' + str(nb_guest))
+        self.current_name.set('{}{}'.format(GUI.DEFAULT_NAME,
+                              '' if len(self.snakes_names) == 0 \
+                                 else '_' + str(randint(0, 666))))
         
     def removeFocus(self, e):
         self.player_ingame.selection_clear(0,END)
@@ -219,7 +217,7 @@ class GUI:
                                 self.snakes_colors.append(self.current_color)
                                 self.commands_list.append([self.move_command_left, self.move_command_right])
                                 self.random_colors_used.append(self.current_color)
-                                self.random_commands_used.append([self.move_command_left, self.move_command_right])
+                                self.random_commands_used.append((self.move_command_left, self.move_command_right))
                                 self.selectRandomCommands()
                                 self.selectRandomColor()
                                 self.selectRandomName()
@@ -244,13 +242,13 @@ class GUI:
         
     def showInfoPlayer(self, e):
         if len(self.player_known.curselection()) > 0:
-            self.regular_list = 'regular_player'
+            self.is_regular_list = True
         elif len(self.player_ingame.curselection()) > 0:
-            self.regular_list = None
+            self.is_regular_list = False
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
             self.colors_list = list(self.color.cget('values'))
-            if self.regular_list:
+            if self.is_regular_list:
                 self.id = self.regular_player.index(e.widget.get(self.selected[0]))
                 self.button_left.configure(text=self.regular_commands[self.id][0])
                 self.button_right.configure(text=self.regular_commands[self.id][1])
@@ -287,8 +285,9 @@ class GUI:
         
     def setCommand(self, e):
         if self.left_key:
-            if len(self.player_ingame.curselection()) > 0 or len(self.player_known.curselection()) > 0:
-                if self.regular_list:
+            if len(self.player_ingame.curselection()) > 0 or \
+               len(self.player_known.curselection()) > 0:
+                if self.is_regular_list:
                     self.regular_commands[self.id][0] = e.keysym
                 else:
                     self.commands_list[self.id][0] = e.keysym
@@ -296,7 +295,7 @@ class GUI:
             self.button_left.configure(text=self.move_command_left)
             self.button_left.configure(bg="white")
         elif self.right_key:
-            if self.regular_list:
+            if self.is_regular_list:
                 self.regular_commands[self.id][1] = e.keysym
             if len(self.player_ingame.curselection()) > 0:
                 self.commands_list[self.id][1] = e.keysym

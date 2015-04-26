@@ -31,7 +31,7 @@ class Snake:
         self.max_hole_length = max_hole_length
         self.min_hole_length = min_hole_length
         self.inversed_commands = False
-        self.rotating_angle = Snake.DEFAULT_ROTATION_ANGLE
+        self.rotating_angle = DEFAULT_ROTATION_ANGLE
         self.previous_angles = list()
         r = self.thickness//2
         self.head_id = self.canvas.create_oval(
