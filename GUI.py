@@ -81,7 +81,8 @@ class GUI:
                     del snake.events_queue[0]
         if random() < GUI.BONUS_PROBABILITY:
             self.generateBonus()
-        self.snakes[0].move(self.step)
+        for snake in self.snakes:
+            snake.move(self.step)
         self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
     
@@ -191,47 +192,46 @@ class GUI:
         
     def addPlayer(self):
         if len(self.player_known.curselection()) > 0:
-            if self.regular_player[self.id] not in self.snakes_names:
-                if self.regular_colors[self.id] not in self.snakes_colors:
-                    if [self.move_command_left, self.move_command_right] not in self.commands_list:
-                        self.snakes_colors.append(self.regular_colors[self.id])
-                        self.commands_list.append(self.regular_commands[self.id])
-                        self.snakes_names.append(self.regular_player[self.id])
-                        self.player_ingame.insert(END, self.regular_player[self.id])
-                        self.random_colors_used.append(self.regular_colors[self.id])
-                        self.random_commands_used.append(self.regular_commands[self.id])
-                    else:
-                        showwarning('Commands', 'Another player has already those commands')
-                else:
-                    showwarning('Color', 'The color chosen is already taken')
-            else:
+            if self.regular_player[self.id] in self.snakes_names:
                 showwarning('Added player', 'This player is already going to play!')
+                return
+            if self.regular_colors[self.id] in self.snakes_colors:
+                showwarning('Color', 'The color chosen is already taken')
+                return
+            if [self.move_command_left, self.move_command_right] in self.commands_list:
+                showwarning('Commands', 'Another player has already those commands')
+                return
+            self.snakes_colors.append(self.regular_colors[self.id])
+            self.commands_list.append(self.regular_commands[self.id])
+            self.snakes_names.append(self.regular_player[self.id])
+            self.player_ingame.insert(END, self.regular_player[self.id])
+            self.random_colors_used.append(self.regular_colors[self.id])
+            self.random_commands_used.append(self.regular_commands[self.id])
         else:
-            if self.current_name.get() not in self.snakes_names:
-                if len(self.current_name.get()) <= 16:
-                    if self.current_name.get() not in self.regular_player:
-                        if self.current_color not in self.snakes_colors:
-                            if [self.move_command_left, self.move_command_right] not in self.commands_list: 
-                                self.snakes_names.append(self.current_name.get())
-                                self.player_ingame.insert(END, self.current_name.get())
-                                self.snakes_colors.append(self.current_color)
-                                self.commands_list.append([self.move_command_left, self.move_command_right])
-                                self.random_colors_used.append(self.current_color)
-                                self.random_commands_used.append((self.move_command_left, self.move_command_right))
-                                self.selectRandomCommands()
-                                self.selectRandomColor()
-                                self.selectRandomName()
-                            else:
-                                showwarning('Commands', 'Another player has already those commands')
-                        else:
-                            showwarning('Color', 'The color chosen is already taken')
-                    else:
-                        showwarning('Name player', 'This name is already taken')
-                else:
-                    showwarning('Name player', 'Your name is too long. Pick a new one')
-            else:
+            if self.current_name.get() in self.snakes_names:
                 showwarning('Added player', 'This player is already going to play!')
-        
+                return
+            if len(self.current_name.get()) > 16:
+                showwarning('Name player', 'Your name is too long. Pick a new one')
+                return
+            if self.current_name.get() in self.regular_player:
+                showwarning('Name player', 'This name is already taken')
+            if self.current_color in self.snakes_colors:
+                showwarning('Color', 'The color chosen is already taken')
+                return
+            if [self.move_command_left, self.move_command_right] in self.commands_list:
+                showwarning('Commands', 'Another player has already those commands')
+                return
+            self.snakes_names.append(self.current_name.get())
+            self.player_ingame.insert(END, self.current_name.get())
+            self.snakes_colors.append(self.current_color)
+            self.commands_list.append([self.move_command_left, self.move_command_right])
+            self.random_colors_used.append(self.current_color)
+            self.random_commands_used.append((self.move_command_left, self.move_command_right))
+            self.selectRandomCommands()
+            self.selectRandomColor()
+            self.selectRandomName()
+
     def newSelection(self, e):
         if len(self.player_ingame.curselection()) > 0:
             self.snakes_colors[self.id] = self.color.get().lower()
