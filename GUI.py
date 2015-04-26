@@ -195,7 +195,10 @@ class GUI:
         if len(self.player_known.curselection()) > 0:
             if self.regular_player[self.id] not in self.snakes_names:
                 if self.regular_colors[self.id] not in self.snakes_colors:
-                    if [self.move_command_left, self.move_command_right] not in self.commands_list:
+                    if [self.move_command_left, self.move_command_right] \
+                                                not in self.commands_list or \
+                            [self.move_command_right, self.move_command_left] \
+                                                not in self.commands_list:
                         self.snakes_colors.append(self.regular_colors[self.id])
                         self.commands_list.append(self.regular_commands[self.id])
                         self.snakes_names.append(self.regular_player[self.id])
