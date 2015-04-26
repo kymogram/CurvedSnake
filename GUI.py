@@ -331,35 +331,36 @@ class GUI:
                 sender = snake
             else:
                 others.append(snake)
+        add_event = lambda l, f: l.append([f, GUI.BONUS_TIME])
         if bonus_type == 'self_speedup':
             sender.speed += 1
-            sender.events_queue.append(['snake.speed -= 1', GUI.BONUS_TIME])
+            add_event(sender.events_queue, 'snake.speed -= 1')
         elif bonus_type == 'all_speedup':
             for snake in others:
                 snake.speed += 1
-                snake.events_queue.append(['snake.speed -= 1', GUI.BONUS_TIME])
+                add_event(snake.events_queue, 'snake.speed -= 1')
         elif bonus_type == 'self_speeddown':
             if sender.speed > 1:
                 sender.speed -= 1
-                sender.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
+                add_event(sender.events_queue,'snake.speed += 1')
         elif bonus_type == 'all_speeddown':
             for snake in others:
                 if snake.speed > 1:
                     snake.speed -= 1
-                    snake.events_queue.append(['snake.speed += 1', GUI.BONUS_TIME])
+                    add_event(snake.events_queue, 'snake.speed += 1')
         elif bonus_type == 'reversed_commands':
             for snake in others:
                 snake.inversed_commands = True
-                snake.events_queue.append(['snake.inversed_commands = False', GUI.BONUS_TIME])
+                add_event(snake.events_queue, 'snake.inversed_commands = False')
         elif bonus_type == 'right_angles':
             for snake in others:
                 snake.previous_angles.append(snake.rotating_angle)
                 snake.rotating_angle = pi/2
-                snake.events_queue.append(['snake.rotating_angle = snake.previous_angles.pop(0)', GUI.BONUS_TIME])
+                add_event(snake.events_queue, 'snake.rotating_angle = snake.previous_angles.pop(0)')
         elif bonus_type == 'thickness_up':
             for snake in others:
                 snake.thickness += DEFAULT_THICKNESS
-                snake.events_queue.append(['snake.thickness -= DEFAULT_THICKNESS', GUI.BONUS_TIME])
+                add_event(snake.events_queue, 'snake.thickness -= DEFAULT_THICKNESS')
 
 if __name__ == '__main__':
     GUI()
