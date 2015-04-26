@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter.messagebox import showwarning
 from random import randint, random, choice
 from math import pi
-import tkinter.ttk as ttk
+from tkinter.ttk import Combobox
 
 from Snake import Snake
 from Bonus import Bonus
@@ -134,7 +134,7 @@ class GUI:
                                    command=lambda:self.modifBgColor('R'))
         self.button_right.pack()
         self.selectRandomCommands()
-        self.color = ttk.Combobox(self.window, state='readonly', exportselection=0)
+        self.color = Combobox(self.window, state='readonly', exportselection=0)
         self.color['values'] = GUI.DEFAULT_COLORS
         self.selectRandomColor()
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
@@ -158,7 +158,6 @@ class GUI:
         commands = None
         i = 0
         while i < len(GUI.DEFAULT_COMMANDS) and commands is None:
-            print(commands, i, GUI.DEFAULT_COMMANDS[i])
             if GUI.DEFAULT_COMMANDS[i] not in self.random_commands_used:
                 commands = GUI.DEFAULT_COMMANDS[i]
                 left_button, right_button = commands
