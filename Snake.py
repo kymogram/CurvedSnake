@@ -112,4 +112,7 @@ class Snake:
             self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
     
+    def restoreAngle(self):
+        self.rotating_angle = self.previous_angles.pop(0)
+    
     #

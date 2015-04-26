@@ -1,8 +1,9 @@
 from tkinter import *
 from tkinter.messagebox import showwarning
+from tkinter.ttk import Combobox
+
 from random import randint, random, choice
 from math import pi
-from tkinter.ttk import Combobox
 
 from Snake import *
 from Bonus import Bonus
@@ -21,6 +22,8 @@ class GUI:
                         ('b', 'n'),
                         ('1', '2'),
                         ('asterisk', 'minus')]
+    
+    MAXIMUM_NAME_LENGTH = 16 #chars
     
     BONUS_TIME = 100 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -56,11 +59,17 @@ class GUI:
         self.window.mainloop()
     
     def loadBonusImages(self):
+        '''
+            loads all the images in GUI
+        '''
         self.bonus_list = list()
         for file_name in GUI.BONUS_FILES:
             self.bonus_list.append(Bonus(GUI.BONUS_DIRECTORY + file_name))
     
     def generateBonus(self):
+        '''
+            generates a random bonus and puts it on canvas
+        '''
         xmin, ymin = GUI.BONUS_SPRITES_DIMENSIONS
         xmax, ymax = GUI.DEFAULT_WIDTH-xmin, GUI.DEFAULT_HEIGHT-ymin
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
@@ -69,9 +78,15 @@ class GUI:
                                  tags='bonus,{}'.format(bonus.name))
     
     def findRandomFreePosition(self, xmin, xmax, ymin, ymax):
+        '''
+            returns a (X, Y) coordinate on canvas
+        '''
         return randint(xmin, xmax), randint(ymin, ymax) 
     
     def refresh(self):
+        '''
+            refreshes the window every $self.timer seconds
+        '''
         for snake in self.snakes:
             if len(snake.events_queue) != 0:
                 for event in snake.events_queue:
@@ -87,6 +102,9 @@ class GUI:
         self.current_loop = self.window.after(self.timer, self.refresh)
     
     def keyPressed(self, e):
+        '''
+            callback function when any key is pressed in canvas
+        '''
         touche = e.keysym
         if touche.lower() == 'q':
             self.quitCurrentPlay()
@@ -102,6 +120,9 @@ class GUI:
                     self.snakes[i].angle += self.snakes[i].rotating_angle
     
     def quitCurrentPlay(self):
+        '''
+            stops the current game and resets the start menu
+        '''
         self.window.after_cancel(self.current_loop)
         self.random_colors_used = []
         self.snakes_names = []
@@ -111,10 +132,16 @@ class GUI:
         self.commands_list = []
     
     def clearWindow(self):
+        '''
+            clears the whole content of the window
+        '''
         for child in self.window.winfo_children():
             child.pack_forget()
     
     def menuStart(self):
+        '''
+            sets the whole GUI start menu
+        '''
         self.clearWindow()
         Label(self.window, width=100, text='Curved Snake').pack()
         Label(self.window, width=250, text='New player').pack()
@@ -126,14 +153,13 @@ class GUI:
         Label(self.window, width=250, text='Already played ?').pack()
         self.player_known = Listbox(self.window, selectmode=SINGLE)
         self.player_known.insert(END, *self.regular_player)
-        #self.player_known.insert(END, *self.snakes_names)
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
-        self.button_left = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][0], bg='white',
-                                  command=lambda:self.modifBgColor('L'))
+        self.button_left = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][0],
+                            bg='white', command=lambda:self.modifBgColor('L'))
         self.button_left.pack()
-        self.button_right = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][1], bg='white',
-                                   command=lambda:self.modifBgColor('R'))
+        self.button_right = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][1],
+                            bg='white', command=lambda:self.modifBgColor('R'))
         self.button_right.pack()
         self.selectRandomCommands()
         self.color = Combobox(self.window, state='readonly', exportselection=0)
@@ -150,6 +176,9 @@ class GUI:
         Button(self.window, text='Play!', command=self.playPressed).pack()
     
     def selectRandomColor(self):
+        '''
+            sets a random color in combobox for player
+        '''
         availables = [color for color in GUI.DEFAULT_COLORS \
                                 if color not in self.random_colors_used]
         if len(availables) > 0:
@@ -157,6 +186,9 @@ class GUI:
             self.current_color = self.color.get()
             
     def selectRandomCommands(self):
+        '''
+            sets the default commands for player
+        '''
         commands = None
         i = 0
         while i < len(GUI.DEFAULT_COMMANDS) and commands is None:
@@ -170,15 +202,25 @@ class GUI:
             i += 1
                 
     def selectRandomName(self):
+        '''
+            creates a random name for next player
+        '''
         self.current_name.set('{}{}'.format(GUI.DEFAULT_NAME,
                               '' if len(self.snakes_names) == 0 \
                                  else '_' + str(randint(0, 666))))
         
     def removeFocus(self, e):
+        '''
+            clears selection from listboxes
+        '''
         self.player_ingame.selection_clear(0,END)
         self.player_known.selection_clear(0,END)
         
     def removePlayer(self):
+        '''
+            callback fucntion when 'remove player' button is pressed: removes
+            selection from current lists
+        '''
         if len(self.player_ingame.curselection()) > 0:
             self.player_ingame.delete(self.selected[0])
             try:
@@ -191,6 +233,10 @@ class GUI:
             showwarning('No one chosen', 'Choose a player to remove')
         
     def addPlayer(self):
+        '''
+            callback function when 'add player' button is pressed: saves
+            config to create a new character for the following play.
+        '''
         if len(self.player_known.curselection()) > 0:
             if self.regular_player[self.id] in self.snakes_names:
                 showwarning('Added player', 'This player is already going to play!')
@@ -211,7 +257,7 @@ class GUI:
             if self.current_name.get() in self.snakes_names:
                 showwarning('Added player', 'This player is already going to play!')
                 return
-            if len(self.current_name.get()) > 16:
+            if len(self.current_name.get()) > GUI.MAXIMUM_NAME_LENGTH:
                 showwarning('Name player', 'Your name is too long. Pick a new one')
                 return
             if self.current_name.get() in self.regular_player:
@@ -233,6 +279,9 @@ class GUI:
             self.selectRandomName()
 
     def newSelection(self, e):
+        '''
+            callback function when combobox selection changes
+        '''
         if len(self.player_ingame.curselection()) > 0:
             self.snakes_colors[self.id] = self.color.get().lower()
         elif len(self.player_known.curselection()) > 0:
@@ -241,6 +290,9 @@ class GUI:
         self.color.selection_clear()
         
     def showInfoPlayer(self, e):
+        '''
+            resets informations about selected user
+        '''
         if len(self.player_known.curselection()) > 0:
             self.is_regular_list = True
         elif len(self.player_ingame.curselection()) > 0:
@@ -260,6 +312,9 @@ class GUI:
                 self.color.current(self.colors_list.index(self.snakes_colors[self.id]))
             
     def playPressed(self):
+        '''
+            callback function when play button is pressed
+        '''
         self.clearWindow()
         for i in range(len(self.snakes_names)):
             if self.snakes_names[i] not in self.regular_player:
@@ -269,21 +324,23 @@ class GUI:
         self.window.after(1000, self.play)
         
     def modifBgColor(self, side):
-        """
-        Change la couleur de fond du boutton lorsque l'on clique dessus,
-        ansi l'utilisateur sait qu'il a cliqué dessus et peut appuyer
-        sur une touche pour changer ses préférences de directions
-        """
+        '''
+            Changes button background color when clicked so user knows when
+            he can press a key to set his preferences
+        '''
         self.window.focus()
         if side == 'L':
-            self.button_left.configure(bg = "red")
+            self.button_left.configure(bg="red")
             self.left_key = True
         else:
-            self.button_right.configure(bg = "red")
+            self.button_right.configure(bg="red")
             self.right_key = True
         self.window.bind('<Key>', self.setCommand)
         
     def setCommand(self, e):
+        '''
+            callback function when new command (left/right) is chosen
+        '''
         if self.left_key:
             if len(self.player_ingame.curselection()) > 0 or \
                len(self.player_known.curselection()) > 0:
@@ -307,6 +364,9 @@ class GUI:
         self.window.unbind('<Key>')
 
     def play(self):
+        '''
+            prepares the game
+        '''
         self.canvas = Canvas(self.window, bg='grey', highlightthickness=0)
         self.canvas.pack(fill='both', expand=1)
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
@@ -324,6 +384,9 @@ class GUI:
         self.canvas.bind('<Key>', self.keyPressed)
     
     def handleBonus(self, sender_name, bonus_type):
+        '''
+            sets bonus and handles events queues
+        '''
         sender = None
         others = list()
         for snake in self.snakes:
@@ -356,7 +419,7 @@ class GUI:
             for snake in others:
                 snake.previous_angles.append(snake.rotating_angle)
                 snake.rotating_angle = pi/2
-                add_event(snake.events_queue, 'snake.rotating_angle = snake.previous_angles.pop(0)')
+                add_event(snake.events_queue, 'snake.restoreAngle()')
         elif bonus_type == 'thickness_up':
             for snake in others:
                 snake.thickness += DEFAULT_THICKNESS
