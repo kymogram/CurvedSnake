@@ -7,9 +7,9 @@ DEFAULT_THICKNESS = 4
 DEFAULT_CHANCE_HOLE = 0.02
 DEFAULT_MAX_HOLE_LENGTH = 20
 DEFAULT_MIN_HOLE_LENGTH = 5
+DEFAULT_ROTATION_ANGLE = 0.15 #rad
 
 class Snake:
-    DEFAULT_ROTATION_ANGLE = 0.15 #rad
     def __init__(self, parent, name, x_head, y_head, angle, color,
                             hole_proba=DEFAULT_CHANCE_HOLE,
                             max_hole_length=DEFAULT_MAX_HOLE_LENGTH,
@@ -31,20 +31,27 @@ class Snake:
         self.max_hole_length = max_hole_length
         self.min_hole_length = min_hole_length
         self.inversed_commands = False
-        self.rotating_angle = Snake.DEFAULT_ROTATION_ANGLE
+        self.rotating_angle = DEFAULT_ROTATION_ANGLE
         self.previous_angles = list()
         r = self.thickness//2
-        self.head_id = self.canvas.create_oval(x_head-r, y_head-r, x_head+r, y_head+r,
-                                        fill=self.color, outline=self.color,
-                                        tag='snake,{},{}'.format(self.name, -1))
+        self.head_id = self.canvas.create_oval(
+                        x_head-r, y_head-r, x_head+r, y_head+r, fill=self.color,
+                        outline=self.color, tag='snake,{},-1'.format(self.name))
         self.events_queue = list()
     
     def isInScreen(self, x, y):
+        '''
+            returns True if (x, y) is on canvas and False otherwise.
+        '''
         self.canvas.update()
         return 0 <= x < self.canvas.winfo_width() and \
                0 <= y < self.canvas.winfo_height()
     
     def handleCollision(self, step, collisions):
+        '''
+            do the appropriate action when collision appears on canvas.
+            Kill the snake or set the bonus.
+        '''
         first_elem = int(collisions[0])
         tags = self.canvas.gettags(first_elem)
         if len(tags) != 0:
@@ -58,6 +65,10 @@ class Snake:
                 self.parent.handleBonus(self.name, info[1])
     
     def handleMove(self, step):
+        '''
+            moves the snake to the new (x, y) computed according
+            to speed and direction.
+        '''
         x, y = self.head_coord
         #if there is contact, snake is dead
         #WARNING: when the snake moves, it always touches its previous position
@@ -75,6 +86,9 @@ class Snake:
                 self.handleCollision(step, collisions)
     
     def move(self, step):
+        '''
+            function when the snake is refreshed to make it move.
+        '''
         #stop moving if snake is dead
         if not self.alive:
             return
@@ -97,5 +111,8 @@ class Snake:
         else:
             self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
+    
+    def restoreAngle(self):
+        self.rotating_angle = self.previous_angles.pop(0)
     
     #

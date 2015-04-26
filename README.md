@@ -1,16 +1,16 @@
 # CurvedSnake
-adaptation de CurveFever en Python avec un Canevas Tkinter
+adaptation de CurveFever en Python avec tkinter
 
 #IDEES BONUS
 
-1. bloque les controles de tout les joueurs(risque de tous les tuer donc un peu cheaté ^^)
-2. change les couleurs de chaque joueurs
+1. bloque les contrôles de tous les joueurs(risque de tous les tuer donc un peu cheaté ^^)
+2. change les couleurs de chaque joueur
 3. trou noir : si on s'en approche trop --> perte de controle et entrainé vers son emplacement.
-4. flash : le canvas apparais blanc une fraction de seconde (2-3 max)
-5. bonus loan : tout les joueurs sont en nuances de rose/mauve.
+4. flash : le canvas apparait blanc une fraction de seconde (2-3 max)
+5. bonus loan : tous les joueurs sont en nuances de rose/mauve.
 6. mode yolo : images d'arc-en-ciel, musique psychédélique avec extrait de charlie the unicorn :P
-7. la carte grandis.
+7. la carte grandit.
 
 #TODO
 
-Refaire les graphismes des bonus
+None
