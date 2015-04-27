@@ -92,9 +92,9 @@ class GUI:
         for i in range(len(self.commands_list)):
             left, right = self.commands_list[i]
             if self.inputs.isPressed(left):
-                self.snakes[i].turn(LEFT)
+                self.snakes[i].turn(TURN_LEFT)
             elif self.inputs.isPressed(right):
-                self.snakes[i].turn(RIGHT)
+                self.snakes[i].turn(TURN_RIGHT)
     
     def refresh(self):
         '''

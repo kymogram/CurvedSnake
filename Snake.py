@@ -7,10 +7,10 @@ DEFAULT_THICKNESS = 4
 DEFAULT_CHANCE_HOLE = 0.02
 DEFAULT_MAX_HOLE_LENGTH = 40
 DEFAULT_MIN_HOLE_LENGTH = 15
-DEFAULT_ROTATION_ANGLE = 0.15 #rad
+DEFAULT_ROTATION_ANGLE = 0.05 #rad
 
-LEFT = 0
-RIGHT = 1
+TURN_LEFT = 0
+TURN_RIGHT = 1
 
 class Snake:
     def __init__(self, parent, name, x_head, y_head, angle, color,
@@ -89,8 +89,8 @@ class Snake:
                 self.handleCollision(step, collisions)
     
     def turn(self, side):
-        if (side == LEFT and not self.inversed_commands) or \
-           (side == RIGHT and self.inversed_commands):
+        if (side == TURN_LEFT and not self.inversed_commands) or \
+           (side == TURN_RIGHT and self.inversed_commands):
             self.angle -= self.rotating_angle
         else:
             self.angle += self.rotating_angle
