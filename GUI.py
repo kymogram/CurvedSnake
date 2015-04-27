@@ -26,7 +26,7 @@ class GUI:
     
     MAXIMUM_NAME_LENGTH = 16 #chars
     
-    BONUS_TIME = 100 #frames
+    BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
     BONUS_DIRECTORY = './sprites/'
     BONUS_FILES = ['self_speedup.gif', 'all_speedup.gif',
@@ -36,7 +36,11 @@ class GUI:
     def __init__(self):
         #window
         self.window = Tk()
-        self.window.geometry('{}x{}'.format(GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT))
+        self.window_width = GUI.DEFAULT_WIDTH
+        self.window_height = GUI.DEFAULT_HEIGHT
+        self.mini_map = IntVar(value=2)
+        self.one_vs_one = IntVar()
+        self.window.geometry('{}x{}'.format(self.window_width, self.window_height))
         self.window.resizable(width=FALSE, height=FALSE)
         self.window.wm_title('Curved Snake')
         self.timer = GUI.DEFAULT_REFRESH_TIMER
@@ -76,7 +80,7 @@ class GUI:
             generates a random bonus and puts it on canvas
         '''
         xmin, ymin = GUI.BONUS_SPRITES_DIMENSIONS
-        xmax, ymax = GUI.DEFAULT_WIDTH-xmin, GUI.DEFAULT_HEIGHT-ymin
+        xmax, ymax = self.window_width-xmin, self.window_height-ymin
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
         bonus = choice(self.available_bonus)
         self.canvas.create_image(x, y, image=bonus.image,
@@ -117,6 +121,10 @@ class GUI:
             snake.move(self.step)
         self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
+        
+    def geometryMap(self):
+        self.window.geometry('{}x{}'.format(self.window_width, self.window_height))
+        self.window.resizable(width=FALSE, height=FALSE)
     
     def quitCurrentPlay(self):
         '''
@@ -126,6 +134,9 @@ class GUI:
         self.random_colors_used = []
         self.snakes_names = []
         self.random_commands_used = []
+        self.window_height = GUI.DEFAULT_HEIGHT
+        self.window_width = GUI.DEFAULT_WIDTH
+        self.geometryMap()
         self.menuStart()
         self.snakes_colors = []
         self.commands_list = []
@@ -187,16 +198,25 @@ class GUI:
             x = i//3
             add_bonus.grid(row=y, column=x)
         self.bonus_scale = Scale(self.top_bonus,
-                                    label='percentage',
+                                    label='probability',
                                     to=100,
                                     orient=HORIZONTAL)
         self.bonus_scale.set(self.bonus_percent)
         self.bonus_scale.grid(row=4, column=1)
-        Button(self.top_bonus, text='Set', command=self.closeAndGetVal).grid(row=5, column=1)
+        Radiobutton(self.top_bonus, text='normal', variable=self.mini_map, value=2).grid(row=5, column=1)
+        Radiobutton(self.top_bonus, text='mini map', variable=self.mini_map, value=0).grid(row=5, column=2)
+        Radiobutton(self.top_bonus, text='1v1', variable=self.mini_map, value=1).grid(row=5, column=0)
+        Button(self.top_bonus, text='Set', command=self.closeAndGetVal).grid(row=6, column=1)
         
     def closeAndGetVal(self):
         self.bonus_percent = self.bonus_scale.get()
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
+        if self.mini_map.get() == 0:
+            self.window_height -= 200
+            self.window_width -= 200
+        elif self.mini_map.get() == 1:
+            self.window_height -= 300
+            self.window_width -= 300
         self.top_bonus.destroy()
     
     def selectRandomColor(self):
@@ -329,7 +349,7 @@ class GUI:
         self.canvas = Canvas(self.window, bg='grey', highlightthickness=0)
         self.canvas.pack(fill='both', expand=1)
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
-        xmax, ymax = GUI.DEFAULT_WIDTH, GUI.DEFAULT_HEIGHT
+        xmax, ymax = self.window_width, self.window_height
         self.snakes = list()
         for i in range(len(self.snakes_names)):
             self.snakes.append(Snake(self,
@@ -339,6 +359,10 @@ class GUI:
                                      random()*2*pi,
                                      self.snakes_colors[i]))
         self.available_bonus = [self.bonus_list[i] for i in range(len(self.bonus_list)) if self.add_bonus_bool[i].get() == 1]
+        if self.mini_map.get() == 0:
+            self.geometryMap()
+        elif self.mini_map.get() == 1:
+            self.geometryMap()
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
