@@ -69,6 +69,7 @@ class GUI:
         self.bonus_list = list()
         for file_name in GUI.BONUS_FILES:
             self.bonus_list.append(Bonus(GUI.BONUS_DIRECTORY + file_name))
+        self.add_bonus_bool = [IntVar(value=1) for i in range(len(self.bonus_list))]
     
     def generateBonus(self):
         '''
@@ -77,7 +78,7 @@ class GUI:
         xmin, ymin = GUI.BONUS_SPRITES_DIMENSIONS
         xmax, ymax = GUI.DEFAULT_WIDTH-xmin, GUI.DEFAULT_HEIGHT-ymin
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
-        bonus = choice(self.bonus_list)
+        bonus = choice(self.available_bonus)
         self.canvas.create_image(x, y, image=bonus.image,
                                  tags='bonus,{}'.format(bonus.name))
     
@@ -180,15 +181,22 @@ class GUI:
         '''
         self.top_bonus = Toplevel()
         self.top_bonus.grab_set()
-        self.bonus_scale = Scale(self.top_bonus, label='percentage', to=100, orient=HORIZONTAL)
+        for i in range(len(self.bonus_list)):
+            add_bonus = Checkbutton(self.top_bonus, image=self.bonus_list[i].image, variable=self.add_bonus_bool[i])
+            y = i%3
+            x = i//3
+            add_bonus.grid(row=y, column=x)
+        self.bonus_scale = Scale(self.top_bonus,
+                                    label='percentage',
+                                    to=100,
+                                    orient=HORIZONTAL)
         self.bonus_scale.set(self.bonus_percent)
-        self.bonus_scale.pack()
-        Button(self.top_bonus, text='Set', command=self.closeAndGetVal).pack()
+        self.bonus_scale.grid(row=4, column=1)
+        Button(self.top_bonus, text='Set', command=self.closeAndGetVal).grid(row=5, column=1)
         
     def closeAndGetVal(self):
         self.bonus_percent = self.bonus_scale.get()
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
-        print(self.bonus_proba)
         self.top_bonus.destroy()
     
     def selectRandomColor(self):
@@ -330,6 +338,7 @@ class GUI:
                                      randint(ymin, ymax-ymin),
                                      random()*2*pi,
                                      self.snakes_colors[i]))
+        self.available_bonus = [self.bonus_list[i] for i in range(len(self.bonus_list)) if self.add_bonus_bool[i].get() == 1]
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
