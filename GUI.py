@@ -55,8 +55,8 @@ class GUI:
         self.inputs = InputManager()
         self.current_loop = 0
         self.step = 0
-        self.bonus_percent = 60
-        self.bonus_proba = self.bonus_percent/GUI.BONUS_PROBABILITY
+        self.bonus_percent = 30
+        self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
         #init
         self.loadBonusImages()
         self.menuStart()
@@ -187,7 +187,7 @@ class GUI:
         
     def closeAndGetVal(self):
         self.bonus_percent = self.bonus_scale.get()
-        self.bonus_proba = GUI.BONUS_PROBABILITY/self.bonus_percent
+        self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
         print(self.bonus_proba)
         self.top_bonus.destroy()
     
