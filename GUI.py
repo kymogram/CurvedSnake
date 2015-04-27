@@ -6,7 +6,8 @@ from random import randint, random, choice
 from math import pi
 
 from Snake import *
-from Bonus import Bonus
+from Bonus import *
+from InputManager import *
 
 class GUI:
     DEFAULT_WIDTH = 800        #pixels
@@ -51,6 +52,7 @@ class GUI:
         self.left_key = self.right_key = False
         self.is_regular_list = False
         #other variables
+        self.inputs = InputManager()
         self.current_loop = 0
         self.step = 0
         #init
@@ -83,10 +85,22 @@ class GUI:
         '''
         return randint(xmin, xmax), randint(ymin, ymax) 
     
+    def changeDirections(self):
+        '''
+            updates the snakes direction according to the pressed keys
+        '''
+        for i in range(len(self.commands_list)):
+            left, right = self.commands_list[i]
+            if self.inputs.isPressed(left):
+                self.snakes[i].turn(LEFT)
+            elif self.inputs.isPressed(right):
+                self.snakes[i].turn(RIGHT)
+    
     def refresh(self):
         '''
             refreshes the window every $self.timer seconds
         '''
+        self.changeDirections()
         for snake in self.snakes:
             if len(snake.events_queue) != 0:
                 for event in snake.events_queue:
@@ -298,6 +312,7 @@ class GUI:
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
+        self.canvas.bind('<KeyRelease>', lambda e: self.inputs.release(e.keysym))
     
     def handleBonus(self, sender_name, bonus_type):
         '''
@@ -413,19 +428,13 @@ class GUI:
         '''
             callback function when any key is pressed in canvas
         '''
-        touche = e.keysym
-        if touche.lower() == 'q':
+        key = e.keysym
+        if key.lower() == 'q':
             self.quitCurrentPlay()
-        #move the correct player(s) when key is pressed
-        for i in range(len(self.commands_list)):
-            if touche in self.commands_list[i]:
-                inversed = self.snakes[i].inversed_commands
-                if   (touche == self.commands_list[i][0] and not inversed) or \
-                     (inversed and touche == self.commands_list[i][1]):
-                    self.snakes[i].angle -= self.snakes[i].rotating_angle
-                elif (touche == self.commands_list[i][1] and not inversed) or \
-                     (inversed and touche == self.commands_list[i][0]):
-                    self.snakes[i].angle += self.snakes[i].rotating_angle
+        else:
+            self.inputs.press(key)
+            #move the correct player(s) when key is pressed
+            
     
     
 if __name__ == '__main__':

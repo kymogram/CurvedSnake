@@ -5,9 +5,12 @@ from random import random, randint
 DEFAULT_SPEED = 2
 DEFAULT_THICKNESS = 4
 DEFAULT_CHANCE_HOLE = 0.02
-DEFAULT_MAX_HOLE_LENGTH = 20
-DEFAULT_MIN_HOLE_LENGTH = 5
+DEFAULT_MAX_HOLE_LENGTH = 40
+DEFAULT_MIN_HOLE_LENGTH = 15
 DEFAULT_ROTATION_ANGLE = 0.15 #rad
+
+LEFT = 0
+RIGHT = 1
 
 class Snake:
     def __init__(self, parent, name, x_head, y_head, angle, color,
@@ -84,6 +87,13 @@ class Snake:
             #if there is something
             if len(collisions) != 0:
                 self.handleCollision(step, collisions)
+    
+    def turn(self, side):
+        if (side == LEFT and not self.inversed_commands) or \
+           (side == RIGHT and self.inversed_commands):
+            self.angle -= self.rotating_angle
+        else:
+            self.angle += self.rotating_angle
     
     def move(self, step):
         '''
