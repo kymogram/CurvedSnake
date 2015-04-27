@@ -251,6 +251,7 @@ class GUI:
                 return
             if self.current_name.get() in self.regular_player:
                 showwarning('Name player', 'This name is already taken')
+                return
             if self.current_color in self.snakes_colors:
                 showwarning('Color', 'The color chosen is already taken')
                 return
