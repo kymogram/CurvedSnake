@@ -55,6 +55,8 @@ class GUI:
         self.inputs = InputManager()
         self.current_loop = 0
         self.step = 0
+        self.bonus_percent = 60
+        self.bonus_proba = self.bonus_percent/GUI.BONUS_PROBABILITY
         #init
         self.loadBonusImages()
         self.menuStart()
@@ -108,7 +110,7 @@ class GUI:
                 if snake.events_queue[0][1] == 0:
                     exec(snake.events_queue[0][0])
                     del snake.events_queue[0]
-        if random() < GUI.BONUS_PROBABILITY:
+        if random() < self.bonus_proba:
             self.generateBonus()
         for snake in self.snakes:
             snake.move(self.step)
@@ -169,7 +171,25 @@ class GUI:
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_ingame.pack()
+        Button(self.window, text='Parameters', command=self.parameters).pack()
         Button(self.window, text='Play!', command=self.playPressed).pack()
+        
+    def parameters(self):
+        '''
+            sets powerups and their probability
+        '''
+        self.top_bonus = Toplevel()
+        self.top_bonus.grab_set()
+        self.bonus_scale = Scale(self.top_bonus, label='percentage', to=100, orient=HORIZONTAL)
+        self.bonus_scale.set(self.bonus_percent)
+        self.bonus_scale.pack()
+        Button(self.top_bonus, text='Set', command=self.closeAndGetVal).pack()
+        
+    def closeAndGetVal(self):
+        self.bonus_percent = self.bonus_scale.get()
+        self.bonus_proba = GUI.BONUS_PROBABILITY/self.bonus_percent
+        print(self.bonus_proba)
+        self.top_bonus.destroy()
     
     def selectRandomColor(self):
         '''
