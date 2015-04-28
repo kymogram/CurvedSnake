@@ -32,7 +32,7 @@ class GUI:
     BONUS_FILES = ['self_speedup.gif', 'self_speeddown.gif', 'thickness_down.gif',
                    'all_speeddown.gif', 'reversed_commands.gif', 'all_speedup.gif',
                    'right_angles.gif', 'thickness_up.gif', 'rotation_angle_down.gif',
-                   'bonus_chance.gif']
+                   'bonus_chance.gif', 'change_color.gif', 'change_chance_hole.gif']
     def __init__(self):
         #window
         self.window = Tk()
@@ -75,7 +75,7 @@ class GUI:
         for file_name in GUI.BONUS_FILES:
             self.bonus_list.append(Bonus(GUI.BONUS_DIRECTORY + file_name))
         self.add_bonus_bool = [IntVar(value=1) for i in range(len(self.bonus_list))]
-    
+        
     def generateBonus(self):
         '''
             generates a random bonus and puts it on canvas
@@ -216,12 +216,6 @@ class GUI:
     def closeAndGetVal(self):
         self.bonus_percent = self.bonus_scale.get()
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
-        if self.mini_map.get() == 0:
-            self.window_height -= 150
-            self.window_width -= 150
-        elif self.mini_map.get() == 1:
-            self.window_height -= 300
-            self.window_width -= 300
         self.top_bonus.destroy()
     
     def selectRandomColor(self):
@@ -335,6 +329,15 @@ class GUI:
                 self.regular_player.append(self.snakes_names[i])
                 self.regular_colors.append(self.snakes_colors[i])
                 self.regular_commands.append(self.commands_list[i])
+        self.available_bonus = [self.bonus_list[i] for i in range(len(self.bonus_list)) if self.add_bonus_bool[i].get() == 1]
+        if self.mini_map.get() == 0:
+            self.window_height -= 150
+            self.window_width -= 150
+            self.geometryMap()
+        elif self.mini_map.get() == 1:
+            self.window_height -= 300
+            self.window_width -= 300
+            self.geometryMap()
         self.window.after(1000, self.play)
     
     def modifBgColor(self, side):
@@ -355,7 +358,7 @@ class GUI:
         '''
             prepares the game
         '''
-        self.canvas = Canvas(self.window, bg='grey', highlightthickness=0)
+        self.canvas = Canvas(self.window, bg='black', highlightthickness=0)
         self.canvas.pack(fill='both', expand=1)
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = self.window_width, self.window_height
@@ -367,11 +370,6 @@ class GUI:
                                      randint(ymin, ymax-ymin),
                                      random()*2*pi,
                                      self.snakes_colors[i]))
-        self.available_bonus = [self.bonus_list[i] for i in range(len(self.bonus_list)) if self.add_bonus_bool[i].get() == 1]
-        if self.mini_map.get() == 0:
-            self.geometryMap()
-        elif self.mini_map.get() == 1:
-            self.geometryMap()
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
@@ -421,13 +419,22 @@ class GUI:
         elif bonus_type == 'thickness_down':
             sender.thickness /= 2
             add_event(sender.events_queue, 'snake.thickness *= 2')
-        elif bonus_type == 'bonus_chance_up':
-            self.bonus_proba *= 2
-            add_event(self.events_queue, 'self.bonus_proba /= 2')
+        elif bonus_type == 'bonus_chance':
+            if self.bonus_proba <= 0.02:
+                self.bonus_proba *= 2
+                add_event(self.events_queue, 'self.bonus_proba /= 2')
         elif bonus_type == 'rotation_angle_down':
             for snake in others:
                 snake.rotating_angle /= 2
                 add_event(snake.events_queue, 'snake.rotating_angle *= 2')
+        elif bonus_type == 'change_color':
+            for snake in others:
+                snake.color = sender.color
+                add_event(snake.events_queue, 'snake.color = snake.color_unchanged')
+        elif bonus_type == 'change_chance_hole':
+            for snake in others:
+                snake.hole_probability *= 10
+                add_event(snake.events_queue, 'snake.hole_probability /= 10')
         # time_bonus_left = GUI.BONUS_TIME
         # angle = (time_bonus_left/GUI.BONUS_TIME)*360
         # if sender == snake:
