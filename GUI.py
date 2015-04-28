@@ -29,10 +29,10 @@ class GUI:
     BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
     BONUS_DIRECTORY = './sprites/'
-    BONUS_FILES = ['self_speedup.gif', 'all_speedup.gif',
-                   'self_speeddown.gif', 'all_speeddown.gif',
-                   'reversed_commands.gif', 'right_angles.gif',
-                   'thickness_up.gif']
+    BONUS_FILES = ['self_speedup.gif', 'self_speeddown.gif', 'thickness_down.gif',
+                   'all_speeddown.gif', 'reversed_commands.gif', 'all_speedup.gif',
+                   'right_angles.gif', 'thickness_up.gif', 'rotation_angle_down.gif',
+                   'bonus_chance.gif']
     def __init__(self):
         #window
         self.window = Tk()
@@ -61,6 +61,7 @@ class GUI:
         self.step = 0
         self.bonus_percent = 30
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
+        self.events_queue = list()
         #init
         self.loadBonusImages()
         self.menuStart()
@@ -108,6 +109,12 @@ class GUI:
             refreshes the window every $self.timer seconds
         '''
         self.changeDirections()
+        if len(self.events_queue) != 0:
+            for event in self.events_queue:
+                event[1] -= 1
+            if self.events_queue[0][1] == 0:
+                exec(self.events_queue[0][0])
+                del self.events_queue[0]
         for snake in self.snakes:
             if len(snake.events_queue) != 0:
                 for event in snake.events_queue:
@@ -132,14 +139,11 @@ class GUI:
         '''
         self.window.after_cancel(self.current_loop)
         self.random_colors_used = []
-        self.snakes_names = []
         self.random_commands_used = []
         self.window_height = GUI.DEFAULT_HEIGHT
         self.window_width = GUI.DEFAULT_WIDTH
         self.geometryMap()
         self.menuStart()
-        self.snakes_colors = []
-        self.commands_list = []
     
     def clearWindow(self):
         '''
@@ -182,6 +186,7 @@ class GUI:
         Label(self.window, width=250, text='Player ready to play').pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
+        self.player_ingame.insert(END, *self.regular_player)
         self.player_ingame.pack()
         Button(self.window, text='Parameters', command=self.parameters).pack()
         Button(self.window, text='Play!', command=self.playPressed).pack()
@@ -212,8 +217,8 @@ class GUI:
         self.bonus_percent = self.bonus_scale.get()
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
         if self.mini_map.get() == 0:
-            self.window_height -= 200
-            self.window_width -= 200
+            self.window_height -= 150
+            self.window_width -= 150
         elif self.mini_map.get() == 1:
             self.window_height -= 300
             self.window_width -= 300
@@ -281,7 +286,9 @@ class GUI:
             if self.regular_colors[self.id] in self.snakes_colors:
                 showwarning('Color', 'The color chosen is already taken')
                 return
-            if [self.move_command_left, self.move_command_right] in self.commands_list:
+            if [commands for commands in self.commands_list \
+                                if self.move_command_left in commands or \
+                                   self.move_command_right in commands] != []:
                 showwarning('Commands', 'Another player has already those commands')
                 return
             self.snakes_colors.append(self.regular_colors[self.id])
@@ -303,7 +310,9 @@ class GUI:
             if self.current_color in self.snakes_colors:
                 showwarning('Color', 'The color chosen is already taken')
                 return
-            if [self.move_command_left, self.move_command_right] in self.commands_list:
+            if [commands for commands in self.commands_list \
+                                if self.move_command_left in commands or \
+                                   self.move_command_right in commands] != []:
                 showwarning('Commands', 'Another player has already those commands')
                 return
             self.snakes_names.append(self.current_name.get())
@@ -389,13 +398,13 @@ class GUI:
                 add_event(snake.events_queue, 'snake.speed -= 1')
         elif bonus_type == 'self_speeddown':
             if sender.speed > 1:
-                sender.speed -= 1
-                add_event(sender.events_queue,'snake.speed += 1')
+                sender.speed /= 1.5
+                add_event(sender.events_queue,'snake.speed *= 1.5')
         elif bonus_type == 'all_speeddown':
             for snake in others:
                 if snake.speed > 1:
-                    snake.speed -= 1
-                    add_event(snake.events_queue, 'snake.speed += 1')
+                    snake.speed /= 1.5
+                    add_event(snake.events_queue, 'snake.speed *= 1.5')
         elif bonus_type == 'reversed_commands':
             for snake in others:
                 snake.inversed_commands = True
@@ -409,6 +418,22 @@ class GUI:
             for snake in others:
                 snake.thickness += DEFAULT_THICKNESS
                 add_event(snake.events_queue, 'snake.thickness -= DEFAULT_THICKNESS')
+        elif bonus_type == 'thickness_down':
+            sender.thickness /= 2
+            add_event(sender.events_queue, 'snake.thickness *= 2')
+        elif bonus_type == 'bonus_chance_up':
+            self.bonus_proba *= 2
+            add_event(self.events_queue, 'self.bonus_proba /= 2')
+        elif bonus_type == 'rotation_angle_down':
+            for snake in others:
+                snake.rotating_angle /= 2
+                add_event(snake.events_queue, 'snake.rotating_angle *= 2')
+        # time_bonus_left = GUI.BONUS_TIME
+        # angle = (time_bonus_left/GUI.BONUS_TIME)*360
+        # if sender == snake:
+            # head = sender.coords()
+            # head.create_arc(head, style = ARC, extent=angle, width = 2, oultine='white')
+        # time_bonus_left -= 1
     
     #callbacks
     
@@ -465,6 +490,8 @@ class GUI:
                 self.button_left.configure(text=self.regular_commands[self.id][0])
                 self.button_right.configure(text=self.regular_commands[self.id][1])
                 self.color.current(self.colors_list.index(self.regular_colors[self.id]))
+                self.move_command_left = self.regular_commands[self.id][0]
+                self.move_command_right = self.regular_commands[self.id][1]
             else:
                 self.id = self.snakes_names.index(e.widget.get(self.selected[0]))
                 self.button_left.configure(text=self.commands_list[self.id][0])
