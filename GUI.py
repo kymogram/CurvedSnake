@@ -32,7 +32,8 @@ class GUI:
     BONUS_FILES = ['self_speedup.gif', 'self_speeddown.gif', 'thickness_down.gif',
                    'all_speeddown.gif', 'reversed_commands.gif', 'all_speedup.gif',
                    'right_angles.gif', 'thickness_up.gif', 'rotation_angle_down.gif',
-                   'bonus_chance.gif', 'change_color.gif', 'change_chance_hole.gif']
+                   'bonus_chance.gif', 'change_color.gif', 'change_chance_hole.gif',
+                   'clean_map.gif', 'change_bg.gif']
     def __init__(self):
         #window
         self.window = Tk()
@@ -435,6 +436,11 @@ class GUI:
             for snake in others:
                 snake.hole_probability *= 10
                 add_event(snake.events_queue, 'snake.hole_probability /= 10')
+        elif bonus_type == 'clean_map':
+            self.canvas.delete(ALL)
+        elif bonus_type == 'change_bg':
+            self.canvas.configure(bg='white')
+            add_event(self.events_queue, 'self.canvas.configure(bg="black")')
         # time_bonus_left = GUI.BONUS_TIME
         # angle = (time_bonus_left/GUI.BONUS_TIME)*360
         # if sender == snake:
