@@ -1,3 +1,4 @@
+from Particule import *
 from tkinter import *
 from math import cos, sin
 from random import random, randint
@@ -27,6 +28,7 @@ class Snake:
         self.parent = parent
         self.thickness = thickness
         self.color = color
+        self.color_unchanged = color
         self.alive = True
         self.name = str(name)
         self.hole = 0
@@ -63,6 +65,8 @@ class Snake:
                 self.alive = int(info[2]) >= step-self.thickness*3
                 if not self.alive:
                     print('dead')
+                    x, y = self.head_coord
+                    Particule(self.canvas, x, y, self.color)
             elif info[0] == 'bonus':
                 self.canvas.delete(first_elem)
                 self.parent.handleBonus(self.name, info[1])
@@ -78,6 +82,8 @@ class Snake:
         #so step of appearance is written as a tag.
         if not self.isInScreen(x, y):
             self.alive = False
+            Particule(self.canvas, x, y, self.color)
+            #particule
         else:
             r = self.thickness // 2
             #find all items in contact with new position
