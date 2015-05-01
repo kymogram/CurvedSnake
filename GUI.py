@@ -33,7 +33,7 @@ class GUI:
                    'all_speeddown.gif', 'reversed_commands.gif', 'all_speedup.gif',
                    'right_angles.gif', 'thickness_up.gif', 'rotation_angle_down.gif',
                    'bonus_chance.gif', 'change_color.gif', 'change_chance_hole.gif',
-                   'clean_map.gif', 'change_bg.gif']
+                   'clean_map.gif', 'change_bg.gif', 'invincible.gif']
     def __init__(self):
         #window
         self.window = Tk()
@@ -360,7 +360,7 @@ class GUI:
             prepares the game
         '''
         self.canvas = Canvas(self.window, bg='black', highlightthickness=0)
-        self.canvas.pack(fill='both', expand=1)
+        self.canvas.pack(expand=1, fill='both')
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = self.window_width, self.window_height
         self.snakes = list()
@@ -371,10 +371,20 @@ class GUI:
                                      randint(ymin, ymax-ymin),
                                      random()*2*pi,
                                      self.snakes_colors[i]))
+        self.startInvincible()
+        #add create_text with command of each player 
         self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
         self.canvas.bind('<KeyRelease>', lambda e: self.inputs.release(e.keysym))
+        
+    def startInvincible(self):
+        players = list()
+        for snake in self.snakes:
+            players.append(snake)
+        add_event = lambda l, f: l.append([f, 150])
+        for snake in players:
+            add_event(snake.events_queue, 'snake.time_before_start = False')
     
     def handleBonus(self, sender_name, bonus_type):
         '''
@@ -396,10 +406,12 @@ class GUI:
                 snake.speed += 1
                 add_event(snake.events_queue, 'snake.speed -= 1')
         elif bonus_type == 'self_speeddown':
+            add_event = lambda l, f: l.append([f, 600])
             if sender.speed > 1:
                 sender.speed /= 1.5
                 add_event(sender.events_queue,'snake.speed *= 1.5')
         elif bonus_type == 'all_speeddown':
+            add_event = lambda l, f: l.append([f, 250])
             for snake in others:
                 if snake.speed > 1:
                     snake.speed /= 1.5
@@ -421,9 +433,9 @@ class GUI:
             sender.thickness /= 2
             add_event(sender.events_queue, 'snake.thickness *= 2')
         elif bonus_type == 'bonus_chance':
-            if self.bonus_proba <= 0.02:
-                self.bonus_proba *= 2
-                add_event(self.events_queue, 'self.bonus_proba /= 2')
+            add_event = lambda l, f: l.append([f, 50])
+            self.bonus_proba *= 4
+            add_event(self.events_queue, 'self.bonus_proba /= 4')
         elif bonus_type == 'rotation_angle_down':
             for snake in others:
                 snake.rotating_angle /= 2
@@ -433,9 +445,13 @@ class GUI:
                 snake.color = sender.color
                 add_event(snake.events_queue, 'snake.color = snake.color_unchanged')
         elif bonus_type == 'change_chance_hole':
+            add_event = lambda l, f: l.append([f, 750])
             for snake in others:
                 snake.hole_probability *= 10
                 add_event(snake.events_queue, 'snake.hole_probability /= 10')
+        elif bonus_type == 'invincible':
+            sender.invincible = True
+            add_event(sender.events_queue, 'snake.invincible = False')
         elif bonus_type == 'clean_map':
             self.canvas.delete(ALL)
         elif bonus_type == 'change_bg':
@@ -447,7 +463,7 @@ class GUI:
             # head = sender.coords()
             # head.create_arc(head, style = ARC, extent=angle, width = 2, oultine='white')
         # time_bonus_left -= 1
-    
+        
     #callbacks
     
     def setCommand(self, e):

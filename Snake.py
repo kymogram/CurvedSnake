@@ -6,7 +6,7 @@ from random import random, randint
 DEFAULT_SPEED = 1.6
 DEFAULT_THICKNESS = 6
 DEFAULT_CHANCE_HOLE = 0.008
-DEFAULT_MAX_HOLE_LENGTH = 25
+DEFAULT_MAX_HOLE_LENGTH = 20
 DEFAULT_MIN_HOLE_LENGTH = 15
 DEFAULT_ROTATION_ANGLE = 0.05 #rad
 
@@ -30,6 +30,8 @@ class Snake:
         self.color = color
         self.color_unchanged = color
         self.alive = True
+        self.invincible = False
+        self.time_before_start = True
         self.name = str(name)
         self.hole = 0
         self.hole_probability = hole_proba
@@ -116,14 +118,16 @@ class Snake:
         self.head_coord = [x, y]
         #radius of oval
         r = self.thickness // 2
-        self.handleMove(step)
-        
-        if self.hole == 0:
+        if not self.invincible or not self.time_before_start:
+            self.handleMove(step)
+        if self.hole == 0 and not self.invincible and not self.time_before_start:
             self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
                                         outline=self.color,
                                         tag='snake,{},{}'.format(self.name, step))
             if random() < self.hole_probability:
                 self.hole = randint(self.min_hole_length, self.max_hole_length)
+        elif self.invincible or self.time_before_start:
+            pass
         else:
             self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
