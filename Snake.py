@@ -121,8 +121,8 @@ class Snake:
             self.handleMove(step)
         if self.hole == 0 and not self.invincible and not self.time_before_start:
             self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
-                                        outline=self.color,
-                                        tag='snake,{},{}'.format(self.name, step))
+                                      outline=self.color,
+                                      tag='snake,{},{}'.format(self.name, step))
             if random() < self.hole_probability:
                 self.hole = randint(self.min_hole_length, self.max_hole_length)
         elif self.invincible or self.time_before_start:
