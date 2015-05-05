@@ -79,7 +79,7 @@ class GUI:
         self.bonus_list = list()
         for file_name in GUI.BONUS_FILES:
             self.bonus_list.append(Bonus(GUI.BONUS_DIRECTORY + file_name))
-        self.add_bonus_bool = 
+        self.add_bonus_bool = \
                         [IntVar(value=1) for i in range(len(self.bonus_list))]
         
     def generateBonus(self):
@@ -149,8 +149,7 @@ class GUI:
             self.canvas.create_text(self.window_height//2,
                             self.window_width//2,
                             text=self.save_name_winner +
-                            ' won this round! Time left before next round: ' + \
-                            str(self.time_before_round),
+                            ' won this round!',
                             fill='white', tags='text_win')
         if self.new_round:
             return self.playNewRound()
