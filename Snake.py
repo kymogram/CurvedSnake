@@ -6,7 +6,7 @@ from random import random, randint
 DEFAULT_SPEED = 1.6
 DEFAULT_THICKNESS = 6
 DEFAULT_CHANCE_HOLE = 0.008
-DEFAULT_MAX_HOLE_LENGTH = 20
+DEFAULT_MAX_HOLE_LENGTH = 18
 DEFAULT_MIN_HOLE_LENGTH = 15
 DEFAULT_ROTATION_ANGLE = 0.05 #rad
 
@@ -85,7 +85,6 @@ class Snake:
         if not self.isInScreen(x, y):
             self.alive = False
             Particule(self.canvas, x, y, self.color)
-            #particule
         else:
             r = self.thickness // 2
             #find all items in contact with new position
@@ -118,7 +117,7 @@ class Snake:
         self.head_coord = [x, y]
         #radius of oval
         r = self.thickness // 2
-        if not self.invincible or not self.time_before_start:
+        if not self.invincible and not self.time_before_start:
             self.handleMove(step)
         if self.hole == 0 and not self.invincible and not self.time_before_start:
             self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
@@ -134,5 +133,11 @@ class Snake:
     
     def restoreAngle(self):
         self.rotating_angle = self.previous_angles.pop(0)
+        
+    def getAlive(self):
+        return self.alive
+        
+    def getName(self):
+        return self.name
     
     #

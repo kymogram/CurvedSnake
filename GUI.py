@@ -116,7 +116,7 @@ class GUI:
             if self.events_queue[0][1] == 0:
                 exec(self.events_queue[0][0])
                 del self.events_queue[0]
-        for snake in self.snakes:
+        for snake in self.snakes_alive:
             if len(snake.events_queue) != 0:
                 for event in snake.events_queue:
                     event[1] -= 1
@@ -125,10 +125,28 @@ class GUI:
                     del snake.events_queue[0]
         if random() < self.bonus_proba:
             self.generateBonus()
-        for snake in self.snakes:
+        for snake in self.snakes_alive:
             snake.move(self.step)
+            if not snake.getAlive():
+                self.snakes_alive.remove(snake)
+        if len(self.snakes_alive) <= 1:
+            add_event = lambda l, f: l.append([f, 250])
+            add_event(self.events_queue, 'self.newRound = True')
+            self.text_before_round = True
+        if self.text_before_round:
+            self.canvas.create_text(self.window_height//2,
+                                    self.window_width//2,
+                                    text=self.snakes_alive[0].getName() +
+                                    ' won this round!',
+                                    fill='white')
+        if self.newRound:
+            return self.playNewRound()
         self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
+        
+    def playNewRound(self):
+        self.clearWindow()
+        self.play()
         
     def geometryMap(self):
         self.window.geometry('{}x{}'.format(self.window_width, self.window_height))
@@ -364,6 +382,8 @@ class GUI:
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = self.window_width, self.window_height
         self.snakes = list()
+        self.newRound = False
+        self.text_before_round = False
         for i in range(len(self.snakes_names)):
             self.snakes.append(Snake(self,
                                      self.snakes_names[i],
@@ -371,6 +391,7 @@ class GUI:
                                      randint(ymin, ymax-ymin),
                                      random()*2*pi,
                                      self.snakes_colors[i]))
+        self.snakes_alive = self.snakes[:]
         self.startInvincible()
         #add create_text with command of each player 
         self.refresh()
