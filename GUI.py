@@ -416,9 +416,9 @@ class GUI:
         self.new_round = False
         self.text_before_round = False
         for i in range(len(self.snakes_names)):
-            snake = Snake(self, self.snake_names[i],
+            snake = Snake(self, self.snakes_names[i],
                           randint(xmin, xmax-xmin), randint(ymin, ymax-ymin),
-                          random()*2*pi, self.snakes_colors[i])))
+                          random()*2*pi, self.snakes_colors[i])
             self.snakes.append(snake)
         self.snakes_alive = self.snakes[:]
         self.startInvincible()

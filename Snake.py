@@ -117,18 +117,16 @@ class Snake:
         self.head_coord = [x, y]
         #radius of oval
         r = self.thickness // 2
-        if not self.invincible and not self.time_before_start:
+        if not self.invincible or not self.time_before_start:
             self.handleMove(step)
-        if self.hole == 0 and not self.invincible and not self.time_before_start:
-            self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
-                                      outline=self.color,
-                                      tag='snake,{},{}'.format(self.name, step))
-            if random() < self.hole_probability:
-                self.hole = randint(self.min_hole_length, self.max_hole_length)
-        elif self.invincible or self.time_before_start:
-            pass
-        else:
-            self.hole -= 1
+            if self.hole == 0:
+                self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
+                                        outline=self.color,
+                                        tag='snake,{},{}'.format(self.name, step))
+                if random() < self.hole_probability:
+                    self.hole = randint(self.min_hole_length, self.max_hole_length)
+            else:
+                self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
     
     def restoreAngle(self):
