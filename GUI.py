@@ -80,7 +80,8 @@ class GUI:
         '''
         self.bonus_dict = dict()
         for i in range(len(GUI.BONUS_FILES)):
-            path = GUI.BONUS_DIRECTORY + GUI.BONUS_FILES[i] + '.' + GUI.BONUS_EXTENSION
+            path = '{}{}.{}'.format(GUI.BONUS_DIRECTORY, GUI.BONUS_FILES[i],
+                                    GUI.BONUS_EXTENSION)
             bonus = Bonus(path, GUI.BONUS_TIMES[i])
             self.bonus_dict[GUI.BONUS_FILES[i]] = bonus
         self.add_bonus_bool = [IntVar(value=1)] * len(self.bonus_dict)
@@ -150,10 +151,10 @@ class GUI:
             # add_event(self.events_queue, 'self.time_before_round = -1')
             # add_event(self.events_queue, 'self.canvas.delete("text_win")')
             self.canvas.create_text(self.window_height//2,
-                            self.window_width//2,
-                            text=self.save_name_winner +
-                            ' won this round!',
-                            fill='white', tags='text_win')
+                                    self.window_width//2,
+                                    text=self.save_name_winner + \
+                                         ' won this round!',
+                                    fill='white', tags='text_win')
         if self.new_round:
             return self.playNewRound()
         self.step += 1
@@ -164,8 +165,8 @@ class GUI:
         self.play()
         
     def geometryMap(self):
-        self.window.geometry(
-                        '{}x{}'.format(self.window_width, self.window_height))
+        self.window.geometry('{}x{}' \
+                            .format(self.window_width, self.window_height))
         self.window.resizable(width=FALSE, height=FALSE)
     
     def quitCurrentPlay(self):
@@ -205,10 +206,12 @@ class GUI:
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
         self.button_left = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][0],
-                            bg='white', command=lambda:self.modifBgColor('L'))
+                                  bg='white',
+                                  command=lambda: self.modifBgColor('L'))
         self.button_left.pack()
         self.button_right = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][1],
-                            bg='white', command=lambda:self.modifBgColor('R'))
+                                   bg='white',
+                                   command=lambda: self.modifBgColor('R'))
         self.button_right.pack()
         self.selectRandomCommands()
         self.color = Combobox(self.window, state='readonly', exportselection=0)
@@ -217,8 +220,8 @@ class GUI:
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
-        Button(self.window,
-                        text='Remove player', command=self.removePlayer).pack()
+        Button(self.window, text='Remove player',
+               command=self.removePlayer).pack()
         Label(self.window, width=250, text='Player ready to play').pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
@@ -238,12 +241,8 @@ class GUI:
                                 image=self.bonus_dict[GUI.BONUS_FILES[i]].image,
                                 variable=self.add_bonus_bool[i])
             add_bonus.grid(row=i%3, column=i//3)
-        self.bonus_scale = Scale(
-                            self.top_bonus,
-                            label='probability',
-                            to=100,
-                            orient=HORIZONTAL
-                        )
+        self.bonus_scale = Scale(self.top_bonus, label='probability',
+                                 to=100, orient=HORIZONTAL)
         self.bonus_scale.set(self.bonus_percent)
         self.bonus_scale.grid(row=4, column=1)
         Radiobutton(self.top_bonus, text='normal',
@@ -252,12 +251,12 @@ class GUI:
                     variable=self.mini_map, value=0).grid(row=5, column=2)
         Radiobutton(self.top_bonus, text='1v1',
                     variable=self.mini_map, value=1).grid(row=5, column=0)
-        Button(self.top_bonus, text='Set', command=self.closeAndGetVal) \
-                                                    .grid(row=6, column=1)
+        b = Button(self.top_bonus, text='Set', command=self.closeAndGetVal)
+        b.grid(row=6, column=1)
         
     def closeAndGetVal(self):
         self.bonus_percent = self.bonus_scale.get()
-        self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
+        self.bonus_proba = (GUI.BONUS_PROBABILITY/100) * self.bonus_percent
         self.top_bonus.destroy()
     
     def selectRandomColor(self):
@@ -265,7 +264,7 @@ class GUI:
             sets a random color in combobox for player
         '''
         availables = [color for color in GUI.DEFAULT_COLORS \
-                                if color not in self.random_colors_used]
+                            if color not in self.random_colors_used]
         if len(availables) > 0:
             self.color.set(choice(availables))
             self.current_color = self.color.get()
@@ -318,16 +317,16 @@ class GUI:
         if len(self.player_known.curselection()) > 0:
             if self.regular_player[self.id] in self.snakes_names:
                 showwarning('Added player',
-                                        'This player is already going to play!')
+                            'This player is already going to play!')
                 return
             if self.regular_colors[self.id] in self.snakes_colors:
                 showwarning('Color', 'The color chosen is already taken')
                 return
             if [commands for commands in self.commands_list \
-                                if self.move_command_left in commands or \
-                                   self.move_command_right in commands] != []:
+                         if self.move_command_left in commands or \
+                            self.move_command_right in commands] != []:
                 showwarning('Commands',
-                                    'Another player has already those commands')
+                            'Another player has already those commands')
                 return
             self.snakes_colors.append(self.regular_colors[self.id])
             self.commands_list.append(self.regular_commands[self.id])
@@ -338,11 +337,11 @@ class GUI:
         else:
             if self.current_name.get() in self.snakes_names:
                 showwarning('Added player',
-                                        'This player is already going to play!')
+                            'This player is already going to play!')
                 return
             if len(self.current_name.get()) > GUI.MAXIMUM_NAME_LENGTH:
                 showwarning('Name player',
-                                        'Your name is too long. Pick a new one')
+                            'Your name is too long. Pick a new one')
                 return
             if self.current_name.get() in self.regular_player:
                 showwarning('Name player', 'This name is already taken')
@@ -351,10 +350,10 @@ class GUI:
                 showwarning('Color', 'The color chosen is already taken')
                 return
             if [commands for commands in self.commands_list \
-                                if self.move_command_left in commands or \
-                                   self.move_command_right in commands] != []:
+                         if self.move_command_left in commands or \
+                            self.move_command_right in commands] != []:
                 showwarning('Commands',
-                                    'Another player has already those commands')
+                            'Another player has already those commands')
                 return
             self.snakes_names.append(self.current_name.get())
             self.player_ingame.insert(END, self.current_name.get())
@@ -417,12 +416,10 @@ class GUI:
         self.new_round = False
         self.text_before_round = False
         for i in range(len(self.snakes_names)):
-            self.snakes.append(Snake(self,
-                                     self.snakes_names[i],
-                                     randint(xmin, xmax-xmin),
-                                     randint(ymin, ymax-ymin),
-                                     random()*2*pi,
-                                     self.snakes_colors[i]))
+            snake = Snake(self, self.snake_names[i],
+                          randint(xmin, xmax-xmin), randint(ymin, ymax-ymin),
+                          random()*2*pi, self.snakes_colors[i])))
+            self.snakes.append(snake)
         self.snakes_alive = self.snakes[:]
         self.startInvincible()
         #add create_text with command of each player 
@@ -430,7 +427,7 @@ class GUI:
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
         self.canvas.bind('<KeyRelease>',
-                                lambda e: self.inputs.release(e.keysym))
+                         lambda e: self.inputs.release(e.keysym))
         
     def startInvincible(self):
         players = list()
@@ -483,7 +480,7 @@ class GUI:
             for snake in others:
                 snake.thickness += DEFAULT_THICKNESS
                 add_event(snake.events_queue,
-                                         'snake.thickness -= DEFAULT_THICKNESS')
+                          'snake.thickness -= DEFAULT_THICKNESS')
         elif bonus_type == 'thickness_down':
             sender.thickness /= 2
             add_event(sender.events_queue, 'snake.thickness *= 2')
@@ -571,20 +568,18 @@ class GUI:
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
             self.colors_list = list(self.color.cget('values'))
+            selection = e.widget.get(self.selected[0])
             if self.is_regular_list:
-                self.id = \
-                    self.regular_player.index(e.widget.get(self.selected[0]))
+                self.id = self.regular_player.index(selection)
                 self.button_left.configure(
                                          text=self.regular_commands[self.id][0])
-                self.button_right.configure(
-                                         text=self.regular_commands[self.id][1])
-                self.color.current(
-                           self.colors_list.index(self.regular_colors[self.id]))
+                self.button_right['text'] = self.regular_commands[self.id][1]
+                self.color.current(self.colors_list.index(
+                                                self.regular_colors[self.id]))
                 self.move_command_left = self.regular_commands[self.id][0]
                 self.move_command_right = self.regular_commands[self.id][1]
             else:
-                self.id = \
-                         self.snakes_names.index(e.widget.get(self.selected[0]))
+                self.id = self.snakes_names.index(selection)
                 self.button_left.configure(text=self.commands_list[self.id][0])
                 self.button_right.configure(text=self.commands_list[self.id][1])
                 self.color.current(
@@ -594,8 +589,8 @@ class GUI:
         '''
             clears selection from listboxes
         '''
-        self.player_ingame.selection_clear(0,END)
-        self.player_known.selection_clear(0,END)
+        self.player_ingame.selection_clear(0, END)
+        self.player_known.selection_clear(0, END)
     
     def keyPressed(self, e):
         '''
