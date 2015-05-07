@@ -29,13 +29,15 @@ class GUI:
     BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
     BONUS_DIRECTORY = './sprites/'
-    BONUS_FILES = ['self_speedup.gif', 'self_speeddown.gif',
-                   'thickness_down.gif', 'all_speeddown.gif',
-                   'reversed_commands.gif', 'all_speedup.gif',
-                   'right_angles.gif', 'thickness_up.gif',
-                   'rotation_angle_down.gif', 'bonus_chance.gif',
-                   'change_color.gif', 'change_chance_hole.gif',
-                   'clean_map.gif', 'change_bg.gif', 'invincible.gif']
+    BONUS_EXTENSION = 'gif'
+    BONUS_FILES = ['self_speedup', 'self_speeddown',
+                   'thickness_down', 'all_speeddown',
+                   'reversed_commands', 'all_speedup',
+                   'right_angles', 'thickness_up',
+                   'rotation_angle_down', 'bonus_chance',
+                   'change_color', 'change_chance_hole',
+                   'clean_map', 'change_bg', 'invincible']
+    BONUS_TIMES = [300] * len(BONUS_FILES)
     def __init__(self):
         #window
         self.window = Tk()
@@ -76,11 +78,12 @@ class GUI:
         '''
             loads all the images in GUI
         '''
-        self.bonus_list = list()
-        for file_name in GUI.BONUS_FILES:
-            self.bonus_list.append(Bonus(GUI.BONUS_DIRECTORY + file_name))
-        self.add_bonus_bool = \
-                        [IntVar(value=1) for i in range(len(self.bonus_list))]
+        self.bonus_dict = dict()
+        for i in range(len(GUI.BONUS_FILES)):
+            path = GUI.BONUS_DIRECTORY + GUI.BONUS_FILES[i] + '.' + GUI.BONUS_EXTENSION
+            bonus = Bonus(path, GUI.BONUS_TIMES[i])
+            self.bonus_dict[GUI.BONUS_FILES[i]] = bonus
+        self.add_bonus_bool = [IntVar(value=1)] * len(self.bonus_dict)
         
     def generateBonus(self):
         '''
@@ -230,15 +233,11 @@ class GUI:
         '''
         self.top_bonus = Toplevel()
         self.top_bonus.grab_set()
-        for i in range(len(self.bonus_list)):
-            add_bonus = Checkbutton(
-                                self.top_bonus,
-                                image=self.bonus_list[i].image,
-                                variable=self.add_bonus_bool[i]
-                            )
-            y = i%3
-            x = i//3
-            add_bonus.grid(row=y, column=x)
+        for i in range(len(self.bonus_dict)):
+            add_bonus = Checkbutton(self.top_bonus,
+                                image=self.bonus_dict[GUI.BONUS_FILES[i]].image,
+                                variable=self.add_bonus_bool[i])
+            add_bonus.grid(row=i%3, column=i//3)
         self.bonus_scale = Scale(
                             self.top_bonus,
                             label='probability',
@@ -247,14 +246,14 @@ class GUI:
                         )
         self.bonus_scale.set(self.bonus_percent)
         self.bonus_scale.grid(row=4, column=1)
-        Radiobutton(self.top_bonus, text='normal', variable=self.mini_map,
-                                                value=2).grid(row=5, column=1)
-        Radiobutton(self.top_bonus, text='mini map', variable=self.mini_map,
-                                                value=0).grid(row=5, column=2)
-        Radiobutton(self.top_bonus, text='1v1', variable=self.mini_map,
-                                                value=1).grid(row=5, column=0)
-        Button(self.top_bonus, text='Set',
-                            command=self.closeAndGetVal).grid(row=6, column=1)
+        Radiobutton(self.top_bonus, text='normal',
+                    variable=self.mini_map, value=2).grid(row=5, column=1)
+        Radiobutton(self.top_bonus, text='mini map',
+                    variable=self.mini_map, value=0).grid(row=5, column=2)
+        Radiobutton(self.top_bonus, text='1v1',
+                    variable=self.mini_map, value=1).grid(row=5, column=0)
+        Button(self.top_bonus, text='Set', command=self.closeAndGetVal) \
+                                                    .grid(row=6, column=1)
         
     def closeAndGetVal(self):
         self.bonus_percent = self.bonus_scale.get()
@@ -379,9 +378,9 @@ class GUI:
                 self.regular_player.append(self.snakes_names[i])
                 self.regular_colors.append(self.snakes_colors[i])
                 self.regular_commands.append(self.commands_list[i])
-        self.available_bonus = \
-                    [self.bonus_list[i] for i in range(len(self.bonus_list))
-                                           if self.add_bonus_bool[i].get() == 1]
+        self.available_bonus =  [self.bonus_dict[GUI.BONUS_FILES[i]] \
+                                 for i in range(len(self.bonus_dict)) \
+                                 if self.add_bonus_bool[i].get() == 1]
         if self.mini_map.get() == 0:
             self.window_height -= 150
             self.window_width -= 150
@@ -452,7 +451,7 @@ class GUI:
                 sender = snake
             else:
                 others.append(snake)
-        add_event = lambda l, f: l.append([f, GUI.BONUS_TIME])
+        add_event = lambda l, f, i=0: l.append([f, GUI.BONUS_TIMES[i]])
         if bonus_type == 'self_speedup':
             sender.speed += 1
             add_event(sender.events_queue, 'snake.speed -= 1')

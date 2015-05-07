@@ -10,7 +10,3 @@ adaptation de CurveFever en Python avec tkinter
 5. bonus loan : tous les joueurs sont en nuances de rose/mauve.
 6. mode yolo : images d'arc-en-ciel, musique psychédélique avec extrait de charlie the unicorn :P
 7. la carte grandit.
-
-#TODO
-
-None
