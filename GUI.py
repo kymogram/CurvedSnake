@@ -67,6 +67,8 @@ class GUI:
         self.time_before_round = 5
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
         self.events_queue = list()
+        self.new_game = True
+        self.finish_game = False
         #init
         self.loadBonusImages()
         self.menuStart()
@@ -133,6 +135,10 @@ class GUI:
         for snake in self.snakes_alive:
             snake.move(self.step)
             if not snake.getAlive():
+                #WARNING: do not add the score of the winner
+                idx = self.snakes.index(snake)
+                self.score[idx] += \
+                                  abs(len(self.snakes) - len(self.snakes_alive))
                 self.snakes_alive.remove(snake)
         if len(self.snakes_alive) <= 1:
             try:
@@ -141,11 +147,11 @@ class GUI:
                 pass
             add_event = lambda l, f: l.append([f, 250])
             add_event(self.events_queue, 'self.new_round = True')
-            self.text_before_round = True
-        if self.text_before_round:
-            # add_event = lambda l, f: l.append([f, 50])
-            # add_event(self.events_queue, 'self.time_before_round = -1')
-            # add_event(self.events_queue, 'self.canvas.delete("text_win")')
+            #Text print who won and timer before next game
+            
+            #add_event = lambda l, f: l.append([f, 50])
+            #add_event(self.events_queue, 'self.time_before_round = -1')
+            #add_event(self.events_queue, 'self.canvas.delete("text_win")')
             self.canvas.create_text(self.window_height//2,
                             self.window_width//2,
                             text=self.save_name_winner +
@@ -157,8 +163,20 @@ class GUI:
         self.current_loop = self.window.after(self.timer, self.refresh)
         
     def playNewRound(self):
-        self.clearWindow()
-        self.play()
+        #find_last_snake = \
+                    #[self.snakes[i].getName() for i in range(len(self.snakes))]
+        #idx = find_last_snake.index(self.save_name_winner)
+        #self.score[idx] += abs(len(self.snakes) - 1)
+        print(self.score)
+        for elem in self.score:
+            if elem >= (len(self.score)*10)-10:
+                self.finish_game = True
+        self.new_game = False
+        if not self.finish_game:
+            self.clearWindow()
+            self.play()
+        else:
+            self.quitCurrentPlay()
         
     def geometryMap(self):
         self.window.geometry(
@@ -175,6 +193,8 @@ class GUI:
         self.window_height = GUI.DEFAULT_HEIGHT
         self.window_width = GUI.DEFAULT_WIDTH
         self.geometryMap()
+        self.new_game = True
+        self.finish_game = False
         self.menuStart()
     
     def clearWindow(self):
@@ -292,8 +312,8 @@ class GUI:
             creates a random name for next player
         '''
         self.current_name.set('{}{}'.format(GUI.DEFAULT_NAME,
-                              '' if len(self.snakes_names) == 0 \
-                                 else '_' + str(randint(0, 666))))
+                                '' if len(self.snakes_names) == 0 \
+                                else '_' + str(randint(0, 666))))
     
     def removePlayer(self):
         '''
@@ -416,15 +436,18 @@ class GUI:
         xmax, ymax = self.window_width, self.window_height
         self.snakes = list()
         self.new_round = False
-        self.text_before_round = False
         for i in range(len(self.snakes_names)):
             self.snakes.append(Snake(self,
-                                     self.snakes_names[i],
-                                     randint(xmin, xmax-xmin),
-                                     randint(ymin, ymax-ymin),
-                                     random()*2*pi,
-                                     self.snakes_colors[i]))
+                                    self.snakes_names[i],
+                                    randint(xmin, xmax-xmin),
+                                    randint(ymin, ymax-ymin),
+                                    random()*2*pi,
+                                    self.snakes_colors[i]))
         self.snakes_alive = self.snakes[:]
+        #self.new_game will be used only to initialiate the score
+        if self.new_game:
+            self.score = list()
+            self.score = [0 for i in range(len(self.snakes))]
         self.startInvincible()
         #add create_text with command of each player 
         self.refresh()
