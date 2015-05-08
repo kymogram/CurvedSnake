@@ -119,7 +119,8 @@ class Snake:
         r = self.thickness // 2
         if not self.invincible and not self.time_before_start:
             self.handleMove(step)
-        if self.hole == 0 and not self.invincible and not self.time_before_start:
+        if self.hole == 0 and not self.invincible \
+                          and not self.time_before_start:
             self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
                                       outline=self.color,
                                       tag='snake,{},{}'.format(self.name, step))

@@ -47,7 +47,7 @@ class Particule:
         for i in range(par_nbr):
             w = self.par_sizes[i]
             #On dessinne une ligne car le width gére automatiquement l'épaisseur
-            #A l'opposé d'un carré ou on aurai du modifier les coordonnées x
+            #A l'opposé d'un carré ou on aurait du modifier les coordonnées x
             particule = self.canva.create_line(
                                         self.x, 
                                         self.y-w//2,
@@ -56,7 +56,7 @@ class Particule:
                                         fill=color,
                                         width = w
                                     )
-            self.particules[i] = particule #id de notre particule sauvegardé:
+            self.particules[i] = particule #id de notre particule sauvegardée:
         self.refreshSystem()
 
     def refreshSystem(self):
