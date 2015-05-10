@@ -116,7 +116,7 @@ class Snake:
         self.head_coord = [x, y]
         #radius of oval
         r = self.thickness // 2
-        if not self.invincible or not self.time_before_start:
+        if not self.invincible and not self.time_before_start:
             self.handleMove(step)
             if self.hole == 0:
                 self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
