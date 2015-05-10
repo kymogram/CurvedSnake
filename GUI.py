@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
+import tkinter.font
 
 from random import randint, random, choice
 from math import pi
@@ -173,8 +174,10 @@ class GUI:
         for i in range(len(self.snakes)):
             score_text = Label(self.score_frame,
                                text=str(self.snakes[i].getName()) + ' : ' + \
-                               str(self.score[i]))
-            score_text.pack()
+                               str(self.score[i]),
+                               background=self.snakes[i].getColor(),
+                               font=font.Font(family='fixedsys', size=12))
+            score_text.pack(padx=5, pady=5)
             if len(self.scores_text) != len(self.snakes):
                 self.scores_text.append(score_text)
             
@@ -184,7 +187,7 @@ class GUI:
         
     def playNewRound(self):
         for elem in self.score:
-            if elem >= (len(self.score)*10)-10:
+            if elem >= (len(self.score)-1)*10:
                 self.finish_game = True
         self.new_game = False
         if not self.finish_game:
