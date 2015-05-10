@@ -171,7 +171,21 @@ class GUI:
         for i in range(len(self.score)):
             if i != idx and self.snakes[i].getAlive():
                 self.score[i] += 1
+                self.updateScoreShown(i)
         print(self.score)
+        
+    def scoreShown(self):
+        for i in range(len(self.snakes)):
+            score_text = Label(self.score_frame,
+                               text=str(self.snakes[i].getName()) + ' : ' + \
+                               str(self.score[i]))
+            score_text.pack()
+            if len(self.scores_text) != len(self.snakes):
+                self.scores_text.append(score_text)
+            
+    def updateScoreShown(self, i):
+        self.scores_text[i].configure(text=str(self.snakes[i].getName()) + \
+                                      ' : ' + str(self.score[i]))
         
     def playNewRound(self):
         for elem in self.score:
@@ -452,6 +466,8 @@ class GUI:
         if self.new_game:
             self.score = list()
             self.score = [0 for i in range(len(self.snakes))]
+            self.scores_text = list()
+        self.scoreShown()
         self.startInvincible()
         #add create_text with command of each player 
         self.refresh()
