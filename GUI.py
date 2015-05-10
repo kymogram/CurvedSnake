@@ -10,8 +10,8 @@ from Bonus import *
 from InputManager import *
 
 class GUI:
-    DEFAULT_WIDTH = 800        #pixels
-    DEFAULT_HEIGHT = 800       #pixels
+    DEFAULT_WIDTH = 1000       #pixels
+    DEFAULT_HEIGHT = 1000      #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
     BONUS_PROBABILITY = 0.01
@@ -43,6 +43,8 @@ class GUI:
         self.window = Tk()
         self.window_width = GUI.DEFAULT_WIDTH
         self.window_height = GUI.DEFAULT_HEIGHT
+        self.canvas_width = self.window_width - 200
+        self.canvas_height = self.window_height - 200
         self.mini_map = IntVar(value=2)
         self.one_vs_one = IntVar()
         self.window.geometry(
@@ -93,7 +95,7 @@ class GUI:
             generates a random bonus and puts it on canvas
         '''
         xmin, ymin = GUI.BONUS_SPRITES_DIMENSIONS
-        xmax, ymax = self.window_width-xmin, self.window_height-ymin
+        xmax, ymax = self.canvas_width-xmin, self.canvas_height-ymin
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
         if len(self.available_bonus) > 0:
             bonus = choice(self.available_bonus)
@@ -154,8 +156,8 @@ class GUI:
             #add_event = lambda l, f: l.append([f, 50])
             #add_event(self.events_queue, 'self.time_before_round = -1')
             #add_event(self.events_queue, 'self.canvas.delete("text_win")')
-            self.canvas.create_text(self.window_height//2,
-                                    self.window_width//2,
+            self.canvas.create_text(self.canvas_height//2,
+                                    self.canvas_width//2,
                                     text=self.save_name_winner + \
                                          ' won this round!',
                                     fill='white', tags='text_win')
@@ -184,7 +186,7 @@ class GUI:
         
     def geometryMap(self):
         self.window.geometry('{}x{}' \
-                            .format(self.window_width+200, self.window_height+200))
+                            .format(self.window_width, self.window_height))
         # self.canvas.configure(height = self.window_height,
                               # width = self.window_width)
         self.window.resizable(width=FALSE, height=FALSE)
@@ -403,11 +405,11 @@ class GUI:
                                  for i in range(len(self.bonus_dict)) \
                                  if self.add_bonus_bool[i].get() == 1]
         if self.mini_map.get() == 0:
-            self.window_height -= 150
-            self.window_width -= 150
+            self.canvas_height -= 150
+            self.canvas_width -= 150
         elif self.mini_map.get() == 1:
-            self.window_height -= 300
-            self.window_width -= 300
+            self.canvas_height -= 300
+            self.canvas_width -= 300
         self.geometryMap()
         self.window.after(1000, self.play)
     
@@ -434,10 +436,10 @@ class GUI:
         Label(self.score_frame, text='Score').pack()
         self.canvas_frame = Frame(self.window, relief=RAISED)
         self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
-        self.canvas = Canvas(self.canvas_frame, height = self.window_height, width = self.window_width, bg='black', highlightthickness=0)
+        self.canvas = Canvas(self.canvas_frame, height = self.canvas_height, width = self.canvas_width, bg='black', highlightthickness=0)
         self.canvas.pack()
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
-        xmax, ymax = self.window_width, self.window_height
+        xmax, ymax = self.canvas_width, self.canvas_height
         self.snakes = list()
         self.new_round = False
         for i in range(len(self.snakes_names)):
