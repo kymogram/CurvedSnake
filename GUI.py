@@ -144,18 +144,13 @@ class GUI:
             if not snake.getAlive():
                 self.updateScore(snake)
                 self.snakes_alive.remove(snake)
-        if len(self.snakes_alive) <= 1:
+        if len(self.snakes_alive) <= 1 and len(self.snakes) != 1:
             try:
                 self.save_name_winner = self.snakes_alive[0].getName()
             except:
                 pass
             add_event = lambda l, f: l.append([f, 250])
             add_event(self.events_queue, 'self.new_round = True')
-            #Text print who won and timer before next game
-            
-            #add_event = lambda l, f: l.append([f, 50])
-            #add_event(self.events_queue, 'self.time_before_round = -1')
-            #add_event(self.events_queue, 'self.canvas.delete("text_win")')
             self.canvas.create_text(self.canvas_height//2,
                                     self.canvas_width//2,
                                     text=self.save_name_winner + \
@@ -169,7 +164,7 @@ class GUI:
     def updateScore(self, snake):
         idx = self.snakes.index(snake)
         for i in range(len(self.score)):
-            if i != idx and self.snakes[i].getAlive():
+            if self.snakes[i].getAlive():
                 self.score[i] += 1
                 self.updateScoreShown(i)
         print(self.score)
@@ -194,6 +189,7 @@ class GUI:
         self.new_game = False
         if not self.finish_game:
             self.clearWindow()
+            self.scoreShown()
             self.play()
         else:
             self.quitCurrentPlay()
@@ -201,8 +197,6 @@ class GUI:
     def geometryMap(self):
         self.window.geometry('{}x{}' \
                             .format(self.window_width, self.window_height))
-        # self.canvas.configure(height = self.window_height,
-                              # width = self.window_width)
         self.window.resizable(width=FALSE, height=FALSE)
     
     def quitCurrentPlay(self):
@@ -445,10 +439,10 @@ class GUI:
         '''
             prepares the game
         '''
-        self.score_frame = Frame(self.window, relief=RAISED)
+        self.score_frame = Frame(self.window, relief=GROOVE, bd=2)
         self.score_frame.pack(side=LEFT)
         Label(self.score_frame, text='Score').pack()
-        self.canvas_frame = Frame(self.window, relief=RAISED)
+        self.canvas_frame = Frame(self.window, relief=RAISED, bd=15, cursor='none')
         self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
         self.canvas = Canvas(self.canvas_frame, height = self.canvas_height, width = self.canvas_width, bg='black', highlightthickness=0)
         self.canvas.pack()
