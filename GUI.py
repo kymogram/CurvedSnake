@@ -84,7 +84,7 @@ class GUI:
                                     GUI.BONUS_EXTENSION)
             bonus = Bonus(path, GUI.BONUS_TIMES[i])
             self.bonus_dict[GUI.BONUS_FILES[i]] = bonus
-        self.add_bonus_bool = [IntVar(value=1)] * len(self.bonus_dict)
+        self.add_bonus_bool = [IntVar(value=1) for i in range(len(self.bonus_dict))]
         
     def generateBonus(self):
         '''
