@@ -140,10 +140,7 @@ class GUI:
         for snake in self.snakes_alive:
             snake.move(self.step)
             if not snake.getAlive():
-                #WARNING: do not add the score of the winner
-                idx = self.snakes.index(snake)
-                self.score[idx] += \
-                                  abs(len(self.snakes) - len(self.snakes_alive))
+                self.updateScore(snake)
                 self.snakes_alive.remove(snake)
         if len(self.snakes_alive) <= 1:
             try:
@@ -167,12 +164,14 @@ class GUI:
         self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
         
-    def playNewRound(self):
-        #find_last_snake = \
-                    #[self.snakes[i].getName() for i in range(len(self.snakes))]
-        #idx = find_last_snake.index(self.save_name_winner)
-        #self.score[idx] += abs(len(self.snakes) - 1)
+    def updateScore(self, snake):
+        idx = self.snakes.index(snake)
+        for i in range(len(self.score)):
+            if i != idx and self.snakes[i].getAlive():
+                self.score[i] += 1
         print(self.score)
+        
+    def playNewRound(self):
         for elem in self.score:
             if elem >= (len(self.score)*10)-10:
                 self.finish_game = True
@@ -185,7 +184,9 @@ class GUI:
         
     def geometryMap(self):
         self.window.geometry('{}x{}' \
-                            .format(self.window_width, self.window_height))
+                            .format(self.window_width+200, self.window_height+200))
+        # self.canvas.configure(height = self.window_height,
+                              # width = self.window_width)
         self.window.resizable(width=FALSE, height=FALSE)
     
     def quitCurrentPlay(self):
@@ -404,11 +405,10 @@ class GUI:
         if self.mini_map.get() == 0:
             self.window_height -= 150
             self.window_width -= 150
-            self.geometryMap()
         elif self.mini_map.get() == 1:
             self.window_height -= 300
             self.window_width -= 300
-            self.geometryMap()
+        self.geometryMap()
         self.window.after(1000, self.play)
     
     def modifBgColor(self, side):
@@ -429,8 +429,13 @@ class GUI:
         '''
             prepares the game
         '''
-        self.canvas = Canvas(self.window, bg='black', highlightthickness=0)
-        self.canvas.pack(expand=1, fill='both')
+        self.score_frame = Frame(self.window, relief=RAISED)
+        self.score_frame.pack(side=LEFT)
+        Label(self.score_frame, text='Score').pack()
+        self.canvas_frame = Frame(self.window, relief=RAISED)
+        self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
+        self.canvas = Canvas(self.canvas_frame, height = self.window_height, width = self.window_width, bg='black', highlightthickness=0)
+        self.canvas.pack()
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = self.window_width, self.window_height
         self.snakes = list()
