@@ -1,6 +1,7 @@
 from tkinter import *
 
 class Bonus:
-    def __init__(self, path):
+    def __init__(self, path, length):
         self.name = path[path.rfind('/')+1:path.rfind('.')]
         self.image = PhotoImage(file=path)
+        self.length = length

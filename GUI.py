@@ -29,13 +29,15 @@ class GUI:
     BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
     BONUS_DIRECTORY = './sprites/'
-    BONUS_FILES = ['self_speedup.gif', 'self_speeddown.gif',
-                   'thickness_down.gif', 'all_speeddown.gif',
-                   'reversed_commands.gif', 'all_speedup.gif',
-                   'right_angles.gif', 'thickness_up.gif',
-                   'rotation_angle_down.gif', 'bonus_chance.gif',
-                   'change_color.gif', 'change_chance_hole.gif',
-                   'clean_map.gif', 'change_bg.gif', 'invincible.gif']
+    BONUS_EXTENSION = 'gif'
+    BONUS_FILES = ['self_speedup', 'self_speeddown',
+                   'thickness_down', 'all_speeddown',
+                   'reversed_commands', 'all_speedup',
+                   'right_angles', 'thickness_up',
+                   'rotation_angle_down', 'bonus_chance',
+                   'change_color', 'change_chance_hole',
+                   'clean_map', 'change_bg', 'invincible']
+    BONUS_TIMES = [300] * len(BONUS_FILES)
     def __init__(self):
         #window
         self.window = Tk()
@@ -78,11 +80,13 @@ class GUI:
         '''
             loads all the images in GUI
         '''
-        self.bonus_list = list()
-        for file_name in GUI.BONUS_FILES:
-            self.bonus_list.append(Bonus(GUI.BONUS_DIRECTORY + file_name))
-        self.add_bonus_bool = \
-                        [IntVar(value=1) for i in range(len(self.bonus_list))]
+        self.bonus_dict = dict()
+        for i in range(len(GUI.BONUS_FILES)):
+            path = '{}{}.{}'.format(GUI.BONUS_DIRECTORY, GUI.BONUS_FILES[i],
+                                    GUI.BONUS_EXTENSION)
+            bonus = Bonus(path, GUI.BONUS_TIMES[i])
+            self.bonus_dict[GUI.BONUS_FILES[i]] = bonus
+        self.add_bonus_bool = [IntVar(value=1)] * len(self.bonus_dict)
         
     def generateBonus(self):
         '''
@@ -91,9 +95,10 @@ class GUI:
         xmin, ymin = GUI.BONUS_SPRITES_DIMENSIONS
         xmax, ymax = self.window_width-xmin, self.window_height-ymin
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
-        bonus = choice(self.available_bonus)
-        self.canvas.create_image(x, y, image=bonus.image,
-                                 tags='bonus,{}'.format(bonus.name))
+        if len(self.available_bonus) > 0:
+            bonus = choice(self.available_bonus)
+            self.canvas.create_image(x, y, image=bonus.image,
+                                     tags='bonus,{}'.format(bonus.name))
     
     def findRandomFreePosition(self, xmin, xmax, ymin, ymax):
         '''
@@ -153,10 +158,10 @@ class GUI:
             #add_event(self.events_queue, 'self.time_before_round = -1')
             #add_event(self.events_queue, 'self.canvas.delete("text_win")')
             self.canvas.create_text(self.window_height//2,
-                            self.window_width//2,
-                            text=self.save_name_winner +
-                            ' won this round!',
-                            fill='white', tags='text_win')
+                                    self.window_width//2,
+                                    text=self.save_name_winner + \
+                                         ' won this round!',
+                                    fill='white', tags='text_win')
         if self.new_round:
             return self.playNewRound()
         self.step += 1
@@ -179,8 +184,8 @@ class GUI:
             self.quitCurrentPlay()
         
     def geometryMap(self):
-        self.window.geometry(
-                        '{}x{}'.format(self.window_width, self.window_height))
+        self.window.geometry('{}x{}' \
+                            .format(self.window_width, self.window_height))
         self.window.resizable(width=FALSE, height=FALSE)
     
     def quitCurrentPlay(self):
@@ -222,10 +227,12 @@ class GUI:
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
         self.button_left = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][0],
-                            bg='white', command=lambda:self.modifBgColor('L'))
+                                  bg='white',
+                                  command=lambda: self.modifBgColor('L'))
         self.button_left.pack()
         self.button_right = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][1],
-                            bg='white', command=lambda:self.modifBgColor('R'))
+                                   bg='white',
+                                   command=lambda: self.modifBgColor('R'))
         self.button_right.pack()
         self.selectRandomCommands()
         self.color = Combobox(self.window, state='readonly', exportselection=0)
@@ -234,8 +241,8 @@ class GUI:
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
-        Button(self.window,
-                        text='Remove player', command=self.removePlayer).pack()
+        Button(self.window, text='Remove player',
+               command=self.removePlayer).pack()
         Label(self.window, width=250, text='Player ready to play').pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
@@ -250,35 +257,27 @@ class GUI:
         '''
         self.top_bonus = Toplevel()
         self.top_bonus.grab_set()
-        for i in range(len(self.bonus_list)):
-            add_bonus = Checkbutton(
-                                self.top_bonus,
-                                image=self.bonus_list[i].image,
-                                variable=self.add_bonus_bool[i]
-                            )
-            y = i%3
-            x = i//3
-            add_bonus.grid(row=y, column=x)
-        self.bonus_scale = Scale(
-                            self.top_bonus,
-                            label='probability',
-                            to=100,
-                            orient=HORIZONTAL
-                        )
+        for i in range(len(self.bonus_dict)):
+            add_bonus = Checkbutton(self.top_bonus,
+                                image=self.bonus_dict[GUI.BONUS_FILES[i]].image,
+                                variable=self.add_bonus_bool[i])
+            add_bonus.grid(row=i%3, column=i//3)
+        self.bonus_scale = Scale(self.top_bonus, label='probability',
+                                 to=100, orient=HORIZONTAL)
         self.bonus_scale.set(self.bonus_percent)
         self.bonus_scale.grid(row=4, column=1)
-        Radiobutton(self.top_bonus, text='normal', variable=self.mini_map,
-                                                value=2).grid(row=5, column=1)
-        Radiobutton(self.top_bonus, text='mini map', variable=self.mini_map,
-                                                value=0).grid(row=5, column=2)
-        Radiobutton(self.top_bonus, text='1v1', variable=self.mini_map,
-                                                value=1).grid(row=5, column=0)
-        Button(self.top_bonus, text='Set',
-                            command=self.closeAndGetVal).grid(row=6, column=1)
+        Radiobutton(self.top_bonus, text='normal',
+                    variable=self.mini_map, value=2).grid(row=5, column=1)
+        Radiobutton(self.top_bonus, text='mini map',
+                    variable=self.mini_map, value=0).grid(row=5, column=2)
+        Radiobutton(self.top_bonus, text='1v1',
+                    variable=self.mini_map, value=1).grid(row=5, column=0)
+        b = Button(self.top_bonus, text='Set', command=self.closeAndGetVal)
+        b.grid(row=6, column=1)
         
     def closeAndGetVal(self):
         self.bonus_percent = self.bonus_scale.get()
-        self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
+        self.bonus_proba = (GUI.BONUS_PROBABILITY/100) * self.bonus_percent
         self.top_bonus.destroy()
     
     def selectRandomColor(self):
@@ -286,7 +285,7 @@ class GUI:
             sets a random color in combobox for player
         '''
         availables = [color for color in GUI.DEFAULT_COLORS \
-                                if color not in self.random_colors_used]
+                            if color not in self.random_colors_used]
         if len(availables) > 0:
             self.color.set(choice(availables))
             self.current_color = self.color.get()
@@ -339,16 +338,16 @@ class GUI:
         if len(self.player_known.curselection()) > 0:
             if self.regular_player[self.id] in self.snakes_names:
                 showwarning('Added player',
-                                        'This player is already going to play!')
+                            'This player is already going to play!')
                 return
             if self.regular_colors[self.id] in self.snakes_colors:
                 showwarning('Color', 'The color chosen is already taken')
                 return
             if [commands for commands in self.commands_list \
-                                if self.move_command_left in commands or \
-                                   self.move_command_right in commands] != []:
+                         if self.move_command_left in commands or \
+                            self.move_command_right in commands] != []:
                 showwarning('Commands',
-                                    'Another player has already those commands')
+                            'Another player has already those commands')
                 return
             self.snakes_colors.append(self.regular_colors[self.id])
             self.commands_list.append(self.regular_commands[self.id])
@@ -359,11 +358,11 @@ class GUI:
         else:
             if self.current_name.get() in self.snakes_names:
                 showwarning('Added player',
-                                        'This player is already going to play!')
+                            'This player is already going to play!')
                 return
             if len(self.current_name.get()) > GUI.MAXIMUM_NAME_LENGTH:
                 showwarning('Name player',
-                                        'Your name is too long. Pick a new one')
+                            'Your name is too long. Pick a new one')
                 return
             if self.current_name.get() in self.regular_player:
                 showwarning('Name player', 'This name is already taken')
@@ -372,10 +371,10 @@ class GUI:
                 showwarning('Color', 'The color chosen is already taken')
                 return
             if [commands for commands in self.commands_list \
-                                if self.move_command_left in commands or \
-                                   self.move_command_right in commands] != []:
+                         if self.move_command_left in commands or \
+                            self.move_command_right in commands] != []:
                 showwarning('Commands',
-                                    'Another player has already those commands')
+                            'Another player has already those commands')
                 return
             self.snakes_names.append(self.current_name.get())
             self.player_ingame.insert(END, self.current_name.get())
@@ -399,9 +398,9 @@ class GUI:
                 self.regular_player.append(self.snakes_names[i])
                 self.regular_colors.append(self.snakes_colors[i])
                 self.regular_commands.append(self.commands_list[i])
-        self.available_bonus = \
-                    [self.bonus_list[i] for i in range(len(self.bonus_list))
-                                           if self.add_bonus_bool[i].get() == 1]
+        self.available_bonus =  [self.bonus_dict[GUI.BONUS_FILES[i]] \
+                                 for i in range(len(self.bonus_dict)) \
+                                 if self.add_bonus_bool[i].get() == 1]
         if self.mini_map.get() == 0:
             self.window_height -= 150
             self.window_width -= 150
@@ -437,12 +436,10 @@ class GUI:
         self.snakes = list()
         self.new_round = False
         for i in range(len(self.snakes_names)):
-            self.snakes.append(Snake(self,
-                                    self.snakes_names[i],
-                                    randint(xmin, xmax-xmin),
-                                    randint(ymin, ymax-ymin),
-                                    random()*2*pi,
-                                    self.snakes_colors[i]))
+            snake = Snake(self, self.snakes_names[i],
+                          randint(xmin, xmax-xmin), randint(ymin, ymax-ymin),
+                          random()*2*pi, self.snakes_colors[i])
+            self.snakes.append(snake)
         self.snakes_alive = self.snakes[:]
         #self.new_game will be used only to initialiate the score
         if self.new_game:
@@ -454,7 +451,7 @@ class GUI:
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
         self.canvas.bind('<KeyRelease>',
-                                lambda e: self.inputs.release(e.keysym))
+                         lambda e: self.inputs.release(e.keysym))
         
     def startInvincible(self):
         players = list()
@@ -475,7 +472,7 @@ class GUI:
                 sender = snake
             else:
                 others.append(snake)
-        add_event = lambda l, f: l.append([f, GUI.BONUS_TIME])
+        add_event = lambda l, f, i=0: l.append([f, GUI.BONUS_TIMES[i]])
         if bonus_type == 'self_speedup':
             sender.speed += 1
             add_event(sender.events_queue, 'snake.speed -= 1')
@@ -507,7 +504,7 @@ class GUI:
             for snake in others:
                 snake.thickness += DEFAULT_THICKNESS
                 add_event(snake.events_queue,
-                                         'snake.thickness -= DEFAULT_THICKNESS')
+                          'snake.thickness -= DEFAULT_THICKNESS')
         elif bonus_type == 'thickness_down':
             sender.thickness /= 2
             add_event(sender.events_queue, 'snake.thickness *= 2')
@@ -595,20 +592,18 @@ class GUI:
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
             self.colors_list = list(self.color.cget('values'))
+            selection = e.widget.get(self.selected[0])
             if self.is_regular_list:
-                self.id = \
-                    self.regular_player.index(e.widget.get(self.selected[0]))
+                self.id = self.regular_player.index(selection)
                 self.button_left.configure(
                                          text=self.regular_commands[self.id][0])
-                self.button_right.configure(
-                                         text=self.regular_commands[self.id][1])
-                self.color.current(
-                           self.colors_list.index(self.regular_colors[self.id]))
+                self.button_right['text'] = self.regular_commands[self.id][1]
+                self.color.current(self.colors_list.index(
+                                                self.regular_colors[self.id]))
                 self.move_command_left = self.regular_commands[self.id][0]
                 self.move_command_right = self.regular_commands[self.id][1]
             else:
-                self.id = \
-                         self.snakes_names.index(e.widget.get(self.selected[0]))
+                self.id = self.snakes_names.index(selection)
                 self.button_left.configure(text=self.commands_list[self.id][0])
                 self.button_right.configure(text=self.commands_list[self.id][1])
                 self.color.current(
@@ -618,8 +613,8 @@ class GUI:
         '''
             clears selection from listboxes
         '''
-        self.player_ingame.selection_clear(0,END)
-        self.player_known.selection_clear(0,END)
+        self.player_ingame.selection_clear(0, END)
+        self.player_known.selection_clear(0, END)
     
     def keyPressed(self, e):
         '''
