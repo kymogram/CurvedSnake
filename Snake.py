@@ -1,4 +1,4 @@
-from Particle import *
+from Particles import *
 from tkinter import *
 from math import cos, sin
 from random import random, randint
