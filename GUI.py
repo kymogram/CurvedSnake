@@ -37,7 +37,7 @@ class GUI:
                    'right_angles', 'thickness_up',
                    'rotation_angle_down', 'bonus_chance',
                    'change_color', 'change_chance_hole',
-                   'clean_map', 'change_bg', 'invincible']
+                   'clean_map', 'negative', 'invincible']
     BONUS_TIMES = [300] * len(BONUS_FILES)
     def __init__(self):
         #window
@@ -135,7 +135,7 @@ class GUI:
             if len(snake.events_queue) != 0:
                 for event in snake.events_queue:
                     event[1] -= 1
-                if snake.events_queue[0][1] == 0:
+                while snake.events_queue and snake.events_queue[0][1] == 0:
                     exec(snake.events_queue[0][0])
                     del snake.events_queue[0]
         if random() < self.bonus_proba:
@@ -207,10 +207,12 @@ class GUI:
             stops the current game and resets the start menu
         '''
         self.window.after_cancel(self.current_loop)
-        self.random_colors_used = []
+        self.random_colors_used   = []
         self.random_commands_used = []
         self.window_height = GUI.DEFAULT_HEIGHT
-        self.window_width = GUI.DEFAULT_WIDTH
+        self.window_width  = GUI.DEFAULT_WIDTH
+        self.canvas_height = self.window_height - 200
+        self.canvas_width  = self.window_width - 200
         self.geometryMap()
         self.new_game = True
         self.finish_game = False
@@ -551,9 +553,14 @@ class GUI:
             add_event(sender.events_queue, 'snake.invincible = False')
         elif bonus_type == 'clean_map':
             self.canvas.delete(ALL)
-        elif bonus_type == 'change_bg':
-            self.canvas.configure(bg='white')
+        elif bonus_type == 'negative':
+            self.canvas.configure(bg=self.invertColor('black'))
             add_event(self.events_queue, 'self.canvas.configure(bg="black")')
+            for snake in self.snakes:
+                snake.color = self.invertColor(snake.getColor())
+                snake.updateHeadColor()
+                add_event(snake.events_queue, 'snake.color = snake.color_unchanged')
+                add_event(snake.events_queue, 'snake.updateHeadColor()')
         # time_bonus_left = GUI.BONUS_TIME
         # angle = (time_bonus_left/GUI.BONUS_TIME)*360
         # if sender == snake:
@@ -563,6 +570,12 @@ class GUI:
         # time_bonus_left -= 1
         
     #callbacks
+    
+    def invertColor(self, color):
+        rgb = self.canvas.winfo_rgb(color)
+        inv_red, inv_green, inv_blue = \
+                                255-(rgb[0]//256), 255-(rgb[1]//256), 255-(rgb[2]//256)
+        return "#{:02x}{:02x}{:02x}".format(inv_red, inv_green, inv_blue)
     
     def setCommand(self, e):
         '''

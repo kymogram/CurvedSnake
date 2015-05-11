@@ -139,5 +139,8 @@ class Snake:
         
     def getColor(self):
         return self.color_unchanged
+        
+    def updateHeadColor(self):
+        self.canvas.itemconfig(self.head_id, fill=self.color, outline=self.color)
     
     #
