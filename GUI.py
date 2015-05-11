@@ -38,7 +38,8 @@ class GUI:
                    'right_angles', 'thickness_up',
                    'rotation_angle_down', 'bonus_chance',
                    'change_color', 'change_chance_hole',
-                   'clean_map', 'negative', 'invincible']
+                   'clean_map', 'negative', 'invincible',
+                   'shrink_map']
     BONUS_TIMES = [300] * len(BONUS_FILES)
     def __init__(self):
         #window
@@ -562,7 +563,7 @@ class GUI:
             for snake in others:
                 snake.color = sender.color
                 add_event(snake.events_queue,
-                                          'snake.color = snake.color_unchanged')
+                          'snake.color = snake.color_unchanged')
         elif bonus_type == 'change_chance_hole':
             add_event = lambda l, f: l.append([f, 750])
             for snake in others:
@@ -581,6 +582,8 @@ class GUI:
                 snake.updateHeadColor()
                 add_event(snake.events_queue, 'snake.color = snake.color_unchanged')
                 add_event(snake.events_queue, 'snake.updateHeadColor()')
+        elif bonus_type == 'shrink_map':
+            pass
         # time_bonus_left = GUI.BONUS_TIME
         # angle = (time_bonus_left/GUI.BONUS_TIME)*360
         # if sender == snake:
