@@ -124,6 +124,8 @@ class GUI:
                 self.snakes[i].turn(TURN_LEFT)
             elif self.inputs.isPressed(right):
                 self.snakes[i].turn(TURN_RIGHT)
+            if abs(self.snakes[i].rotating_angle - pi/2) < 0.0001:
+                self.inputs.release(left if self.inputs.isPressed(left) else right)
     
     def refresh(self):
         '''
