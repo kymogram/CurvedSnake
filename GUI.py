@@ -42,10 +42,7 @@ class GUI:
     def __init__(self):
         #window
         self.window = Tk()
-        self.window_width = GUI.DEFAULT_WIDTH
-        self.window_height = GUI.DEFAULT_HEIGHT
-        self.canvas_width = self.window_width - 200
-        self.canvas_height = self.window_height - 200
+        self.default_values()
         self.mini_map = IntVar(value=2)
         self.one_vs_one = IntVar()
         self.window.geometry(
@@ -60,8 +57,6 @@ class GUI:
         self.regular_player = []
         self.regular_colors = []
         self.regular_commands = []
-        self.random_colors_used = []
-        self.random_commands_used = []
         self.left_key = self.right_key = False
         self.is_regular_list = False
         #other variables
@@ -72,14 +67,22 @@ class GUI:
         self.time_before_round = 5
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
         self.events_queue = list()
-        self.new_game = True
-        self.finish_game = False
         #init
         self.loadBonusImages()
         self.loadSave()
         self.menuStart()
         self.window.protocol("WM_DELETE_WINDOW", self.saveParameters)
         self.window.mainloop()
+    
+    def default_values(self):
+        self.random_colors_used   = []
+        self.random_commands_used = []
+        self.window_height = GUI.DEFAULT_HEIGHT
+        self.window_width  = GUI.DEFAULT_WIDTH
+        self.canvas_height = self.window_height - 200
+        self.canvas_width  = self.window_width - 200
+        self.new_game = True
+        self.finish_game = False
     
     def loadBonusImages(self):
         '''
@@ -135,11 +138,11 @@ class GUI:
                 del self.events_queue[0]
         for snake in self.snakes_alive:
             if len(snake.events_queue) != 0:
-                for event in snake.events_queue:
-                    event[1] -= 1
-                while snake.events_queue and snake.events_queue[0][1] == 0:
-                    exec(snake.events_queue[0][0])
-                    del snake.events_queue[0]
+                for i in range(len(snake.events_queue)):
+                    snake.events_queue[i][1] -= 1
+                    if snake.events_queue[i][1] == 0:
+                        exec(snake.events_queue[0][0])
+                        del snake.events_queue[0]
         if random() < self.bonus_proba:
             self.generateBonus()
         for snake in self.snakes_alive:
@@ -147,23 +150,34 @@ class GUI:
             if not snake.getAlive():
                 self.updateScore(snake)
                 self.snakes_alive.remove(snake)
-        if len(self.snakes_alive) <= 1 and len(self.snakes) != 1:
-            try:
-                self.save_name_winner = self.snakes_alive[0].getName()
-            except:
-                pass
-            add_event = lambda l, f: l.append([f, 250])
-            add_event(self.events_queue, 'self.new_round = True')
+        if len(self.snakes_alive) == 1 and len(self.snakes) != 1 and not self.finished:
+            self.save_name_winner = self.snakes_alive[0].getName()
             self.canvas.create_text(self.canvas_height//2,
                                     self.canvas_width//2,
-                                    text=self.save_name_winner + \
-                                         ' won this round!',
+                                    text=self.save_name_winner + ' ' + \
+                                         'won this round!',
                                     fill='white', tags='text_win')
-        if self.new_round:
-            return self.playNewRound()
+            self.finished = True
+            self.window.after(5000, self.finishRound)
         self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
-        
+    
+    def stopRefreshing(self):
+        self.window.after_cancel(self.current_loop)
+    
+    def finishRound(self):
+        self.stopRefreshing()
+        for elem in self.score:
+            if elem >= (len(self.score)-1)*10:
+                self.finish_game = True
+        self.new_game = False
+        if not self.finish_game:
+            self.clearWindow()
+            self.scoreShown()
+            self.play()
+        else:
+            self.quitCurrentPlay()
+    
     def updateScore(self, snake):
         idx = self.snakes.index(snake)
         for i in range(len(self.score)):
@@ -208,16 +222,9 @@ class GUI:
         '''
             stops the current game and resets the start menu
         '''
-        self.window.after_cancel(self.current_loop)
-        self.random_colors_used   = []
-        self.random_commands_used = []
-        self.window_height = GUI.DEFAULT_HEIGHT
-        self.window_width  = GUI.DEFAULT_WIDTH
-        self.canvas_height = self.window_height - 200
-        self.canvas_width  = self.window_width - 200
+        self.stopRefreshing()
+        self.default_values()
         self.geometryMap()
-        self.new_game = True
-        self.finish_game = False
         self.menuStart()
     
     def clearWindow(self):
@@ -446,6 +453,7 @@ class GUI:
         '''
             prepares the game
         '''
+        self.finished = False
         self.score_frame = Frame(self.window, relief=GROOVE, bd=2)
         self.score_frame.pack(side=LEFT)
         Label(self.score_frame, text='Score').pack()
@@ -471,11 +479,11 @@ class GUI:
         self.scoreShown()
         self.startInvincible()
         #add create_text with command of each player 
-        self.refresh()
         self.canvas.focus_set()
         self.canvas.bind('<Key>', self.keyPressed)
         self.canvas.bind('<KeyRelease>',
                          lambda e: self.inputs.release(e.keysym))
+        self.refresh()
         
     def startInvincible(self):
         players = list()
@@ -659,8 +667,8 @@ class GUI:
         if key.lower() == 'q':
             self.quitCurrentPlay()
         else:
-            self.inputs.press(key)
             #move the correct player(s) when key is pressed
+            self.inputs.press(key)
             
     def saveParameters(self):
         save = open("save.txt", "w")
