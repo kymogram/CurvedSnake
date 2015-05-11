@@ -1,0 +1,4 @@
+[GuestMooh]
+command left = Left
+command right = Right
+color = yellow
