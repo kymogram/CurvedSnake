@@ -754,6 +754,6 @@ class GUI:
                 color = text[i].split()
                 color = color[2]
                 self.regular_colors.append(color)
-
+    
 if __name__ == '__main__':
     GUI()
