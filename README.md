@@ -12,8 +12,6 @@ snake ayant prit le bonus
 
     clean_map
 
-- Mettre un timer pour avertir avant la prochaine partie
-
 - Essayer de trouver une façon de mettre de la musique sans devoir télécharger
 des modules au préalable (Je ne pense pas qu'il y ait moyen)
 
