@@ -41,9 +41,16 @@ class GUI:
                    'right_angles', 'thickness_up',
                    'rotation_angle_down', 'bonus_chance',
                    'change_color', 'change_chance_hole',
-                   'clean_map', 'negative', 'invincible',
-                   'shrink_map']
-    BONUS_TIMES = [300] * len(BONUS_FILES)
+                   'clean_map', 'negative',
+                   'invincible', 'shrink_map']
+    BONUS_TIMES = [300, 600,
+                   300, 250,
+                   300, 300,
+                   300, 300,
+                   300, 300,
+                    50, 750,
+                   300, 300,
+                   300, 300,]
     
     def __init__(self):
         #window
@@ -519,7 +526,7 @@ class GUI:
                 sender = snake
             else:
                 others.append(snake)
-        add_event = lambda l, f, i=0: l.append([f, GUI.BONUS_TIMES[i]])
+        add_event = lambda l, f, i=0: l.append([f, self.bonus_dict[bonus_type].length])
         if bonus_type == 'self_speedup':
             sender.speed += 1
             add_event(sender.events_queue, 'snake.speed -= 1')
@@ -528,12 +535,10 @@ class GUI:
                 snake.speed += 1
                 add_event(snake.events_queue, 'snake.speed -= 1')
         elif bonus_type == 'self_speeddown':
-            add_event = lambda l, f: l.append([f, 600])
             if sender.speed > 1:
                 sender.speed /= 1.5
                 add_event(sender.events_queue,'snake.speed *= 1.5')
         elif bonus_type == 'all_speeddown':
-            add_event = lambda l, f: l.append([f, 250])
             for snake in others:
                 if snake.speed > 1:
                     snake.speed /= 1.5
@@ -556,7 +561,6 @@ class GUI:
             sender.thickness /= 2
             add_event(sender.events_queue, 'snake.thickness *= 2')
         elif bonus_type == 'bonus_chance':
-            add_event = lambda l, f: l.append([f, 50])
             self.bonus_proba *= 4
             add_event(self.events_queue, 'self.bonus_proba /= 4')
         elif bonus_type == 'rotation_angle_down':
@@ -569,7 +573,6 @@ class GUI:
                 add_event(snake.events_queue,
                           'snake.color = snake.color_unchanged')
         elif bonus_type == 'change_chance_hole':
-            add_event = lambda l, f: l.append([f, 750])
             for snake in others:
                 snake.hole_probability *= 10
                 add_event(snake.events_queue, 'snake.hole_probability /= 10')
