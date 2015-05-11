@@ -163,27 +163,38 @@ class GUI:
         self.current_loop = self.window.after(self.timer, self.refresh)
         
     def updateScore(self, snake):
-        idx = self.snakes.index(snake)
         for i in range(len(self.score)):
             if self.snakes[i].getAlive():
-                self.score[i] += 1
-                self.updateScoreShown(i)
-        print(self.score)
+                self.score_snake_list[i][0] += 1
+        self.score_snake_list = list(reversed(sorted(self.score_snake_list, key=self.getKey)))
+        self.updateScoreShown()
+        
+    def getKey(self, item):
+        return item[0]
         
     def scoreShown(self):
         for i in range(len(self.snakes)):
             score_text = Label(self.score_frame,
-                               text=str(self.snakes[i].getName()) + ' : ' + \
-                               str(self.score[i]),
-                               background=self.snakes[i].getColor(),
+                               text=str(self.score_snake_list[i][1].getName()) + ' : ' + \
+                               str(self.score_snake_list[i][0]),
+                               background=self.score_snake_list[i][1].getColor(),
                                font=font.Font(family='fixedsys', size=12))
             score_text.pack(padx=5, pady=5)
             if len(self.scores_text) != len(self.snakes):
                 self.scores_text.append(score_text)
             
-    def updateScoreShown(self, i):
-        self.scores_text[i].configure(text=str(self.snakes[i].getName()) + \
-                                      ' : ' + str(self.score[i]))
+    def updateScoreShown(self):
+        for child in self.score_frame.winfo_children():
+            child.pack_forget()
+        for i in range(len(self.score_snake_list)):
+            score_text = Label(self.score_frame,
+                               text=str(self.score_snake_list[i][1].getName()) + ' : ' + \
+                               str(self.score_snake_list[i][0]),
+                               background=self.score_snake_list[i][1].getColor(),
+                               font=font.Font(family='fixedsys', size=12))
+            score_text.pack(padx=5, pady=5)
+        # self.scores_text[i].configure(text=str(self.snakes[i].getName()) + \
+                                      # ' : ' + str(self.score[i]))
         
     def playNewRound(self):
         for elem in self.score:
@@ -466,6 +477,7 @@ class GUI:
             self.score = list()
             self.score = [0 for i in range(len(self.snakes))]
             self.scores_text = list()
+            self.score_snake_list = [[0, self.snakes[i]] for i in range(len(self.snakes))]
         self.scoreShown()
         self.startInvincible()
         #add create_text with command of each player 
