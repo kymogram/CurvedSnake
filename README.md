@@ -3,8 +3,6 @@ adaptation de CurveFever en Python avec tkinter
 
 # TO DO:
 
-- playNewRound doit être mieux fait pour pas qu'il ne boucle infiniment
-
 - Utiliser correctement les pack avec des frames dans l'interface principale
 
 - Mettre en place l'arc de cercle signifiant la durée d'un bonus à la tête du
@@ -13,8 +11,6 @@ snake ayant prit le bonus
 - Refaire certains bonus tels que:
 
     clean_map
-    
-    right_angle
 
 - Mettre un timer pour avertir avant la prochaine partie
 
