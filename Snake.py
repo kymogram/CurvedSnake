@@ -136,5 +136,8 @@ class Snake:
         
     def getName(self):
         return self.name
+        
+    def getColor(self):
+        return self.color_unchanged
     
     #
