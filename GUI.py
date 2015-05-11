@@ -44,6 +44,7 @@ class GUI:
                    'clean_map', 'negative', 'invincible',
                    'shrink_map']
     BONUS_TIMES = [300] * len(BONUS_FILES)
+    
     def __init__(self):
         #window
         self.window = Tk()
@@ -136,7 +137,6 @@ class GUI:
         '''
             refreshes the window every $self.timer seconds
         '''
-        print('refresh')
         self.changeDirections()
         if len(self.events_queue) != 0:
             for event in self.events_queue:
@@ -577,7 +577,22 @@ class GUI:
             sender.invincible = True
             add_event(sender.events_queue, 'snake.invincible = False')
         elif bonus_type == 'clean_map':
+            heads = [snake.head_coord for snake in self.snakes]
+            self.bonus_list = list()
+            for bonus in GUI.BONUS_FILES:
+                for el in self.canvas.find_withtag('bonus,' + bonus):
+                    self.bonus_list.append(list(self.canvas.coords(el)) + [bonus])
             self.canvas.delete(ALL)
+            for i in range(len(heads)):
+                x, y = heads[i]
+                snake = self.snakes[i]
+                r = snake.thickness//2
+                snake.head_id = self.canvas.create_oval(
+                        x-r, y-r, x+r, y+r, fill=snake.color,
+                        outline=snake.color, tag='snake,{},-1'.format(snake.name))
+            for x, y, name in self.bonus_list:
+                self.canvas.create_image(x, y, image=self.bonus_dict[name].image,
+                                         tags='bonus,{}'.format(self.bonus_dict[name].name))
         elif bonus_type == 'negative':
             self.canvas.configure(bg=self.invertColor('black'))
             add_event(self.events_queue, 'self.canvas.configure(bg="black")')
