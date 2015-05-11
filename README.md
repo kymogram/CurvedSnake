@@ -5,15 +5,10 @@ adaptation de CurveFever en Python avec tkinter
 
 - Utiliser correctement les pack avec des frames dans l'interface principale
 
-- Mettre en place l'arc de cercle signifiant la durée d'un bonus à la tête du
-snake ayant prit le bonus
+- Améliorer arc de cercle
 
 - Essayer de trouver une façon de mettre de la musique sans devoir télécharger
 des modules au préalable (Je ne pense pas qu'il y ait moyen)
-
-- Faire bouger le cul de Louis pour qu'il fasse la sauvegarde, ou la faire nous-
-même (ce qui revient à la faire nous-même)
-
 
 
 # Idée de bonus:
