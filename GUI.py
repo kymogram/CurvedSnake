@@ -15,6 +15,7 @@ class GUI:
     DEFAULT_HEIGHT = 1000      #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
+    DEFAULT_TIME_AFTER_GAME = 5#s
     BONUS_PROBABILITY = 0.01
     DEFAULT_NAME = 'GuestMooh'
     DEFAULT_COLORS = ['yellow', 'pink', 'red', 'blue', 'green', 'orange']
@@ -152,15 +153,26 @@ class GUI:
                 self.snakes_alive.remove(snake)
         if len(self.snakes_alive) == 1 and len(self.snakes) != 1 and not self.finished:
             self.save_name_winner = self.snakes_alive[0].getName()
-            self.canvas.create_text(self.canvas_height//2,
-                                    self.canvas_width//2,
-                                    text=self.save_name_winner + ' ' + \
-                                         'won this round!',
-                                    fill='white', tags='text_win')
             self.finished = True
+            self.text_id = None
+            self.updateRemainingTime()
             self.window.after(5000, self.finishRound)
         self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
+    
+    def updateRemainingTime(self, time=DEFAULT_TIME_AFTER_GAME):
+        if time != 0:
+            text = '{} won this round! {} seconds remaining' \
+                   .format(self.save_name_winner, time)
+            if not self.text_id:
+                self.text_id = self.canvas.create_text(self.canvas_height//2,
+                                                       self.canvas_width//2,
+                                                       text=text,
+                                                       fill='white',
+                                                       tags='text_win')
+            else:
+                self.canvas.itemconfig(self.text_id, text=text)
+            self.window.after(1000, lambda: self.updateRemainingTime(time-1))
     
     def stopRefreshing(self):
         self.window.after_cancel(self.current_loop)
