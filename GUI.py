@@ -89,6 +89,9 @@ class GUI:
         self.window.mainloop()
     
     def default_values(self):
+        '''
+            set default values
+        '''
         self.random_colors_used   = []
         self.random_commands_used = []
         self.window_height = GUI.DEFAULT_HEIGHT
@@ -179,6 +182,9 @@ class GUI:
         self.current_loop = self.window.after(self.timer, self.refresh)
     
     def updateRemainingTime(self, time=DEFAULT_TIME_AFTER_GAME):
+        '''
+            manage the timer to prevent for the next round
+        '''
         if time != 0:
             text = '{} won this round! {} seconds remaining' \
                    .format(self.save_name_winner, time)
@@ -191,9 +197,16 @@ class GUI:
             self.window.after(1000, lambda: self.updateRemainingTime(time-1))
     
     def stopRefreshing(self):
+        '''
+            stop refresh to not have an infini loop
+        '''
         self.window.after_cancel(self.current_loop)
     
     def finishRound(self):
+        '''
+            each end of round, this function will be called and check score +
+            refresh some variable
+        '''
         self.stopRefreshing()
         self.canvas_height = self.window_height - 200
         self.canvas_width = self.window_width - 200
@@ -209,6 +222,9 @@ class GUI:
             self.quitCurrentPlay()
     
     def updateScore(self, snake):
+        '''
+            update the score
+        '''
         for i in range(len(self.score)):
             if self.snakes[i].getAlive():
                 self.score_snake_list[i][0] += 1
@@ -219,6 +235,9 @@ class GUI:
         return item[0]
         
     def scoreShown(self):
+        '''
+            show the score
+        '''
         for i in range(len(self.snakes)):
             score_text = Label(self.score_frame,
                                text=str(self.score_snake_list[i][1].getName()) + ' : ' + \
@@ -230,6 +249,9 @@ class GUI:
                 self.scores_text.append(score_text)
             
     def updateScoreShown(self):
+        '''
+            update the score with the label
+        '''
         for child in self.score_frame.winfo_children():
             child.pack_forget()
         for i in range(len(self.score_snake_list)):
@@ -241,6 +263,9 @@ class GUI:
             score_text.pack(padx=5, pady=5)
         
     def geometryMap(self):
+        '''
+            refresh the geometry used for the main window
+        '''
         self.window.geometry('{}x{}' \
                             .format(self.window_width, self.window_height))
         self.window.resizable(width=FALSE, height=FALSE)
@@ -299,8 +324,8 @@ class GUI:
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         if not self.first_open_game:
-            self.player_ingame.insert(END, *self.regular_player)
-            self.first_open_game = False
+            self.player_ingame.insert(END, *self.snakes_names)
+        self.first_open_game = False
         self.player_ingame.pack()
         Button(self.window, text='Parameters', command=self.parameters).pack()
         Button(self.window, text='Play!', command=self.playPressed).pack()
@@ -330,6 +355,9 @@ class GUI:
         b.grid(row=6, column=1)
         
     def closeAndGetVal(self):
+        '''
+            refresh values when destroying the parameters toplevel
+        '''
         self.bonus_percent = self.bonus_scale.get()
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100) * self.bonus_percent
         self.top_bonus.destroy()
@@ -516,6 +544,9 @@ class GUI:
         self.refresh()
         
     def startInvincible(self):
+        '''
+            set invincible at the beggining of the game to situate yourself
+        '''
         players = list()
         for snake in self.snakes:
             players.append(snake)
@@ -617,6 +648,9 @@ class GUI:
             self.shrinkMap()
     
     def shrinkMap(self):
+        '''
+            shrink the map if the bonus shrink_map is taken
+        '''
         if self.canvas_height > GUI.MIN_CANVAS_HEIGHT and \
            self.canvas_width > GUI.MIN_CANVAS_WIDTH:
             self.canvas_height -= 1
@@ -682,7 +716,6 @@ class GUI:
             self.colors_list = list(self.color.cget('values'))
             selection = e.widget.get(self.selected[0])
             if self.is_regular_list:
-
                 self.id = self.regular_player.index(selection)
                 self.button_left.configure(
                                          text=self.regular_commands[self.id][0])
@@ -692,7 +725,6 @@ class GUI:
                 self.move_command_left = self.regular_commands[self.id][0]
                 self.move_command_right = self.regular_commands[self.id][1]
             else:
-
                 self.id = self.snakes_names.index(selection)
                 self.button_left.configure(text=self.commands_list[self.id][0])
                 self.button_right.configure(text=self.commands_list[self.id][1])
@@ -718,16 +750,18 @@ class GUI:
             self.inputs.press(key)
             
     def saveParameters(self):
+        '''
+            save paramers about players habit
+        '''
         save = open("save.txt", "w")
-        
         for i in range(len(self.regular_player)):
-            
             save.write(str(self.regular_player[i])+'\ncommand left = '+str(self.regular_commands[i][0])+
             '\ncommand right = '+str(self.regular_commands[i][1])+'\ncolor = '+str(self.regular_colors[i])+'\n')
         self.window.destroy()
-    
     def loadSave(self):
-        
+        '''
+            load the parameters saved about players habit
+        '''
         try:
             save = open("save.txt", "r")
         except:
@@ -738,7 +772,6 @@ class GUI:
             if x == 0:
                 name = text[i].strip()
                 self.regular_player.append(name)
-                #self.snakes_names.append(name)
             elif x == 1:
                 Lcommand = text[i].split('=')
                 Lcommand = Lcommand[1].strip()
