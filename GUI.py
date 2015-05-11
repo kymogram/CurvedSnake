@@ -153,11 +153,14 @@ class GUI:
                 del self.events_queue[0]
         for snake in self.snakes_alive:
             if len(snake.events_queue) != 0:
-                for i in range(len(snake.events_queue)):
+                i = 0
+                while i < len(snake.events_queue):
                     snake.events_queue[i][1] -= 1
                     if snake.events_queue[i][1] == 0:
-                        exec(snake.events_queue[0][0])
-                        del snake.events_queue[0]
+                        exec(snake.events_queue[i][0])
+                        del snake.events_queue[i]
+                        i -= 1
+                    i += 1
         if random() < self.bonus_proba:
             self.generateBonus()
         for snake in self.snakes_alive:
@@ -191,6 +194,8 @@ class GUI:
     
     def finishRound(self):
         self.stopRefreshing()
+        self.canvas_height = self.window_height - 200
+        self.canvas_width = self.window_width - 200
         for elem in self.score:
             if elem >= (len(self.score)-1)*10:
                 self.finish_game = True

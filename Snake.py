@@ -69,7 +69,10 @@ class Snake:
         if len(tags) != 0:
             info = tags[0].split(',')
             if info[0] == 'snake':
-                self.alive = int(info[2]) >= step-self.thickness*3
+                if info[1] != self.name:
+                    self.alive = False
+                else:
+                    self.alive = int(info[2]) >= step-self.thickness*3
                 if not self.alive:
                     x, y = self.head_coord
                     Particles(self.canvas, x, y, self.color)
