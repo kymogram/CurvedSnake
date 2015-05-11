@@ -1,12 +1,39 @@
 # CurvedSnake
 adaptation de CurveFever en Python avec tkinter
 
-#IDEES BONUS
+# TO DO:
 
-1. bloque les contrôles de tous les joueurs(risque de tous les tuer donc un peu cheaté ^^)
-2. change les couleurs de chaque joueur
-3. trou noir : si on s'en approche trop --> perte de controle et entrainé vers son emplacement.
-4. flash : le canvas apparait blanc une fraction de seconde (2-3 max)
-5. bonus loan : tous les joueurs sont en nuances de rose/mauve.
-6. mode yolo : images d'arc-en-ciel, musique psychédélique avec extrait de charlie the unicorn :P
-7. la carte grandit.
+- playNewRound doit être mieux fait pour pas qu'il ne boucle infiniment
+
+- Utiliser correctement les pack avec des frames dans l'interface principale
+
+- Mettre en place l'arc de cercle signifiant la durée d'un bonus à la tête du
+snake ayant prit le bonus
+
+- Refaire certains bonus tels que:
+
+    clean_map
+    
+    right_angle
+    
+    change_bg -> ne doit pas simplement changer le background mais inverse 
+                                    toutes les couleurs du canvas(négatif mode)
+
+- Mettre un timer pour avertir avant la prochaine partie
+
+- Essayer de trouver une façon de mettre de la musique sans devoir télécharger
+des modules au préalable (Je ne pense pas qu'il y ait moyen)
+
+- Faire bouger le cul de Louis pour qu'il fasse la sauvegarde, ou la faire nous-
+même (ce qui revient à la faire nous-même)
+
+
+
+# Idée de bonus:
+
+- Échanger la position de chacun des joueurs en leur mettant une invincibilité
+temporaire pour qu'ils remarquent où ils sont
+
+- Éventuelle agrandissement de la carte ou rétrécissement
+
+- Faire apparaître des obstacles (des bébés chats par exemple)

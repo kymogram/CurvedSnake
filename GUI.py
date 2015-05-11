@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
+import tkinter.font
 
 from random import randint, random, choice
 from math import pi
@@ -10,8 +11,8 @@ from Bonus import *
 from InputManager import *
 
 class GUI:
-    DEFAULT_WIDTH = 800        #pixels
-    DEFAULT_HEIGHT = 800       #pixels
+    DEFAULT_WIDTH = 1000       #pixels
+    DEFAULT_HEIGHT = 1000      #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
     BONUS_PROBABILITY = 0.01
@@ -36,13 +37,15 @@ class GUI:
                    'right_angles', 'thickness_up',
                    'rotation_angle_down', 'bonus_chance',
                    'change_color', 'change_chance_hole',
-                   'clean_map', 'change_bg', 'invincible']
+                   'clean_map', 'negative', 'invincible']
     BONUS_TIMES = [300] * len(BONUS_FILES)
     def __init__(self):
         #window
         self.window = Tk()
         self.window_width = GUI.DEFAULT_WIDTH
         self.window_height = GUI.DEFAULT_HEIGHT
+        self.canvas_width = self.window_width - 200
+        self.canvas_height = self.window_height - 200
         self.mini_map = IntVar(value=2)
         self.one_vs_one = IntVar()
         self.window.geometry(
@@ -95,7 +98,7 @@ class GUI:
             generates a random bonus and puts it on canvas
         '''
         xmin, ymin = GUI.BONUS_SPRITES_DIMENSIONS
-        xmax, ymax = self.window_width-xmin, self.window_height-ymin
+        xmax, ymax = self.canvas_width-xmin, self.canvas_height-ymin
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
         if len(self.available_bonus) > 0:
             bonus = choice(self.available_bonus)
@@ -134,7 +137,7 @@ class GUI:
             if len(snake.events_queue) != 0:
                 for event in snake.events_queue:
                     event[1] -= 1
-                if snake.events_queue[0][1] == 0:
+                while snake.events_queue and snake.events_queue[0][1] == 0:
                     exec(snake.events_queue[0][0])
                     del snake.events_queue[0]
         if random() < self.bonus_proba:
@@ -142,25 +145,17 @@ class GUI:
         for snake in self.snakes_alive:
             snake.move(self.step)
             if not snake.getAlive():
-                #WARNING: do not add the score of the winner
-                idx = self.snakes.index(snake)
-                self.score[idx] += \
-                                  abs(len(self.snakes) - len(self.snakes_alive))
+                self.updateScore(snake)
                 self.snakes_alive.remove(snake)
-        if len(self.snakes_alive) <= 1:
+        if len(self.snakes_alive) <= 1 and len(self.snakes) != 1:
             try:
                 self.save_name_winner = self.snakes_alive[0].getName()
             except:
                 pass
             add_event = lambda l, f: l.append([f, 250])
             add_event(self.events_queue, 'self.new_round = True')
-            #Text print who won and timer before next game
-            
-            #add_event = lambda l, f: l.append([f, 50])
-            #add_event(self.events_queue, 'self.time_before_round = -1')
-            #add_event(self.events_queue, 'self.canvas.delete("text_win")')
-            self.canvas.create_text(self.window_height//2,
-                                    self.window_width//2,
+            self.canvas.create_text(self.canvas_height//2,
+                                    self.canvas_width//2,
                                     text=self.save_name_winner + \
                                          ' won this round!',
                                     fill='white', tags='text_win')
@@ -169,18 +164,37 @@ class GUI:
         self.step += 1
         self.current_loop = self.window.after(self.timer, self.refresh)
         
-    def playNewRound(self):
-        #find_last_snake = \
-                    #[self.snakes[i].getName() for i in range(len(self.snakes))]
-        #idx = find_last_snake.index(self.save_name_winner)
-        #self.score[idx] += abs(len(self.snakes) - 1)
+    def updateScore(self, snake):
+        idx = self.snakes.index(snake)
+        for i in range(len(self.score)):
+            if self.snakes[i].getAlive():
+                self.score[i] += 1
+                self.updateScoreShown(i)
         print(self.score)
+        
+    def scoreShown(self):
+        for i in range(len(self.snakes)):
+            score_text = Label(self.score_frame,
+                               text=str(self.snakes[i].getName()) + ' : ' + \
+                               str(self.score[i]),
+                               background=self.snakes[i].getColor(),
+                               font=font.Font(family='fixedsys', size=12))
+            score_text.pack(padx=5, pady=5)
+            if len(self.scores_text) != len(self.snakes):
+                self.scores_text.append(score_text)
+            
+    def updateScoreShown(self, i):
+        self.scores_text[i].configure(text=str(self.snakes[i].getName()) + \
+                                      ' : ' + str(self.score[i]))
+        
+    def playNewRound(self):
         for elem in self.score:
-            if elem >= (len(self.score)*10)-10:
+            if elem >= (len(self.score)-1)*10:
                 self.finish_game = True
         self.new_game = False
         if not self.finish_game:
             self.clearWindow()
+            self.scoreShown()
             self.play()
         else:
             self.quitCurrentPlay()
@@ -195,10 +209,12 @@ class GUI:
             stops the current game and resets the start menu
         '''
         self.window.after_cancel(self.current_loop)
-        self.random_colors_used = []
+        self.random_colors_used   = []
         self.random_commands_used = []
         self.window_height = GUI.DEFAULT_HEIGHT
-        self.window_width = GUI.DEFAULT_WIDTH
+        self.window_width  = GUI.DEFAULT_WIDTH
+        self.canvas_height = self.window_height - 200
+        self.canvas_width  = self.window_width - 200
         self.geometryMap()
         self.new_game = True
         self.finish_game = False
@@ -404,13 +420,12 @@ class GUI:
                                  for i in range(len(self.bonus_dict)) \
                                  if self.add_bonus_bool[i].get() == 1]
         if self.mini_map.get() == 0:
-            self.window_height -= 150
-            self.window_width -= 150
-            self.geometryMap()
+            self.canvas_height -= 150
+            self.canvas_width -= 150
         elif self.mini_map.get() == 1:
-            self.window_height -= 300
-            self.window_width -= 300
-            self.geometryMap()
+            self.canvas_height -= 300
+            self.canvas_width -= 300
+        self.geometryMap()
         self.window.after(1000, self.play)
     
     def modifBgColor(self, side):
@@ -431,10 +446,15 @@ class GUI:
         '''
             prepares the game
         '''
-        self.canvas = Canvas(self.window, bg='black', highlightthickness=0)
-        self.canvas.pack(expand=1, fill='both')
+        self.score_frame = Frame(self.window, relief=GROOVE, bd=2)
+        self.score_frame.pack(side=LEFT)
+        Label(self.score_frame, text='Score').pack()
+        self.canvas_frame = Frame(self.window, relief=RAISED, bd=15, cursor='none')
+        self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
+        self.canvas = Canvas(self.canvas_frame, height = self.canvas_height, width = self.canvas_width, bg='black', highlightthickness=0)
+        self.canvas.pack()
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
-        xmax, ymax = self.window_width, self.window_height
+        xmax, ymax = self.canvas_width, self.canvas_height
         self.snakes = list()
         self.new_round = False
         for i in range(len(self.snakes_names)):
@@ -447,6 +467,8 @@ class GUI:
         if self.new_game:
             self.score = list()
             self.score = [0 for i in range(len(self.snakes))]
+            self.scores_text = list()
+        self.scoreShown()
         self.startInvincible()
         #add create_text with command of each player 
         self.refresh()
@@ -533,9 +555,14 @@ class GUI:
             add_event(sender.events_queue, 'snake.invincible = False')
         elif bonus_type == 'clean_map':
             self.canvas.delete(ALL)
-        elif bonus_type == 'change_bg':
-            self.canvas.configure(bg='white')
+        elif bonus_type == 'negative':
+            self.canvas.configure(bg=self.invertColor('black'))
             add_event(self.events_queue, 'self.canvas.configure(bg="black")')
+            for snake in self.snakes:
+                snake.color = self.invertColor(snake.getColor())
+                snake.updateHeadColor()
+                add_event(snake.events_queue, 'snake.color = snake.color_unchanged')
+                add_event(snake.events_queue, 'snake.updateHeadColor()')
         # time_bonus_left = GUI.BONUS_TIME
         # angle = (time_bonus_left/GUI.BONUS_TIME)*360
         # if sender == snake:
@@ -545,6 +572,12 @@ class GUI:
         # time_bonus_left -= 1
         
     #callbacks
+    
+    def invertColor(self, color):
+        rgb = self.canvas.winfo_rgb(color)
+        inv_red, inv_green, inv_blue = \
+                                255-(rgb[0]//256), 255-(rgb[1]//256), 255-(rgb[2]//256)
+        return "#{:02x}{:02x}{:02x}".format(inv_red, inv_green, inv_blue)
     
     def setCommand(self, e):
         '''
