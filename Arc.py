@@ -14,9 +14,9 @@ class Arc:
                                                    width=2, outline=color)
     
     def updateArc(self):
-        self.val += 1
-        self.snake.canvas.itemconfig(self.arc_id, extent=360-(self.val/self.max) * 360)
-        x, y = self.snake.head_coord
-        r = (self.snake.thickness + 2*self.offset) * 2
-        self.snake.canvas.coords(self.arc_id, x-r, y-r, x+r, y+r)
-    
+        if self.val < self.max:
+            self.val += 1
+            self.snake.canvas.itemconfig(self.arc_id, extent=360-(self.val/self.max) * 360)
+            x, y = self.snake.head_coord
+            r = (self.snake.thickness + 2*self.offset) * 2
+            self.snake.canvas.coords(self.arc_id, x-r, y-r, x+r, y+r)
