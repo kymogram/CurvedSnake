@@ -199,19 +199,7 @@ class GUI:
             
     def updateScoreShown(self, i):
         self.scores_text[i].configure(text=str(self.snakes[i].getName()) + \
-                                      ' : ' + str(self.score[i]))
-        
-    def playNewRound(self):
-        for elem in self.score:
-            if elem >= (len(self.score)-1)*10:
-                self.finish_game = True
-        self.new_game = False
-        if not self.finish_game:
-            self.clearWindow()
-            self.scoreShown()
-            self.play()
-        else:
-            self.quitCurrentPlay()
+                                           ' : ' + str(self.score[i]))
         
     def geometryMap(self):
         self.window.geometry('{}x{}' \
