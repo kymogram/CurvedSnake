@@ -122,10 +122,16 @@ class Snake:
         y += self.speed * sin(self.angle)
         #update head_coord
         self.head_coord = [x, y]
-        for arc in self.arcs:
-            arc.updateArc()
-            if arc.val == arc.max:
-                del arc
+        i = 0
+        while i < len(self.arcs):
+            self.arcs[i].setOffset(i)
+            self.arcs[i].updateArc()
+            if self.arcs[i].val == self.arcs[i].max:
+                #delete arc #i
+                self.canvas.delete(self.arcs[i].arc_id)
+                self.arcs.pop(i)
+                i -= 1
+            i += 1
         #radius of oval
         r = self.thickness // 2
         if not self.invincible and not self.time_before_start:
