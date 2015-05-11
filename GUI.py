@@ -73,7 +73,9 @@ class GUI:
         self.finish_game = False
         #init
         self.loadBonusImages()
+        self.loadSave()
         self.menuStart()
+        self.window.protocol("WM_DELETE_WINDOW", self.saveParameters)
         self.window.mainloop()
     
     def loadBonusImages(self):
@@ -627,6 +629,39 @@ class GUI:
             self.inputs.press(key)
             #move the correct player(s) when key is pressed
             
+    def saveParameters(self):
+        save = open("save.txt", "w")
+        
+        for i in range(len(self.snakes_names)):
+            
+            save.write('['+str(self.snakes_names[i])+']'+'\ncommand left = '+str(self.commands_list[i][0])+
+            '\ncommand right = '+str(self.commands_list[i][1])+'\ncolor = '+str(self.snakes_colors[i])+'\n')
+        self.window.destroy()
+    
+    def loadSave(self):
+        self.old = []
+        self.oldnames = []
+        change = False
+        try:
+            save = open("save.txt", "r")
+            text = save.readlines()
+            for i in range(len(text)//4):
+                Lcommand = text[i+1].split('=')
+                Lcommand = Lcommand[1].strip()
+                Rcommand = text[i+2].split('=')
+                Rcommand = Rcommand[1].strip()
+                color = text[i+3].split()
+                color[i] = color[1]
+                if i %4 != 0:
+                    x = i+4
+                else:
+                    x = i
+                new = eval("[text[x].strip(), Lcommand, Rcommand, color[2].strip()]")
+                self.old.append(new)
+                self.oldnames.append(text[x].strip())
+                print(self.old)
+        except:
+            pass 
     
     
 if __name__ == '__main__':
