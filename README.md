@@ -15,9 +15,6 @@ snake ayant prit le bonus
     clean_map
     
     right_angle
-    
-    change_bg -> ne doit pas simplement changer le background mais inverse 
-                                    toutes les couleurs du canvas(négatif mode)
 
 - Mettre un timer pour avertir avant la prochaine partie
 
