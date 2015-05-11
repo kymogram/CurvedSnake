@@ -54,6 +54,7 @@ class GUI:
         self.window.wm_title('Curved Snake')
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         #GUI variables
+        self.first_open_game = True
         self.snakes_colors = []
         self.commands_list = []
         self.snakes_names = []
@@ -264,7 +265,9 @@ class GUI:
         Label(self.window, width=250, text='Player ready to play').pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
-        self.player_ingame.insert(END, *self.regular_player)
+        if not self.first_open_game:
+            self.player_ingame.insert(END, *self.regular_player)
+            self.first_open_game = False
         self.player_ingame.pack()
         Button(self.window, text='Parameters', command=self.parameters).pack()
         Button(self.window, text='Play!', command=self.playPressed).pack()
@@ -629,6 +632,7 @@ class GUI:
             self.colors_list = list(self.color.cget('values'))
             selection = e.widget.get(self.selected[0])
             if self.is_regular_list:
+
                 self.id = self.regular_player.index(selection)
                 self.button_left.configure(
                                          text=self.regular_commands[self.id][0])
@@ -638,6 +642,7 @@ class GUI:
                 self.move_command_left = self.regular_commands[self.id][0]
                 self.move_command_right = self.regular_commands[self.id][1]
             else:
+
                 self.id = self.snakes_names.index(selection)
                 self.button_left.configure(text=self.commands_list[self.id][0])
                 self.button_right.configure(text=self.commands_list[self.id][1])
@@ -665,37 +670,41 @@ class GUI:
     def saveParameters(self):
         save = open("save.txt", "w")
         
-        for i in range(len(self.snakes_names)):
+        for i in range(len(self.regular_player)):
             
-            save.write('['+str(self.snakes_names[i])+']'+'\ncommand left = '+str(self.commands_list[i][0])+
-            '\ncommand right = '+str(self.commands_list[i][1])+'\ncolor = '+str(self.snakes_colors[i])+'\n')
+            save.write(str(self.regular_player[i])+'\ncommand left = '+str(self.regular_commands[i][0])+
+            '\ncommand right = '+str(self.regular_commands[i][1])+'\ncolor = '+str(self.regular_colors[i])+'\n')
         self.window.destroy()
     
     def loadSave(self):
-        self.old = []
-        self.oldnames = []
-        change = False
+        
         try:
             save = open("save.txt", "r")
-            text = save.readlines()
-            for i in range(len(text)//4):
-                Lcommand = text[i+1].split('=')
-                Lcommand = Lcommand[1].strip()
-                Rcommand = text[i+2].split('=')
-                Rcommand = Rcommand[1].strip()
-                color = text[i+3].split()
-                color[i] = color[1]
-                if i %4 != 0:
-                    x = i+4
-                else:
-                    x = i
-                new = eval("[text[x].strip(), Lcommand, Rcommand, color[2].strip()]")
-                self.old.append(new)
-                self.oldnames.append(text[x].strip())
-                print(self.old)
         except:
-            pass 
-    
-    
+            pass
+        text = save.readlines()
+        for i in range(len(text)):
+            x = i%4
+            if x == 0:
+                name = text[i].strip()
+                self.regular_player.append(name)
+                #self.snakes_names.append(name)
+            elif x == 1:
+                Lcommand = text[i].split('=')
+                Lcommand = Lcommand[1].strip()
+
+            elif x == 2:
+                Rcommand = text[i].split('=')
+                Rcommand = Rcommand[1].strip()
+                try:
+                    self.regular_commands.append([Lcommand, Rcommand])
+                except:
+                    pass
+            else:
+                color = text[i].split()
+                color = color[2]
+                self.regular_colors.append(color)
+
+                
 if __name__ == '__main__':
     GUI()

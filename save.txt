@@ -1,0 +1,16 @@
+Loan181
+command left = Left
+command right = Right
+color = pink
+Robin
+command left = s
+command right = d
+color = yellow
+Greentears
+command left = o
+command right = p
+color = green
+Louis2809
+command left = b
+command right = n
+color = red
