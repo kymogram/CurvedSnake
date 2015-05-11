@@ -28,6 +28,9 @@ class GUI:
     
     MAXIMUM_NAME_LENGTH = 16 #chars
     
+    MIN_CANVAS_HEIGHT = 300 #pixels
+    MIN_CANVAS_WIDTH = 300  #pixels
+    
     BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
     BONUS_DIRECTORY = './sprites/'
@@ -133,6 +136,7 @@ class GUI:
         '''
             refreshes the window every $self.timer seconds
         '''
+        print('refresh')
         self.changeDirections()
         if len(self.events_queue) != 0:
             for event in self.events_queue:
@@ -583,15 +587,16 @@ class GUI:
                 add_event(snake.events_queue, 'snake.color = snake.color_unchanged')
                 add_event(snake.events_queue, 'snake.updateHeadColor()')
         elif bonus_type == 'shrink_map':
-            pass
-        # time_bonus_left = GUI.BONUS_TIME
-        # angle = (time_bonus_left/GUI.BONUS_TIME)*360
-        # if sender == snake:
-            # head = sender.coords()
-            # head.create_arc(head, style = ARC, extent=angle, width = 2,
-                                                               #oultine='white')
-        # time_bonus_left -= 1
-        
+            self.shrinkMap()
+    
+    def shrinkMap(self):
+        if self.canvas_height > GUI.MIN_CANVAS_HEIGHT and \
+           self.canvas_width > GUI.MIN_CANVAS_WIDTH:
+            self.canvas_height -= 1
+            self.canvas_width -= 1
+            self.canvas.configure(height=self.canvas_height, width=self.canvas_width)
+            self.window.after(100, self.shrinkMap)
+    
     #callbacks
     
     def invertColor(self, color):
