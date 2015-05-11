@@ -529,6 +529,7 @@ class GUI:
         add_event = lambda l, f, i=0: l.append([f, self.bonus_dict[bonus_type].length])
         if bonus_type == 'self_speedup':
             sender.speed += 1
+            sender.addArc(self.bonus_dict[bonus_type])
             add_event(sender.events_queue, 'snake.speed -= 1')
         elif bonus_type == 'all_speedup':
             for snake in others:

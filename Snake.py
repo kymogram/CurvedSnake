@@ -1,3 +1,4 @@
+from Arc import *
 from Particles import *
 from tkinter import *
 from math import cos, sin
@@ -45,6 +46,10 @@ class Snake:
                         x_head-r, y_head-r, x_head+r, y_head+r, fill=self.color,
                         outline=self.color, tag='snake,{},-1'.format(self.name))
         self.events_queue = list()
+        self.arcs = list()
+    
+    def addArc(self, bonus):
+        self.arcs.append(Arc(self, bonus.length, len(self.arcs)))
     
     def isInScreen(self, x, y):
         '''
@@ -114,6 +119,10 @@ class Snake:
         y += self.speed * sin(self.angle)
         #update head_coord
         self.head_coord = [x, y]
+        for arc in self.arcs:
+            arc.updateArc()
+            if arc.val == arc.max:
+                del arc
         #radius of oval
         r = self.thickness // 2
         if not self.invincible and not self.time_before_start:
