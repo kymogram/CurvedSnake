@@ -3,12 +3,15 @@ from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
 import tkinter.font
 
+# import pyglet
+
 from random import randint, random, choice
 from math import pi
 
 from Snake import *
 from Bonus import *
 from InputManager import *
+from MusicManager import *
 
 class GUI:
     DEFAULT_WIDTH = 700        #pixels
@@ -27,8 +30,9 @@ class GUI:
                         ('asterisk', 'minus')]
     
     MAXIMUM_NAME_LENGTH = 16 #chars
-    
     MAX_CANVAS_BORDER = 200 #pixels
+    
+    BACKGROUND_MUSIC = 'data/background_music.wav'
     
     BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -80,6 +84,8 @@ class GUI:
         self.time_before_round = 5
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
         self.events_queue = list()
+        self.music_manager = MusicManager(GUI.BACKGROUND_MUSIC)
+        self.music_manager.start()
         #init
         self.loadBonusImages()
         self.loadSave()
@@ -279,6 +285,7 @@ class GUI:
         '''
             stops the current game and resets the start menu
         '''
+        self.stopMusic()
         self.stopRefreshing()
         self.default_values()
         self.geometryMap()
@@ -528,10 +535,24 @@ class GUI:
             self.right_key = True
         self.window.bind('<Key>', self.setCommand)
     
+    def playMusic(self):
+        '''
+            starts the music in game
+        '''
+        
+        self.music_manager.reset()
+    
+    def stopMusic(self):
+        '''
+            stops the music in game
+        '''
+        self.music_manager.pause()
+    
     def play(self):
         '''
             prepares the game
         '''
+        self.playMusic()
         self.finished = False
         self.score_frame = LabelFrame(self.window, relief=GROOVE, bd=2, text='Scores')
         self.score_frame.pack(side=LEFT)
