@@ -3,8 +3,6 @@ from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
 import tkinter.font
 
-import pyglet
-
 from random import randint, random, choice
 from math import pi
 
@@ -63,32 +61,32 @@ class GUI:
         self.default_values()
         self.mini_map = IntVar(value=2)
         self.one_vs_one = IntVar()
-        self.window.geometry(
-                        '{}x{}'.format(self.window_width, self.window_height))
+        geom = '{}x{}'.format(self.window_width, self.window_height)
+        self.window.geometry(geom)
         self.window.resizable(width=FALSE, height=FALSE)
         self.window.wm_title('Curved Snake')
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         #GUI variables
-        self.first_open_game   = True
-        self.snakes_colors     = []
-        self.commands_list     = []
-        self.snakes_names      = []
-        self.regular_player    = []
-        self.regular_colors    = []
-        self.regular_commands  = []
+        self.first_open_game = True
+        self.snakes_colors = []
+        self.commands_list = []
+        self.snakes_names = []
+        self.regular_player = []
+        self.regular_colors = []
+        self.regular_commands = []
         self.left_key = self.right_key = False
-        self.is_regular_list   = False
+        self.is_regular_list = False
         #other variables
-        self.play_once_music   = True
-        self.sound_activate    = True
+        self.play_once_music = True
+        self.sound_activate = True
         self.inputs = InputManager()
-        self.current_loop      = 0
+        self.current_loop = 0
         self.step = 0
-        self.bonus_percent     = 30
+        self.bonus_percent = 30
         self.time_before_round = 5
-        self.bonus_proba       = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
-        self.events_queue      = list()
-        self.music_manager     = MusicManager(GUI.BACKGROUND_MUSIC)
+        self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
+        self.events_queue = list()
+        self.music_manager = MusicManager(GUI.BACKGROUND_MUSIC)
         self.music_manager.start()
         #init
         self.loadBonusImages()
@@ -104,13 +102,16 @@ class GUI:
         self.random_colors_used   = []
         self.random_commands_used = []
         self.window_height = GUI.DEFAULT_HEIGHT
-        self.window_width  = GUI.DEFAULT_WIDTH
+        self.window_width = GUI.DEFAULT_WIDTH
         self.canvas_height = self.window_height - 200
-        self.canvas_width  = self.window_width - 200
+        self.canvas_width = self.window_width - 200
         self.new_game = True
         self.finish_game = False
         
     def loadCurveImages(self):
+        '''
+            not used yet/anymore (to load images)
+        '''
         self.images_curves = []
         for i in range(1,4):
             path = '{}{}.{}'.format('./curves/curveideasnake',
@@ -127,8 +128,8 @@ class GUI:
                                     GUI.IMAGE_EXTENSION)
             bonus = Bonus(GUI.BONUS_FILES[i], path, GUI.BONUS_TIMES[i])
             self.bonus_dict[GUI.BONUS_FILES[i]] = bonus
-        self.add_bonus_bool = \
-                        [IntVar(value=1) for i in range(len(self.bonus_dict))]
+        self.add_bonus_bool = [IntVar(value=1) for \
+                                i in range(len(self.bonus_dict))]
         
     def generateBonus(self):
         '''
@@ -190,8 +191,8 @@ class GUI:
             if not snake.getAlive():
                 self.updateScore(snake)
                 self.snakes_alive.remove(snake)
-        if len(self.snakes_alive) == 1 and len(self.snakes) != 1 \
-                                       and not self.finished:
+        if len(self.snakes_alive) == 1 and \
+           len(self.snakes) != 1 and not self.finished:
             self.save_name_winner = self.snakes_alive[0].getName()
             self.finished = True
             self.text_id = None
@@ -208,16 +209,16 @@ class GUI:
             text = '{} won this round! {} seconds remaining' \
                    .format(self.save_name_winner, time)
             if not self.text_id:
-                self.text_id = self.canvas.create_text(
-                                   self.canvas_height//2, self.canvas_width//2,
-                                   text=text, fill='white', tags='text_win')
+                self.text_id = self.canvas.create_text(self.canvas_height//2,
+                                               self.canvas_width//2, text=text,
+                                               fill='white', tags='text_win')
             else:
                 self.canvas.itemconfig(self.text_id, text=text)
             self.window.after(1000, lambda: self.updateRemainingTime(time-1))
     
     def stopRefreshing(self):
         '''
-            stop refresh to not have an infini loop
+            stop refresh to not have an infinite loop
         '''
         self.window.after_cancel(self.current_loop)
     
@@ -246,16 +247,13 @@ class GUI:
         '''
         for i in range(len(self.snakes)):
             if self.snakes[i].getAlive():
+                snakeName
                 for j in range(len(self.snakes)):
-                    if self.snakes[i].getName() == \
-                                        self.score_snake_list[j][1].getName():
+                    if snakeName == self.score_snake_list[j][1].getName():
                         self.score_snake_list[j][0] += 1
-        self.score_snake_list = \
-                list(reversed(sorted(self.score_snake_list, key=self.getKey)))
+        self.score_snake_list = sorted(self.score_snake_list, key=lambda i: i[0])
+        self.score_snake_list = list(reversed(self.score_snake_list))
         self.updateScoreShown()
-        
-    def getKey(self, item):
-        return item[0]
         
     def scoreShown(self):
         '''
@@ -263,8 +261,8 @@ class GUI:
         '''
         for i in range(len(self.snakes)):
             score_text = Label(self.score_frame,
-                               text=str(self.score_snake_list[i][1].getName()) \
-                               + ' : ' + str(self.score_snake_list[i][0]),
+                               text=self.score_snake_list[i][1].getName() + \
+                                    ' : ' + str(self.score_snake_list[i][0]),
                                bg=self.score_snake_list[i][1].getColor(),
                                font=font.Font(family='fixedsys', size=12))
             score_text.pack(padx=5, pady=5)
@@ -275,20 +273,14 @@ class GUI:
         '''
         for child in self.score_frame.winfo_children():
             child.pack_forget()
-        for i in range(len(self.score_snake_list)):
-            score_text = Label(self.score_frame,
-                               text=str(self.score_snake_list[i][1].getName()) \
-                               + ' : ' + str(self.score_snake_list[i][0]),
-                               bg=self.score_snake_list[i][1].getColor(),
-                               font=font.Font(family='fixedsys', size=12))
-            score_text.pack(padx=5, pady=5)
+        self.scoreShown()
         
     def geometryMap(self):
         '''
             refresh the geometry used for the main window
         '''
-        self.window.geometry('{}x{}' \
-                            .format(self.window_width, self.window_height))
+        geom = '{}x{}'.format(self.window_width, self.window_height)
+        self.window.geometry(geom)
         self.window.resizable(width=FALSE, height=FALSE)
     
     def quitCurrentPlay(self):
@@ -312,13 +304,6 @@ class GUI:
         '''
             sets the whole GUI start menu
         '''
-        # self.loadCurveImages()
-        # image_canvas_left = Canvas(self.window, width=500, height=700)
-        # x, y = 50, 350
-        # for i in range(len(self.images_curves)):
-            # image_canvas_left.create_image(x, y, image=self.images_curves[i])
-            # x += 80
-        # image_canvas_left.pack(side=LEFT)
         if self.sound_activate:
             self.play_once_music = True
         self.clearWindow()
@@ -386,9 +371,10 @@ class GUI:
                                            text='Available bonus')
         available_bonus_frame.grid()
         for i in range(len(self.bonus_dict)):
+            bonus = self.bonus_dict[GUI.BONUS_FILES[i]]
             add_bonus = Checkbutton(available_bonus_frame,
-                                image=self.bonus_dict[GUI.BONUS_FILES[i]].image,
-                                variable=self.add_bonus_bool[i])
+                                    image=bonus.image,
+                                    variable=self.add_bonus_bool[i])
             add_bonus.grid(row=i%3, column=i//3)
         Button(available_bonus_frame,
                text='select all',
@@ -403,7 +389,7 @@ class GUI:
         self.bonus_scale.set(self.bonus_percent)
         self.bonus_scale.grid()
         available_map_frame = LabelFrame(self.top_para,
-                                              text='Available map size')
+                                         text='Available map size')
         available_map_frame.grid(row=6)
         Radiobutton(available_map_frame, text='normal',
                     variable=self.mini_map, value=2).grid(row=6, column=2)
@@ -413,21 +399,17 @@ class GUI:
                     variable=self.mini_map, value=1).grid(row=6, column=1)
         sound_frame = LabelFrame(self.top_para, text='Music')
         sound_frame.grid(row=7)
-        self.sound_button = Button(sound_frame,
-                                   text='Sound on' if self.sound_activate
-                                                   else 'Sound off',
+        sound = {True: 'on', False: 'off'}[self.sound_activate]
+        self.sound_button = Button(sound_frame, text='Sound ' + sound,
                                    command=self.soundActivation)
         self.sound_button.grid()
         b = Button(self.top_para, text='Set', command=self.closeAndGetVal)
         b.grid(row=8)
         
     def soundActivation(self):
-        if self.sound_activate:
-            self.sound_activate = False
-            self.sound_button.configure(text='Sound off')
-        else:
-            self.sound_activate = True
-            self.sound_button.configure(text='Sound on')
+        self.sound_activate = False if self.sound_activate else True
+        sound = {True: 'on', False: 'off'}[self.sound_activate]
+        self.sound_button.configure(text='Sound ' + sound)
     
     def selectAll(self):
         for i in range(len(self.add_bonus_bool)):
@@ -481,7 +463,7 @@ class GUI:
     
     def removePlayer(self):
         '''
-            callback fucntion when 'remove player' button is pressed: removes
+            callback function when 'remove player' button is pressed: removes
             selection from current lists
         '''
         if len(self.player_ingame.curselection()) > 0:
@@ -790,14 +772,15 @@ class GUI:
             if border < GUI.MAX_CANVAS_BORDER:
                 self.canvas_height -= 4
                 self.canvas_width -= 4
-                self.canvas.configure(bd=border+2, height=self.canvas_height, width=self.canvas_width)
+                self.canvas.configure(bd=border+2, height=self.canvas_height,
+                                      width=self.canvas_width)
                 self.window.after(100, self.shrinkMap)
     
     def invertColor(self, color):
         rgb = self.canvas.winfo_rgb(color)
-        inv_red, inv_green, inv_blue = \
-                                255-(rgb[0]//256), 255-(rgb[1]//256), 255-(rgb[2]//256)
-        return "#{:02x}{:02x}{:02x}".format(inv_red, inv_green, inv_blue)
+        
+        # inv_red, inv_green, inv_blue = [255 - c//256 for c in rgb]
+        return "#{:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
     
     def setCommand(self, e):
         '''
@@ -888,8 +871,13 @@ class GUI:
         '''
         save = open("save.txt", "w")
         for i in range(len(self.regular_player)):
-            save.write(str(self.regular_player[i])+'\ncommand left = '+str(self.regular_commands[i][0])+
-            '\ncommand right = '+str(self.regular_commands[i][1])+'\ncolor = '+str(self.regular_colors[i])+'\n')
+            text = '{}\n' \
+                   'command left = {}\n' \
+                   'command right = {}\n' \
+                   'color = {}\n' \
+                   .format(self.regular_player[i], self.regular_commands[i][0],
+                           self.regular_commands[i][1], self.regular_colors[i])
+            save.write(text)
         self.window.destroy()
         
     def loadSave(self):
