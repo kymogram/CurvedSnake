@@ -1,6 +1,7 @@
 from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
 from tkinter.font import Font
+from tkinter.filedialog import askopenfilename
 
 from random import randint, random, choice, shuffle
 from math import pi
@@ -410,6 +411,10 @@ class GUI:
         self.sound_button = Button(sound_frame, text='Sound ' + sound,
                                    command=self.soundActivation)
         self.sound_button.grid()
+        self.choose_sound_button = Button(sound_frame,
+                                   text='Choose Music',
+                                   command=self.choose_music)
+        self.choose_sound_button.grid()
         b = Button(self.top_para, text='Set', command=self.closeAndGetVal)
         b.grid(row=8)
 
