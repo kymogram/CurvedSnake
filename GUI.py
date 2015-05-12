@@ -44,7 +44,8 @@ class GUI:
                    'change_color', 'change_chance_hole',
                    'clean_map', 'negative',
                    'invincible', 'shrink_map',
-                   'self_right_angles', 'swap_position']
+                   'self_right_angles', 'swap_position',
+                   'portal']
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -53,7 +54,8 @@ class GUI:
                    350, 750,
                    300, 300,
                    300, 300,
-                   750, 200]
+                   750, 200,
+                   10]
 
     def __init__(self):
         # window
@@ -88,6 +90,7 @@ class GUI:
         self.events_queue = list()
         self.music_manager = MusicManager(GUI.BACKGROUND_MUSIC)
         self.music_manager.start()
+        self.portal_index = 0
         # init
         self.loadBonusImages()
         self.loadSave()
@@ -140,8 +143,16 @@ class GUI:
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
         if len(self.available_bonus) > 0:
             bonus = choice(self.available_bonus)
-            self.canvas.create_image(x, y, image=bonus.image,
-                                     tags='bonus,{}'.format(bonus.name))
+            if bonus.name != 'portal':
+                self.canvas.create_image(x, y, image=bonus.image,
+                                         tags='bonus,{}'.format(bonus.name))
+            else:
+                self.canvas.create_image(x, y, image=bonus.image,
+                         tags='bonus,{}{}'.format(bonus.name, self.portal_index))
+                x2, y2 = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
+                self.canvas.create_image(x2, y2, image=bonus.image,
+                                         tags='bonus,{}{}'.format(bonus.name, self.portal_index))
+                self.portal_index += 1
 
     def findRandomFreePosition(self, xmin, xmax, ymin, ymax):
         '''
@@ -789,6 +800,10 @@ class GUI:
                 shuffle(head_list)
             for i in range(len(head_list)):
                 self.snakes[i].head_coord = head_list[i]
+        elif bonus_type[:6] == 'portal':
+            el = self.canvas.find_withtag('bonus,'+bonus_type)[0]
+            sender.head_coord = self.canvas.coords(el)
+            self.canvas.delete(el)
 
     def shrinkMap(self):
         '''
