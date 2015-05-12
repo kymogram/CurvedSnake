@@ -14,8 +14,8 @@ from InputManager import *
 from MusicManager import *
 
 class GUI:
-    DEFAULT_WIDTH = 700        #pixels
-    DEFAULT_HEIGHT = 700       #pixels
+    DEFAULT_WIDTH = 850        #pixels
+    DEFAULT_HEIGHT = 850       #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
     DEFAULT_TIME_AFTER_GAME = 5#s
@@ -335,6 +335,8 @@ class GUI:
         self.player_known.insert(END, *self.regular_player)
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
+        Button(self.window, text='Remove regular player',
+               command=self.removeRegularPlayer).pack()
         button_frame = LabelFrame(self.window, text='Left and Right commands',
               font=font.Font(family='comic sans ms', size=10))
         button_frame.pack()
@@ -342,7 +344,8 @@ class GUI:
                                   bg='white',
                                   command=lambda: self.modifBgColor('L'))
         self.button_left.pack(side=LEFT, padx=20)
-        self.button_right = Button(button_frame, text=GUI.DEFAULT_COMMANDS[0][1],
+        self.button_right = Button(button_frame,
+                                   text=GUI.DEFAULT_COMMANDS[0][1],
                                    bg='white',
                                    command=lambda: self.modifBgColor('R'))
         self.button_right.pack(side=RIGHT, padx=20)
@@ -355,8 +358,6 @@ class GUI:
         self.color.bind('<<ComboboxSelected>>', self.newSelection)
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
-        Button(self.window, text='Remove player',
-               command=self.removePlayer).pack()
         Label(self.window, width=250, text='Player ready to play',
               font=font.Font(family='comic sans ms')).pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
@@ -365,8 +366,13 @@ class GUI:
             self.player_ingame.insert(END, *self.snakes_names)
         self.first_open_game = False
         self.player_ingame.pack()
-        Button(self.window, text='Parameters', command=self.parameters).pack()
-        Button(self.window, text='Play!', command=self.playPressed).pack()
+        Button(self.window, text='Remove player',
+               command=self.removePlayer).pack()
+        ready_to_play = LabelFrame(self.window, text='Finally ready to play ?',
+              font=font.Font(family='comic sans ms', size=10))
+        ready_to_play.pack()
+        Button(ready_to_play, text='Parameters', command=self.parameters).pack(padx=5, pady=5)
+        Button(ready_to_play, text='Play!', command=self.playPressed).pack(padx=5, pady=5)
         
     def parameters(self):
         '''
@@ -407,7 +413,8 @@ class GUI:
         sound_frame = LabelFrame(self.top_para, text='Music')
         sound_frame.grid(row=7)
         self.sound_button = Button(sound_frame,
-                                   text='Sound on' if self.sound_activate else 'Sound off',
+                                   text='Sound on' if self.sound_activate
+                                                   else 'Sound off',
                                    command=self.soundActivation)
         self.sound_button.grid()
         b = Button(self.top_para, text='Set', command=self.closeAndGetVal)
@@ -482,6 +489,22 @@ class GUI:
                 del self.snakes_names[self.selected[0]]
                 del self.snakes_colors[self.selected[0]]
                 del self.commands_list[self.selected[0]]
+            except:
+                showwarning('No one to remove', 'You have no one to remove')
+        else:
+            showwarning('No one chosen', 'Choose a player to remove')
+            
+    def removeRegularPlayer(self):
+        '''
+            callback fucntion when 'remove player' button is pressed: removes
+            selection from current lists
+        '''
+        if len(self.player_known.curselection()) > 0:
+            self.player_known.delete(self.selected[0])
+            try:
+                del self.regular_player[self.selected[0]]
+                del self.regular_colors[self.selected[0]]
+                del self.regular_commands[self.selected[0]]
             except:
                 showwarning('No one to remove', 'You have no one to remove')
         else:
@@ -605,9 +628,11 @@ class GUI:
                 self.playMusic()
                 self.play_once_music = False
         self.finished = False
-        self.score_frame = LabelFrame(self.window, relief=GROOVE, bd=2, text='Scores')
+        self.score_frame = LabelFrame(self.window, relief=GROOVE, bd=2,
+                                      text='Scores')
         self.score_frame.pack(side=LEFT)
-        self.canvas_frame = LabelFrame(self.window, relief=RAISED, bd=15, cursor='none', text='canvas')
+        self.canvas_frame = LabelFrame(self.window, relief=RAISED, bd=15,
+                                       cursor='none', text='canvas')
         self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
         self.canvas = Canvas(self.canvas_frame, height=self.canvas_height,
                             width=self.canvas_width,
@@ -625,7 +650,8 @@ class GUI:
         self.snakes_alive = self.snakes[:]
         #self.new_game will be used only to initialiate the score
         if self.new_game:
-            self.score_snake_list = [[0, self.snakes[i]] for i in range(len(self.snakes))]
+            self.score_snake_list = \
+                        [[0, self.snakes[i]] for i in range(len(self.snakes))]
         self.scoreShown()
         self.startInvincible()
         #add create_text with command of each player 
@@ -762,8 +788,6 @@ class GUI:
                 self.canvas.configure(bd=border+2, height=self.canvas_height, width=self.canvas_width)
                 self.window.after(100, self.shrinkMap)
     
-    #callbacks
-    
     def invertColor(self, color):
         rgb = self.canvas.winfo_rgb(color)
         inv_red, inv_green, inv_blue = \
@@ -852,6 +876,7 @@ class GUI:
         else:
             #move the correct player(s) when key is pressed
             self.inputs.press(key)
+            
     def saveParameters(self):
         '''
             save paramers about players habit
@@ -861,6 +886,7 @@ class GUI:
             save.write(str(self.regular_player[i])+'\ncommand left = '+str(self.regular_commands[i][0])+
             '\ncommand right = '+str(self.regular_commands[i][1])+'\ncolor = '+str(self.regular_colors[i])+'\n')
         self.window.destroy()
+        
     def loadSave(self):
         '''
             load the parameters saved about players habit
