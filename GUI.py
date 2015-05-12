@@ -56,7 +56,7 @@ class GUI:
     def __init__(self):
         #window
         self.window = Tk()
-        self.default_values()
+        self.defaultValues()
         self.mini_map = IntVar(value=2)
         self.one_vs_one = IntVar()
         geom = '{}x{}'.format(self.window_width, self.window_height)
@@ -93,7 +93,7 @@ class GUI:
         self.window.protocol("WM_DELETE_WINDOW", self.saveParameters)
         self.window.mainloop()
     
-    def default_values(self):
+    def defaultValues(self):
         '''
             set default values
         '''
@@ -287,7 +287,7 @@ class GUI:
         '''
         self.stopMusic()
         self.stopRefreshing()
-        self.default_values()
+        self.defaultValues()
         self.geometryMap()
         self.menuStart()
     
