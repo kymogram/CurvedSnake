@@ -28,12 +28,11 @@ class Particles:
                                         for i in range(nbr_particles)]
         self.particles_speed = [uniform(SPEED_PARTICLES_MIN, SPEED_PARTICLES_MAX) \
                                         for i in range(nbr_particles)]
-        #Constantes des vies pour chaque particule
         particles_life = [randint(LIFE_PARTICLES_MIN, LIFE_PARTICLES_MAX) \
                                         for i in range(nbr_particles)]
         self.particles_life_diminution = [self.particles_size[i] / particles_life[i] \
                                         for i in range(nbr_particles)] 
-        #When particle's life < 1, it is destroyed
+        #when particle's life < 1, it is destroyed
         for i in range(nbr_particles):
             w = self.particles_size[i]
             self.particles[i] = self.canvas.create_line(self.x, self.y-w//2,
@@ -57,7 +56,7 @@ class Particles:
             else:
                 self.canvas.itemconfigure(particle,
                                           width=self.particles_size[index])
-                #Move the particle
+                #move the particle
                 speed = self.particles_speed[index]
                 x_offset = speed*cos(self.particles_direction[index])
                 y_offset = -speed*sin(self.particles_direction[index])
@@ -78,3 +77,4 @@ class Particles:
         #loop
         if self.particles != []: 
             self.canvas.after(Particles.DELAY, self.refreshSystem)
+    #

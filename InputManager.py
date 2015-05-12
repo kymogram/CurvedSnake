@@ -1,4 +1,9 @@
 class InputManager:
+    '''
+        InputManager class is used to store the pressed keys
+        to know when snakes must change direction
+    '''
+    
     def __init__(self):
         self.pressed_keys = dict()
     
@@ -13,3 +18,5 @@ class InputManager:
             return self.pressed_keys[key]
         except:
             return False
+    
+    #

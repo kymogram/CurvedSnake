@@ -28,8 +28,7 @@ class GUI:
     
     MAXIMUM_NAME_LENGTH = 16 #chars
     
-    MIN_CANVAS_HEIGHT = 300 #pixels
-    MIN_CANVAS_WIDTH = 300  #pixels
+    MAX_CANVAS_BORDER = 200 #pixels
     
     BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -354,19 +353,29 @@ class GUI:
                                 image=self.bonus_dict[GUI.BONUS_FILES[i]].image,
                                 variable=self.add_bonus_bool[i])
             add_bonus.grid(row=i%3, column=i//3)
+        Button(self.top_bonus, text='select all', command=self.selectAll).grid(row=4, column=1)
+        Button(self.top_bonus, text='unselect all', command=self.unselectAll).grid(row=4, column=3)
         self.bonus_scale = Scale(self.top_bonus, label='probability',
                                  to=100, orient=HORIZONTAL)
         self.bonus_scale.set(self.bonus_percent)
-        self.bonus_scale.grid(row=4, column=1)
+        self.bonus_scale.grid(row=5, column=1)
         Radiobutton(self.top_bonus, text='normal',
-                    variable=self.mini_map, value=2).grid(row=5, column=1)
+                    variable=self.mini_map, value=2).grid(row=6, column=1)
         Radiobutton(self.top_bonus, text='mini map',
-                    variable=self.mini_map, value=0).grid(row=5, column=2)
+                    variable=self.mini_map, value=0).grid(row=6, column=2)
         Radiobutton(self.top_bonus, text='1v1',
-                    variable=self.mini_map, value=1).grid(row=5, column=0)
+                    variable=self.mini_map, value=1).grid(row=6, column=0)
         b = Button(self.top_bonus, text='Set', command=self.closeAndGetVal)
-        b.grid(row=6, column=1)
+        b.grid(row=7, column=1)
+    
+    def selectAll(self):
+        for i in range(len(self.add_bonus_bool)):
+            self.add_bonus_bool[i].set(1)
         
+    def unselectAll(self):
+        for i in range(len(self.add_bonus_bool)):
+            self.add_bonus_bool[i].set(0)
+    
     def closeAndGetVal(self):
         '''
             refresh values when destroying the parameters toplevel
@@ -524,12 +533,15 @@ class GUI:
             prepares the game
         '''
         self.finished = False
-        self.score_frame = Frame(self.window, relief=GROOVE, bd=2)
+        self.score_frame = LabelFrame(self.window, relief=GROOVE, bd=2, text='Scores')
         self.score_frame.pack(side=LEFT)
-        Label(self.score_frame, text='Score').pack()
-        self.canvas_frame = Frame(self.window, relief=RAISED, bd=15, cursor='none')
+        Label(self.score_frame, text='Score:').pack()
+        self.canvas_frame = LabelFrame(self.window, relief=RAISED, bd=15, cursor='none', text='canvas')
         self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
-        self.canvas = Canvas(self.canvas_frame, height = self.canvas_height, width = self.canvas_width, bg='black', highlightthickness=0)
+        self.canvas = Canvas(self.canvas_frame, height=self.canvas_height,
+                            width=self.canvas_width,
+                            bg='black', highlightthickness=0,
+                            bd=0, relief=GROOVE)
         self.canvas.pack()
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = self.canvas_width, self.canvas_height
@@ -670,11 +682,11 @@ class GUI:
         '''
             shrink the map if the bonus shrink_map is taken
         '''
-        if self.canvas_height > GUI.MIN_CANVAS_HEIGHT and \
-           self.canvas_width > GUI.MIN_CANVAS_WIDTH:
-            self.canvas_height -= 1
-            self.canvas_width -= 1
-            self.canvas.configure(height=self.canvas_height, width=self.canvas_width)
+        border = int(self.canvas['bd'])
+        if border < GUI.MAX_CANVAS_BORDER:
+            self.canvas_height -= 4
+            self.canvas_width -= 4
+            self.canvas.configure(bd=border+2, height=self.canvas_height, width=self.canvas_width)
             self.window.after(100, self.shrinkMap)
     
     #callbacks
