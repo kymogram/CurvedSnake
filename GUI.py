@@ -45,7 +45,8 @@ class GUI:
                    'rotation_angle_down', 'bonus_chance',
                    'change_color', 'change_chance_hole',
                    'clean_map', 'negative',
-                   'invincible', 'shrink_map']
+                   'invincible', 'shrink_map',
+                   'self_right_angles']
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -53,7 +54,8 @@ class GUI:
                    300,  50,
                    350, 750,
                    300, 300,
-                   300, 300,]
+                   300, 300,
+                   750]
     
     def __init__(self):
         #window
@@ -323,14 +325,14 @@ class GUI:
         Label(self.window, width=100, text='Curved Snake',
               font=font.Font(family='fixedsys', size=32)).pack()
         Label(self.window, width=250, text='New player',
-              font=font.Font(family='comic sans ms')).pack()
+              font=font.Font(family='Arial Unicode MS')).pack()
         self.current_name = StringVar()
         self.name = Entry(self.window, textvariable=self.current_name)
         self.name.bind('<Button-1>', self.removeFocus)
         self.name.pack()
         self.selectRandomName()
         Label(self.window, width=250, text='Already played ?',
-              font=font.Font(family='comic sans ms')).pack()
+              font=font.Font(family='Arial Unicode MS')).pack()
         self.player_known = Listbox(self.window, selectmode=SINGLE)
         self.player_known.insert(END, *self.regular_player)
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
@@ -338,7 +340,7 @@ class GUI:
         Button(self.window, text='Remove regular player',
                command=self.removeRegularPlayer).pack()
         button_frame = LabelFrame(self.window, text='Left and Right commands',
-              font=font.Font(family='comic sans ms', size=10))
+              font=font.Font(family='Arial Unicode MS', size=10))
         button_frame.pack()
         self.button_left = Button(button_frame, text=GUI.DEFAULT_COMMANDS[0][0],
                                   bg='white',
@@ -351,7 +353,7 @@ class GUI:
         self.button_right.pack(side=RIGHT, padx=20)
         self.selectRandomCommands()
         Label(self.window, width=100, text='Choose your color',
-              font=font.Font(family='comic sans ms', size=10)).pack()
+              font=font.Font(family='Arial Unicode MS', size=10)).pack()
         self.color = Combobox(self.window, state='readonly', exportselection=0)
         self.color['values'] = GUI.DEFAULT_COLORS
         self.selectRandomColor()
@@ -359,7 +361,7 @@ class GUI:
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
         Label(self.window, width=250, text='Player ready to play',
-              font=font.Font(family='comic sans ms')).pack()
+              font=font.Font(family='Arial Unicode MS')).pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         if not self.first_open_game:
@@ -369,7 +371,7 @@ class GUI:
         Button(self.window, text='Remove player',
                command=self.removePlayer).pack()
         ready_to_play = LabelFrame(self.window, text='Finally ready to play ?',
-              font=font.Font(family='comic sans ms', size=10))
+              font=font.Font(family='Arial Unicode MS', size=10))
         ready_to_play.pack()
         Button(ready_to_play, text='Parameters', command=self.parameters).pack(padx=5, pady=5)
         Button(ready_to_play, text='Play!', command=self.playPressed).pack(padx=5, pady=5)
@@ -381,7 +383,7 @@ class GUI:
         self.top_para = Toplevel()
         self.top_para.grab_set()
         available_bonus_frame = LabelFrame(self.top_para,
-                                                text='Available bonus')
+                                           text='Available bonus')
         available_bonus_frame.grid()
         for i in range(len(self.bonus_dict)):
             add_bonus = Checkbutton(available_bonus_frame,
@@ -394,8 +396,7 @@ class GUI:
         Button(available_bonus_frame,
                text='unselect all',
                command=self.unselectAll).grid(row=4, column=3)
-        bonus_scale_frame = LabelFrame(self.top_para,
-                                            text='Bonus probability')
+        bonus_scale_frame = LabelFrame(self.top_para, text='Bonus probability')
         bonus_scale_frame.grid(row=5)
         self.bonus_scale = Scale(bonus_scale_frame,
                                  to=100, orient=HORIZONTAL)
@@ -710,6 +711,10 @@ class GUI:
                 snake.previous_angles.append(snake.rotating_angle)
                 snake.rotating_angle = pi/2
                 add_event(snake.events_queue, 'snake.restoreAngle()')
+        elif bonus_type == 'self_right_angles':
+            sender.previous_angles.append(sender.rotating_angle)
+            sender.rotating_angle = pi/2
+            add_event(sender.events_queue, 'snake.restoreAngle()')
         elif bonus_type == 'thickness_up':
             for snake in others:
                 snake.thickness += DEFAULT_THICKNESS
