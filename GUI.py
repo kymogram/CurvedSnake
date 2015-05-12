@@ -411,9 +411,8 @@ class GUI:
         self.sound_button = Button(sound_frame, text='Sound ' + sound,
                                    command=self.soundActivation)
         self.sound_button.grid()
-        self.choose_sound_button = Button(sound_frame,
-                                   text='Choose Music',
-                                   command=self.choose_music)
+        self.choose_sound_button = Button(sound_frame, text='Choose Music',
+                                          command=self.choose_music)
         self.choose_sound_button.grid()
         b = Button(self.top_para, text='Set', command=self.closeAndGetVal)
         b.grid(row=8)
@@ -422,6 +421,11 @@ class GUI:
         self.sound_activate = False if self.sound_activate else True
         sound = {True: 'on', False: 'off'}[self.sound_activate]
         self.sound_button.configure(text='Sound ' + sound)
+
+    def choose_music(self):
+        types = [("WVA files", "*.wav")]
+        GUI.BACKGROUND_MUSIC = askopenfilename(filetypes=types)
+        self.music_manager.changeTrack(GUI.BACKGROUND_MUSIC)
 
     def selectAll(self):
         for i in range(len(self.add_bonus_bool)):
