@@ -272,13 +272,6 @@ class GUI:
         for child in self.score_frame.winfo_children():
             child.pack_forget()
         self.scoreShown()
-        # for i in range(len(self.score_snake_list)):
-            # score_text = Label(self.score_frame,
-                               # text=self.score_snake_list[i][1].getName() + \
-                                    # ' : ' + str(self.score_snake_list[i][0]),
-                               # bg=self.score_snake_list[i][1].getColor(),
-                               # font=font.Font(family='fixedsys', size=12))
-            # score_text.pack(padx=5, pady=5)
         
     def geometryMap(self):
         '''
@@ -749,7 +742,8 @@ class GUI:
             if border < GUI.MAX_CANVAS_BORDER:
                 self.canvas_height -= 4
                 self.canvas_width -= 4
-                self.canvas.configure(bd=border+2, height=self.canvas_height, width=self.canvas_width)
+                self.canvas.configure(bd=border+2, height=self.canvas_height,
+                                      width=self.canvas_width)
                 self.window.after(100, self.shrinkMap)
     
     #callbacks
@@ -758,7 +752,6 @@ class GUI:
         rgb = self.canvas.winfo_rgb(color)
         
         inv_red, inv_green, inv_blue = [255 - c//256 for c in rgb]
-                                # 255-(rgb[0]//256), 255-(rgb[1]//256), 255-(rgb[2]//256)
         return "#{:02x}{:02x}{:02x}".format(inv_red, inv_green, inv_blue)
     
     def setCommand(self, e):
@@ -854,8 +847,6 @@ class GUI:
                    'command right = {}\n' \
                    .format(self.regular_player[i], self.regular_commands[i][0],
                            self.regular_commands[i][1], self.regular_colors[i])
-            # save.write(str(self.regular_player[i])+'\ncommand left = '+str(self.regular_commands[i][0])+
-            # '\ncommand right = '+str(self.regular_commands[i][1])+'\ncolor = '+str(self.regular_colors[i])+'\n')
         self.window.destroy()
     def loadSave(self):
         '''
