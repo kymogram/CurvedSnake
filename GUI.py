@@ -11,8 +11,8 @@ from Bonus import *
 from InputManager import *
 
 class GUI:
-    DEFAULT_WIDTH = 1000       #pixels
-    DEFAULT_HEIGHT = 1000      #pixels
+    DEFAULT_WIDTH = 700        #pixels
+    DEFAULT_HEIGHT = 700       #pixels
     DEFAULT_SPAWN_OFFSET = 60  #pixels
     DEFAULT_REFRESH_TIMER = 15 #ms
     DEFAULT_TIME_AFTER_GAME = 5#s
@@ -34,7 +34,7 @@ class GUI:
     BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
     BONUS_DIRECTORY = './sprites/'
-    BONUS_EXTENSION = 'gif'
+    IMAGE_EXTENSION = 'gif'
     BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'thickness_down', 'all_speeddown',
                    'reversed_commands', 'all_speedup',
@@ -44,11 +44,11 @@ class GUI:
                    'clean_map', 'negative',
                    'invincible', 'shrink_map']
     BONUS_TIMES = [300, 600,
+                   500, 250,
                    300, 250,
                    300, 300,
-                   300, 300,
-                   300, 300,
-                    50, 750,
+                   300,  50,
+                   350, 750,
                    300, 300,
                    300, 300,]
     
@@ -64,12 +64,12 @@ class GUI:
         self.window.wm_title('Curved Snake')
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         #GUI variables
-        self.first_open_game = True
-        self.snakes_colors = []
-        self.commands_list = []
-        self.snakes_names = []
-        self.regular_player = []
-        self.regular_colors = []
+        self.first_open_game  = True
+        self.snakes_colors    = []
+        self.commands_list    = []
+        self.snakes_names     = []
+        self.regular_player   = []
+        self.regular_colors   = []
         self.regular_commands = []
         self.left_key = self.right_key = False
         self.is_regular_list = False
@@ -100,15 +100,21 @@ class GUI:
         self.canvas_width  = self.window_width - 200
         self.new_game = True
         self.finish_game = False
+        
+    def loadCurveImages(self):
+        self.images_curves = []
+        for i in range(1,4):
+            path = '{}{}.{}'.format('./curves/curveideasnake', i, GUI.IMAGE_EXTENSION)
+            self.images_curves.append(PhotoImage(file=path))
     
     def loadBonusImages(self):
         '''
-            loads all the images in GUI
+            loads all the bonus image
         '''
         self.bonus_dict = dict()
         for i in range(len(GUI.BONUS_FILES)):
             path = '{}{}.{}'.format(GUI.BONUS_DIRECTORY, GUI.BONUS_FILES[i],
-                                    GUI.BONUS_EXTENSION)
+                                    GUI.IMAGE_EXTENSION)
             bonus = Bonus(path, GUI.BONUS_TIMES[i])
             self.bonus_dict[GUI.BONUS_FILES[i]] = bonus
         self.add_bonus_bool = [IntVar(value=1) for i in range(len(self.bonus_dict))]
@@ -210,8 +216,8 @@ class GUI:
         self.stopRefreshing()
         self.canvas_height = self.window_height - 200
         self.canvas_width = self.window_width - 200
-        for elem in self.score:
-            if elem >= (len(self.score)-1)*10:
+        for elem in self.score_snake_list:
+            if elem[0] >= (len(self.score)-1)*10:
                 self.finish_game = True
         self.new_game = False
         if not self.finish_game:
@@ -290,7 +296,14 @@ class GUI:
         '''
             sets the whole GUI start menu
         '''
+        # self.loadCurveImages()
         self.clearWindow()
+        # image_canvas_left = Canvas(self.window, width=500, height=700)
+        # x, y = 50, 350
+        # for i in range(len(self.images_curves)):
+            # image_canvas_left.create_image(x, y, image=self.images_curves[i])
+            # x += 80
+        # image_canvas_left.pack(side=LEFT)
         Label(self.window, width=100, text='Curved Snake').pack()
         Label(self.window, width=250, text='New player').pack()
         self.current_name = StringVar()
@@ -601,8 +614,14 @@ class GUI:
             sender.thickness /= 2
             add_event(sender.events_queue, 'snake.thickness *= 2')
         elif bonus_type == 'bonus_chance':
-            self.bonus_proba *= 4
-            add_event(self.events_queue, 'self.bonus_proba /= 4')
+            #Precaution to not have bonus poping all around the map
+            if self.bonus_proba <= 0.16:
+                if self.bonus_proba <= 0.04:
+                    self.bonus_proba *= 4
+                    add_event(self.events_queue, 'self.bonus_proba /= 4')
+                else:
+                    self.bonus_proba *=2
+                    add_event(self.events_queue, 'self.bonus_proba /= 2')
         elif bonus_type == 'rotation_angle_down':
             for snake in others:
                 snake.rotating_angle /= 2
@@ -748,7 +767,6 @@ class GUI:
         else:
             #move the correct player(s) when key is pressed
             self.inputs.press(key)
-            
     def saveParameters(self):
         '''
             save paramers about players habit
