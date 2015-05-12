@@ -313,21 +313,21 @@ class GUI:
         Label(self.window, width=100, text='Curved Snake',
               font=Font(family='fixedsys', size=32)).pack()
         Label(self.window, width=250, text='New player',
-              font=Font(family='comic sans ms')).pack()
+              font=Font(family='Arial Unicode MS')).pack()
         self.current_name = StringVar()
         self.name = Entry(self.window, textvariable=self.current_name)
         self.name.bind('<Button-1>', self.removeFocus)
         self.name.pack()
         self.selectRandomName()
         Label(self.window, width=250, text='Already played ?',
-              font=Font(family='comic sans ms')).pack()
+              font=Font(family='Arial Unicode MS')).pack()
         self.player_known = Listbox(self.window, selectmode=SINGLE)
         self.player_known.insert(END, *self.regular_player)
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
         Button(self.window, text='Remove regular player',
                command=self.removeRegularPlayer).pack()
-        font = Font(family='comic sans ms', size=10)
+        font = Font(family='Arial Unicode MS', size=10)
         button_frame = LabelFrame(self.window, text='Left and Right commands',
                                   font=font)
         button_frame.pack()
@@ -342,7 +342,7 @@ class GUI:
         self.button_right.pack(side=RIGHT, padx=20)
         self.selectRandomCommands()
         Label(self.window, width=100, text='Choose your color',
-              font=Font(family='comic sans ms', size=10)).pack()
+              font=Font(family='Arial Unicode MS', size=10)).pack()
         self.color = Combobox(self.window, state='readonly', exportselection=0)
         self.color['values'] = GUI.DEFAULT_COLORS
         self.selectRandomColor()
@@ -350,7 +350,7 @@ class GUI:
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
         Label(self.window, width=250, text='Player ready to play',
-              font=Font(family='comic sans ms')).pack()
+              font=Font(family='Arial Unicode MS')).pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         if not self.first_open_game:
@@ -360,7 +360,7 @@ class GUI:
         Button(self.window, text='Remove player',
                command=self.removePlayer).pack()
         ready_to_play = LabelFrame(self.window, text='Finally ready to play ?',
-                                   font=Font(family='comic sans ms', size=10))
+                                   font=Font(family='Arial Unicode MS', size=10))
         ready_to_play.pack()
         b = Button(ready_to_play, text='Parameters', command=self.parameters)
         b.pack(padx=5, pady=5)
@@ -709,9 +709,9 @@ class GUI:
             add_event(sender.events_queue, 'snake.restoreAngle()')
         elif bonus_type == 'thickness_up':
             for snake in others:
-                snake.thickness += DEFAULT_THICKNESS
+                snake.thickness *= 2
                 add_event(snake.events_queue,
-                          'snake.thickness -= DEFAULT_THICKNESS')
+                          'snake.thickness /= 2')
         elif bonus_type == 'thickness_down':
             sender.thickness /= 2
             add_event(sender.events_queue, 'snake.thickness *= 2')
