@@ -3,7 +3,7 @@ from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
 import tkinter.font
 
-import pyglet
+# import pyglet
 
 from random import randint, random, choice
 from math import pi
@@ -67,26 +67,26 @@ class GUI:
         self.window.wm_title('Curved Snake')
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         #GUI variables
-        self.first_open_game   = True
-        self.snakes_colors     = []
-        self.commands_list     = []
-        self.snakes_names      = []
-        self.regular_player    = []
-        self.regular_colors    = []
-        self.regular_commands  = []
+        self.first_open_game = True
+        self.snakes_colors = []
+        self.commands_list = []
+        self.snakes_names = []
+        self.regular_player = []
+        self.regular_colors = []
+        self.regular_commands = []
         self.left_key = self.right_key = False
-        self.is_regular_list   = False
+        self.is_regular_list = False
         #other variables
-        self.play_once_music   = True
-        self.sound_activate    = True
+        self.play_once_music = True
+        self.sound_activate = True
         self.inputs = InputManager()
-        self.current_loop      = 0
+        self.current_loop = 0
         self.step = 0
-        self.bonus_percent     = 30
+        self.bonus_percent = 30
         self.time_before_round = 5
-        self.bonus_proba       = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
-        self.events_queue      = list()
-        self.music_manager     = MusicManager(GUI.BACKGROUND_MUSIC)
+        self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
+        self.events_queue = list()
+        self.music_manager = MusicManager(GUI.BACKGROUND_MUSIC)
         self.music_manager.start()
         #init
         self.loadBonusImages()
@@ -102,9 +102,9 @@ class GUI:
         self.random_colors_used   = []
         self.random_commands_used = []
         self.window_height = GUI.DEFAULT_HEIGHT
-        self.window_width  = GUI.DEFAULT_WIDTH
+        self.window_width = GUI.DEFAULT_WIDTH
         self.canvas_height = self.window_height - 200
-        self.canvas_width  = self.window_width - 200
+        self.canvas_width = self.window_width - 200
         self.new_game = True
         self.finish_game = False
         
@@ -211,7 +211,7 @@ class GUI:
     
     def stopRefreshing(self):
         '''
-            stop refresh to not have an infini loop
+            stop refresh to not have an infinite loop
         '''
         self.window.after_cancel(self.current_loop)
     
