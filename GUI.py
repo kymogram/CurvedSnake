@@ -28,8 +28,7 @@ class GUI:
     
     MAXIMUM_NAME_LENGTH = 16 #chars
     
-    MIN_CANVAS_HEIGHT = 300 #pixels
-    MIN_CANVAS_WIDTH = 300  #pixels
+    MAX_CANVAS_BORDER = 200 #pixels
     
     BONUS_TIME = 300 #frames
     BONUS_SPRITES_DIMENSIONS = (32, 32) #pixels
@@ -511,12 +510,15 @@ class GUI:
             prepares the game
         '''
         self.finished = False
-        self.score_frame = Frame(self.window, relief=GROOVE, bd=2)
+        self.score_frame = LabelFrame(self.window, relief=GROOVE, bd=2, text='Scores')
         self.score_frame.pack(side=LEFT)
-        Label(self.score_frame, text='Score').pack()
-        self.canvas_frame = Frame(self.window, relief=RAISED, bd=15, cursor='none')
+        Label(self.score_frame, text='Score:').pack()
+        self.canvas_frame = LabelFrame(self.window, relief=RAISED, bd=15, cursor='none', text='canvas')
         self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
-        self.canvas = Canvas(self.canvas_frame, height = self.canvas_height, width = self.canvas_width, bg='black', highlightthickness=0)
+        self.canvas = Canvas(self.canvas_frame, height=self.canvas_height,
+                            width=self.canvas_width,
+                            bg='black', highlightthickness=0,
+                            bd=0, relief=GROOVE)
         self.canvas.pack()
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = self.canvas_width, self.canvas_height
@@ -651,11 +653,11 @@ class GUI:
         '''
             shrink the map if the bonus shrink_map is taken
         '''
-        if self.canvas_height > GUI.MIN_CANVAS_HEIGHT and \
-           self.canvas_width > GUI.MIN_CANVAS_WIDTH:
-            self.canvas_height -= 1
-            self.canvas_width -= 1
-            self.canvas.configure(height=self.canvas_height, width=self.canvas_width)
+        border = int(self.canvas['bd'])
+        if border < GUI.MAX_CANVAS_BORDER:
+            self.canvas_height -= 4
+            self.canvas_width -= 4
+            self.canvas.configure(bd=border+2, height=self.canvas_height, width=self.canvas_width)
             self.window.after(100, self.shrinkMap)
     
     #callbacks

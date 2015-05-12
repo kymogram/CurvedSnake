@@ -56,8 +56,9 @@ class Snake:
             returns True if (x, y) is on canvas and False otherwise.
         '''
         self.canvas.update()
-        return 0 <= x < self.canvas.winfo_width() and \
-               0 <= y < self.canvas.winfo_height()
+        border_depth = int(self.canvas['bd'])
+        return border_depth <= x < self.canvas.winfo_width()-border_depth and \
+               border_depth <= y < self.canvas.winfo_height()-border_depth
     
     def handleCollision(self, step, collisions):
         '''
