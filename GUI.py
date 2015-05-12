@@ -425,7 +425,7 @@ class GUI:
     def choose_music(self):
         types = [("WVA files", "*.wav")]
         tmp = askopenfilename(filetypes=types)
-        if not tmp is None:
+        if tmp is not None:
             GUI.BACKGROUND_MUSIC = tmp
             self.music_manager.changeTrack(GUI.BACKGROUND_MUSIC)
 
