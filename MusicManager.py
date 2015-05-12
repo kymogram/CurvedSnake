@@ -27,3 +27,10 @@ class MusicManager(Thread):
     
     def play(self):
         self.music_player.play()
+    
+    def changeTrack(self, file):
+        import pyglet
+        self.file = file
+        self.music = pyglet.media.load(self.file)
+        self.music_player.queue(self.music)
+        self.music_player.next()

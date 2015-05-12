@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
 import tkinter.font
+from tkinter.filedialog import askopenfilename
 
 # import pyglet
 
@@ -397,6 +398,10 @@ class GUI:
                                    text='Sound on' if self.sound_activate else 'Sound off',
                                    command=self.soundActivation)
         self.sound_button.grid()
+        self.choose_sound_button = Button(sound_frame,
+                                   text='Choose Music',
+                                   command=self.choose_music)
+        self.choose_sound_button.grid()
         b = Button(self.top_para, text='Set', command=self.closeAndGetVal)
         b.grid(row=8)
         
@@ -407,6 +412,10 @@ class GUI:
         else:
             self.sound_activate = True
             self.sound_button.configure(text='Sound on')
+    
+    def choose_music(self):
+        GUI.BACKGROUND_MUSIC = askopenfilename(filetypes=[("WVA files", "*.wav")])
+        self.music_manager.changeTrack(GUI.BACKGROUND_MUSIC)
     
     def selectAll(self):
         for i in range(len(self.add_bonus_bool)):
