@@ -340,19 +340,29 @@ class GUI:
                                 image=self.bonus_dict[GUI.BONUS_FILES[i]].image,
                                 variable=self.add_bonus_bool[i])
             add_bonus.grid(row=i%3, column=i//3)
+        Button(self.top_bonus, text='select all', command=self.selectAll).grid(row=4, column=1)
+        Button(self.top_bonus, text='unselect all', command=self.unselectAll).grid(row=4, column=3)
         self.bonus_scale = Scale(self.top_bonus, label='probability',
                                  to=100, orient=HORIZONTAL)
         self.bonus_scale.set(self.bonus_percent)
-        self.bonus_scale.grid(row=4, column=1)
+        self.bonus_scale.grid(row=5, column=1)
         Radiobutton(self.top_bonus, text='normal',
-                    variable=self.mini_map, value=2).grid(row=5, column=1)
+                    variable=self.mini_map, value=2).grid(row=6, column=1)
         Radiobutton(self.top_bonus, text='mini map',
-                    variable=self.mini_map, value=0).grid(row=5, column=2)
+                    variable=self.mini_map, value=0).grid(row=6, column=2)
         Radiobutton(self.top_bonus, text='1v1',
-                    variable=self.mini_map, value=1).grid(row=5, column=0)
+                    variable=self.mini_map, value=1).grid(row=6, column=0)
         b = Button(self.top_bonus, text='Set', command=self.closeAndGetVal)
-        b.grid(row=6, column=1)
+        b.grid(row=7, column=1)
+    
+    def selectAll(self):
+        for i in range(len(self.add_bonus_bool)):
+            self.add_bonus_bool[i].set(1)
         
+    def unselectAll(self):
+        for i in range(len(self.add_bonus_bool)):
+            self.add_bonus_bool[i].set(0)
+    
     def closeAndGetVal(self):
         '''
             refresh values when destroying the parameters toplevel
