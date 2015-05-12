@@ -24,38 +24,55 @@ class Snake:
         #list and not tuple because tuples can't be modified
         self.head_coord = [x_head, y_head]
         self.speed = speed
+        #current angle in canvas
         self.angle = angle #radians!
+        #angle which is added (subtracted) when snake moves
+        self.rotating_angle = DEFAULT_ROTATION_ANGLE
         self.canvas = parent.canvas
+        #must be linked to GUI to handle bonuses
         self.parent = parent
         self.thickness = thickness
         self.color = color
+        #when color is changed by bonus, original color must be kept somewhere
         self.color_unchanged = color
         self.alive = True
         self.invincible = False
         self.time_before_start = True
+        #used to tag items in canvas
         self.name = str(name)
+        #number of frames still to come when snake produces a hole
         self.hole = 0
+        #hole parameters
         self.hole_probability = hole_proba
         self.max_hole_length = max_hole_length
         self.min_hole_length = min_hole_length
+        #for inversing commands bonus
         self.inversed_commands = False
-        self.rotating_angle = DEFAULT_ROTATION_ANGLE
+        #for right angle bonus
         self.previous_angles = list()
         r = self.thickness//2
+        #create head (which is moved towards canvas and not recreated every time)
         self.head_id = self.canvas.create_oval(
                         x_head-r, y_head-r, x_head+r, y_head+r, fill=self.color,
                         outline=self.color, tag='snake,{},-1'.format(self.name))
+        #bonus events to handle
         self.events_queue = list()
+        #arcs created when a bonus is applied
         self.arcs = list()
     
     def addArc(self, bonus):
+        '''
+            creates a new arc around snake head
+        '''
         self.arcs.append(Arc(self, bonus.length, len(self.arcs)))
     
     def isInScreen(self, x, y):
         '''
             returns True if (x, y) is on canvas and False otherwise.
         '''
+        #needed for winfo_width and winfo_height
         self.canvas.update()
+        #needed for map shrinking bonus
         border_depth = int(self.canvas['bd'])
         return border_depth <= x < self.canvas.winfo_width()-border_depth and \
                border_depth <= y < self.canvas.winfo_height()-border_depth
@@ -65,19 +82,24 @@ class Snake:
             do the appropriate action when collision appears on canvas.
             Kill the snake or set the bonus.
         '''
+        #oldest element placed on canvas is at index 0
         first_elem = int(collisions[0])
+        #get its tags (to see whether it is a snake or a bonus (or something else))
         tags = self.canvas.gettags(first_elem)
+        #every item should have tags but test might still be useful...
         if len(tags) != 0:
+            #tags are separated by ',' so split to get all info
             info = tags[0].split(',')
             if info[0] == 'snake':
-                if info[1] != self.name:
+                #if snake hits another snake or itself, it dies
+                if info[1] != self.name or int(info[2]) < step-self.thickness*3:
                     self.alive = False
-                else:
-                    self.alive = int(info[2]) >= step-self.thickness*3
                 if not self.alive:
+                    #throw particles
                     x, y = self.head_coord
                     Particles(self.canvas, x, y, self.color)
             elif info[0] == 'bonus':
+                #if snakes catches a bonus delete it from canvas and ask GUI to handle it
                 self.canvas.delete(first_elem)
                 self.parent.handleBonus(self.name, info[1])
     

@@ -108,7 +108,7 @@ class GUI:
         for i in range(len(GUI.BONUS_FILES)):
             path = '{}{}.{}'.format(GUI.BONUS_DIRECTORY, GUI.BONUS_FILES[i],
                                     GUI.BONUS_EXTENSION)
-            bonus = Bonus(path, GUI.BONUS_TIMES[i])
+            bonus = Bonus(GUI.BONUS_FILES[i], path, GUI.BONUS_TIMES[i])
             self.bonus_dict[GUI.BONUS_FILES[i]] = bonus
         self.add_bonus_bool = [IntVar(value=1) for i in range(len(self.bonus_dict))]
         
