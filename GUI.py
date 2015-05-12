@@ -751,8 +751,8 @@ class GUI:
     def invertColor(self, color):
         rgb = self.canvas.winfo_rgb(color)
         
-        inv_red, inv_green, inv_blue = [255 - c//256 for c in rgb]
-        return "#{:02x}{:02x}{:02x}".format(inv_red, inv_green, inv_blue)
+        # inv_red, inv_green, inv_blue = [255 - c//256 for c in rgb]
+        return "#{:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
     
     def setCommand(self, e):
         '''
@@ -845,8 +845,10 @@ class GUI:
             text = '{}\n' \
                    'command left = {}\n' \
                    'command right = {}\n' \
+                   'color = {}' \
                    .format(self.regular_player[i], self.regular_commands[i][0],
                            self.regular_commands[i][1], self.regular_colors[i])
+            save.write(text)
         self.window.destroy()
     def loadSave(self):
         '''
