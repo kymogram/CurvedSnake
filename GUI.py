@@ -216,7 +216,7 @@ class GUI:
         self.canvas_height = self.window_height - 200
         self.canvas_width = self.window_width - 200
         for elem in self.score_snake_list:
-            if elem[0] >= (len(self.score)-1)*10:
+            if elem[0] >= (len(self.snakes)-1)*10:
                 self.finish_game = True
         self.new_game = False
         if not self.finish_game:
@@ -230,9 +230,11 @@ class GUI:
         '''
             update the score
         '''
-        for i in range(len(self.score)):
+        for i in range(len(self.snakes)):
             if self.snakes[i].getAlive():
-                self.score_snake_list[i][0] += 1
+                for j in range(len(self.snakes)):
+                    if self.snakes[i].getName() == self.score_snake_list[j][1].getName():
+                        self.score_snake_list[j][0] += 1
         self.score_snake_list = list(reversed(sorted(self.score_snake_list, key=self.getKey)))
         self.updateScoreShown()
         
@@ -250,8 +252,6 @@ class GUI:
                                background=self.score_snake_list[i][1].getColor(),
                                font=font.Font(family='fixedsys', size=12))
             score_text.pack(padx=5, pady=5)
-            if len(self.scores_text) != len(self.snakes):
-                self.scores_text.append(score_text)
             
     def updateScoreShown(self):
         '''
@@ -535,7 +535,6 @@ class GUI:
         self.finished = False
         self.score_frame = LabelFrame(self.window, relief=GROOVE, bd=2, text='Scores')
         self.score_frame.pack(side=LEFT)
-        Label(self.score_frame, text='Score:').pack()
         self.canvas_frame = LabelFrame(self.window, relief=RAISED, bd=15, cursor='none', text='canvas')
         self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
         self.canvas = Canvas(self.canvas_frame, height=self.canvas_height,
@@ -555,9 +554,6 @@ class GUI:
         self.snakes_alive = self.snakes[:]
         #self.new_game will be used only to initialiate the score
         if self.new_game:
-            self.score = list()
-            self.score = [0 for i in range(len(self.snakes))]
-            self.scores_text = list()
             self.score_snake_list = [[0, self.snakes[i]] for i in range(len(self.snakes))]
         self.scoreShown()
         self.startInvincible()
@@ -682,12 +678,13 @@ class GUI:
         '''
             shrink the map if the bonus shrink_map is taken
         '''
-        border = int(self.canvas['bd'])
-        if border < GUI.MAX_CANVAS_BORDER:
-            self.canvas_height -= 4
-            self.canvas_width -= 4
-            self.canvas.configure(bd=border+2, height=self.canvas_height, width=self.canvas_width)
-            self.window.after(100, self.shrinkMap)
+        if not self.finished:
+            border = int(self.canvas['bd'])
+            if border < GUI.MAX_CANVAS_BORDER:
+                self.canvas_height -= 4
+                self.canvas_width -= 4
+                self.canvas.configure(bd=border+2, height=self.canvas_height, width=self.canvas_width)
+                self.window.after(100, self.shrinkMap)
     
     #callbacks
     
