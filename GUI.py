@@ -397,10 +397,10 @@ class GUI:
             add_bonus.grid(row=i % 3, column=i // 3)
         Button(available_bonus_frame,
                text='select all',
-               command=self.selectAll).grid(row=4, column=1)
+               command=self.selectAll).grid(row=4, column=2)
         Button(available_bonus_frame,
                text='unselect all',
-               command=self.unselectAll).grid(row=4, column=3)
+               command=self.unselectAll).grid(row=4, column=4)
         bonus_scale_frame = LabelFrame(self.top_para, text='Bonus probability')
         bonus_scale_frame.grid(row=5)
         self.bonus_scale = Scale(bonus_scale_frame,
