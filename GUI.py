@@ -2,7 +2,7 @@ from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
 from tkinter.font import Font
 
-from random import randint, random, choice
+from random import randint, random, choice, shuffle
 from math import pi
 
 from Snake import *
@@ -43,7 +43,8 @@ class GUI:
                    'rotation_angle_down', 'bonus_chance',
                    'change_color', 'change_chance_hole',
                    'clean_map', 'negative',
-                   'invincible', 'shrink_map']
+                   'invincible', 'shrink_map',
+                   'self_right_angles', 'swap_position']
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -51,7 +52,8 @@ class GUI:
                    300,  50,
                    350, 750,
                    300, 300,
-                   300, 300]
+                   300, 300,
+                   750, 200]
 
     def __init__(self):
         # window
@@ -247,7 +249,7 @@ class GUI:
         '''
         for i in range(len(self.snakes)):
             if self.snakes[i].getAlive():
-                snakeName
+                snakeName = self.snakes[i].getName()
                 for j in range(len(self.snakes)):
                     if snakeName == self.score_snake_list[j][1].getName():
                         self.score_snake_list[j][0] += 1
@@ -386,8 +388,7 @@ class GUI:
         Button(available_bonus_frame,
                text='unselect all',
                command=self.unselectAll).grid(row=4, column=3)
-        bonus_scale_frame = LabelFrame(self.top_para,
-                                       text='Bonus probability')
+        bonus_scale_frame = LabelFrame(self.top_para, text='Bonus probability')
         bonus_scale_frame.grid(row=5)
         self.bonus_scale = Scale(bonus_scale_frame,
                                  to=100, orient=HORIZONTAL)
@@ -412,8 +413,8 @@ class GUI:
         b.grid(row=8)
 
     def soundActivation(self):
-        sound = {True: 'on', False: 'off'}[self.sound_activate]
         self.sound_activate = False if self.sound_activate else True
+        sound = {True: 'on', False: 'off'}[self.sound_activate]
         self.sound_button.configure(text='Sound ' + sound)
 
     def selectAll(self):
@@ -702,6 +703,10 @@ class GUI:
                 snake.previous_angles.append(snake.rotating_angle)
                 snake.rotating_angle = pi/2
                 add_event(snake.events_queue, 'snake.restoreAngle()')
+        elif bonus_type == 'self_right_angles':
+            sender.previous_angles.append(sender.rotating_angle)
+            sender.rotating_angle = pi/2
+            add_event(sender.events_queue, 'snake.restoreAngle()')
         elif bonus_type == 'thickness_up':
             for snake in others:
                 snake.thickness += DEFAULT_THICKNESS
@@ -772,6 +777,18 @@ class GUI:
                           'snake.updateHeadColor()')
         elif bonus_type == 'shrink_map':
             self.shrinkMap()
+        elif bonus_type == 'swap_position':
+            head_list = list()
+            for snake in self.snakes:
+                head_list.append(snake.head_coord)
+                snake.invincible = True
+                add_event(snake.events_queue, 'snake.invincible = False')
+            save = head_list[:]
+            shuffle(head_list)
+            while head_list == save:
+                shuffle(head_list)
+            for i in range(len(head_list)):
+                self.snakes[i].head_coord = head_list[i]
 
     def shrinkMap(self):
         '''
