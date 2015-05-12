@@ -32,6 +32,11 @@ class MusicManager(Thread):
     def changeTrack(self, file):
         import pyglet
         self.file = file
-        self.music = pyglet.media.load(self.file)
-        self.music_player.queue(self.music)
-        self.music_player.next()
+        try:
+            tmp = pyglet.media.load(self.file)
+        except:
+            pass
+        else:
+            self.music = tmp
+            self.music_player.queue(self.music)
+            self.music_player.next()
