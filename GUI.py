@@ -3,7 +3,7 @@ from tkinter.messagebox import showwarning
 from tkinter.ttk import Combobox
 import tkinter.font
 
-# import pyglet
+import pyglet
 
 from random import randint, random, choice
 from math import pi
@@ -77,6 +77,8 @@ class GUI:
         self.left_key = self.right_key = False
         self.is_regular_list = False
         #other variables
+        self.play_once_music = True
+        self.sound_activate = True
         self.inputs = InputManager()
         self.current_loop = 0
         self.step = 0
@@ -310,7 +312,7 @@ class GUI:
             # image_canvas_left.create_image(x, y, image=self.images_curves[i])
             # x += 80
         # image_canvas_left.pack(side=LEFT)
-        Label(self.window, width=100, text='Curved Snake').pack()
+        Label(self.window, width=100, text='Curved Snake', font=font.Font(family='fixedsys', size=32)).pack()
         Label(self.window, width=250, text='New player').pack()
         self.current_name = StringVar()
         self.name = Entry(self.window, textvariable=self.current_name)
@@ -322,14 +324,16 @@ class GUI:
         self.player_known.insert(END, *self.regular_player)
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
-        self.button_left = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][0],
+        button_frame = LabelFrame(self.window, text='Left and Right commands')
+        button_frame.pack()
+        self.button_left = Button(button_frame, text=GUI.DEFAULT_COMMANDS[0][0],
                                   bg='white',
                                   command=lambda: self.modifBgColor('L'))
-        self.button_left.pack()
-        self.button_right = Button(self.window, text=GUI.DEFAULT_COMMANDS[0][1],
+        self.button_left.pack(side=LEFT, padx=20)
+        self.button_right = Button(button_frame, text=GUI.DEFAULT_COMMANDS[0][1],
                                    bg='white',
                                    command=lambda: self.modifBgColor('R'))
-        self.button_right.pack()
+        self.button_right.pack(side=RIGHT, padx=20)
         self.selectRandomCommands()
         self.color = Combobox(self.window, state='readonly', exportselection=0)
         self.color['values'] = GUI.DEFAULT_COLORS
@@ -353,27 +357,54 @@ class GUI:
         '''
             sets powerups and their probability
         '''
-        self.top_bonus = Toplevel()
-        self.top_bonus.grab_set()
+        self.top_para = Toplevel()
+        self.top_para.grab_set()
+        available_bonus_frame = LabelFrame(self.top_para,
+                                                text='Available bonus')
+        available_bonus_frame.grid()
         for i in range(len(self.bonus_dict)):
-            add_bonus = Checkbutton(self.top_bonus,
+            add_bonus = Checkbutton(available_bonus_frame,
                                 image=self.bonus_dict[GUI.BONUS_FILES[i]].image,
                                 variable=self.add_bonus_bool[i])
             add_bonus.grid(row=i%3, column=i//3)
-        Button(self.top_bonus, text='select all', command=self.selectAll).grid(row=4, column=1)
-        Button(self.top_bonus, text='unselect all', command=self.unselectAll).grid(row=4, column=3)
-        self.bonus_scale = Scale(self.top_bonus, label='probability',
+        Button(available_bonus_frame,
+               text='select all',
+               command=self.selectAll).grid(row=4, column=1)
+        Button(available_bonus_frame,
+               text='unselect all',
+               command=self.unselectAll).grid(row=4, column=3)
+        bonus_scale_frame = LabelFrame(self.top_para,
+                                            text='Bonus probability')
+        bonus_scale_frame.grid(row=5)
+        self.bonus_scale = Scale(bonus_scale_frame,
                                  to=100, orient=HORIZONTAL)
         self.bonus_scale.set(self.bonus_percent)
-        self.bonus_scale.grid(row=5, column=1)
-        Radiobutton(self.top_bonus, text='normal',
-                    variable=self.mini_map, value=2).grid(row=6, column=1)
-        Radiobutton(self.top_bonus, text='mini map',
-                    variable=self.mini_map, value=0).grid(row=6, column=2)
-        Radiobutton(self.top_bonus, text='1v1',
-                    variable=self.mini_map, value=1).grid(row=6, column=0)
-        b = Button(self.top_bonus, text='Set', command=self.closeAndGetVal)
-        b.grid(row=7, column=1)
+        self.bonus_scale.grid()
+        available_map_frame = LabelFrame(self.top_para,
+                                              text='Available map size')
+        available_map_frame.grid(row=6)
+        Radiobutton(available_map_frame, text='normal',
+                    variable=self.mini_map, value=2).grid(row=6, column=2)
+        Radiobutton(available_map_frame, text='mini map',
+                    variable=self.mini_map, value=0).grid(row=6, column=3)
+        Radiobutton(available_map_frame, text='1v1',
+                    variable=self.mini_map, value=1).grid(row=6, column=1)
+        sound_frame = LabelFrame(self.top_para, text='sound')
+        sound_frame.grid(row=7)
+        self.sound_button = Button(sound_frame,
+                                   text='Sound on' if self.sound_activate else 'Sound off',
+                                   command=self.soundActivation)
+        self.sound_button.grid()
+        b = Button(self.top_para, text='Set', command=self.closeAndGetVal)
+        b.grid(row=8)
+        
+    def soundActivation(self):
+        if self.sound_activate:
+            self.sound_activate = False
+            self.sound_button.configure(text='Sound off')
+        else:
+            self.sound_activate = True
+            self.sound_button.configure(text='Sound on')
     
     def selectAll(self):
         for i in range(len(self.add_bonus_bool)):
@@ -389,7 +420,7 @@ class GUI:
         '''
         self.bonus_percent = self.bonus_scale.get()
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100) * self.bonus_percent
-        self.top_bonus.destroy()
+        self.top_para.destroy()
     
     def selectRandomColor(self):
         '''
@@ -503,23 +534,26 @@ class GUI:
         '''
             callback function when play button is pressed
         '''
-        self.clearWindow()
-        for i in range(len(self.snakes_names)):
-            if self.snakes_names[i] not in self.regular_player:
-                self.regular_player.append(self.snakes_names[i])
-                self.regular_colors.append(self.snakes_colors[i])
-                self.regular_commands.append(self.commands_list[i])
-        self.available_bonus =  [self.bonus_dict[GUI.BONUS_FILES[i]] \
-                                 for i in range(len(self.bonus_dict)) \
-                                 if self.add_bonus_bool[i].get() == 1]
-        if self.mini_map.get() == 0:
-            self.canvas_height -= 150
-            self.canvas_width -= 150
-        elif self.mini_map.get() == 1:
-            self.canvas_height -= 300
-            self.canvas_width -= 300
-        self.geometryMap()
-        self.window.after(1000, self.play)
+        if len(self.snakes_names) == 0:
+            showwarning('No player', 'You have do add player to play')
+        else:
+            self.clearWindow()
+            for i in range(len(self.snakes_names)):
+                if self.snakes_names[i] not in self.regular_player:
+                    self.regular_player.append(self.snakes_names[i])
+                    self.regular_colors.append(self.snakes_colors[i])
+                    self.regular_commands.append(self.commands_list[i])
+            self.available_bonus =  [self.bonus_dict[GUI.BONUS_FILES[i]] \
+                                     for i in range(len(self.bonus_dict)) \
+                                     if self.add_bonus_bool[i].get() == 1]
+            if self.mini_map.get() == 0:
+                self.canvas_height -= 150
+                self.canvas_width -= 150
+            elif self.mini_map.get() == 1:
+                self.canvas_height -= 300
+                self.canvas_width -= 300
+            self.geometryMap()
+            self.window.after(1000, self.play)
     
     def modifBgColor(self, side):
         '''
@@ -552,7 +586,10 @@ class GUI:
         '''
             prepares the game
         '''
-        self.playMusic()
+        if self.sound_activate:
+            if self.play_once_music:
+                self.playMusic()
+                self.play_once_music = False
         self.finished = False
         self.score_frame = LabelFrame(self.window, relief=GROOVE, bd=2, text='Scores')
         self.score_frame.pack(side=LEFT)
@@ -566,7 +603,6 @@ class GUI:
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = self.canvas_width, self.canvas_height
         self.snakes = list()
-        self.new_round = False
         for i in range(len(self.snakes_names)):
             snake = Snake(self, self.snakes_names[i],
                           randint(xmin, xmax-xmin), randint(ymin, ymax-ymin),
