@@ -360,7 +360,8 @@ class GUI:
         Button(self.window, text='Remove player',
                command=self.removePlayer).pack()
         ready_to_play = LabelFrame(self.window, text='Finally ready to play ?',
-                                   font=Font(family='Arial Unicode MS', size=10))
+                                   font=Font(family='Arial Unicode MS',
+                                             size=10))
         ready_to_play.pack()
         b = Button(ready_to_play, text='Parameters', command=self.parameters)
         b.pack(padx=5, pady=5)
