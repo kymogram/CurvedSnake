@@ -67,26 +67,26 @@ class GUI:
         self.window.wm_title('Curved Snake')
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         #GUI variables
-        self.first_open_game  = True
-        self.snakes_colors    = []
-        self.commands_list    = []
-        self.snakes_names     = []
-        self.regular_player   = []
-        self.regular_colors   = []
-        self.regular_commands = []
+        self.first_open_game   = True
+        self.snakes_colors     = []
+        self.commands_list     = []
+        self.snakes_names      = []
+        self.regular_player    = []
+        self.regular_colors    = []
+        self.regular_commands  = []
         self.left_key = self.right_key = False
-        self.is_regular_list = False
+        self.is_regular_list   = False
         #other variables
-        self.play_once_music = True
-        self.sound_activate = True
+        self.play_once_music   = True
+        self.sound_activate    = True
         self.inputs = InputManager()
-        self.current_loop = 0
+        self.current_loop      = 0
         self.step = 0
-        self.bonus_percent = 30
+        self.bonus_percent     = 30
         self.time_before_round = 5
-        self.bonus_proba = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
-        self.events_queue = list()
-        self.music_manager = MusicManager(GUI.BACKGROUND_MUSIC)
+        self.bonus_proba       = (GUI.BONUS_PROBABILITY/100)*self.bonus_percent
+        self.events_queue      = list()
+        self.music_manager     = MusicManager(GUI.BACKGROUND_MUSIC)
         self.music_manager.start()
         #init
         self.loadBonusImages()
@@ -305,13 +305,15 @@ class GUI:
             sets the whole GUI start menu
         '''
         # self.loadCurveImages()
-        self.clearWindow()
         # image_canvas_left = Canvas(self.window, width=500, height=700)
         # x, y = 50, 350
         # for i in range(len(self.images_curves)):
             # image_canvas_left.create_image(x, y, image=self.images_curves[i])
             # x += 80
         # image_canvas_left.pack(side=LEFT)
+        if self.sound_activate:
+            self.play_once_music = True
+        self.clearWindow()
         Label(self.window, width=100, text='Curved Snake', font=font.Font(family='fixedsys', size=32)).pack()
         Label(self.window, width=250, text='New player').pack()
         self.current_name = StringVar()
@@ -389,7 +391,7 @@ class GUI:
                     variable=self.mini_map, value=0).grid(row=6, column=3)
         Radiobutton(available_map_frame, text='1v1',
                     variable=self.mini_map, value=1).grid(row=6, column=1)
-        sound_frame = LabelFrame(self.top_para, text='sound')
+        sound_frame = LabelFrame(self.top_para, text='Music')
         sound_frame.grid(row=7)
         self.sound_button = Button(sound_frame,
                                    text='Sound on' if self.sound_activate else 'Sound off',
@@ -573,7 +575,6 @@ class GUI:
         '''
             starts the music in game
         '''
-        
         self.music_manager.reset()
     
     def stopMusic(self):
@@ -694,8 +695,11 @@ class GUI:
         elif bonus_type == 'change_color':
             for snake in others:
                 snake.color = sender.color
+                snake.updateHeadColor()
                 add_event(snake.events_queue,
                           'snake.color = snake.color_unchanged')
+                add_event(snake.events_queue,
+                          'snake.updateHeadColor()')
         elif bonus_type == 'change_chance_hole':
             for snake in others:
                 snake.hole_probability *= 10
@@ -726,8 +730,10 @@ class GUI:
             for snake in self.snakes:
                 snake.color = self.invertColor(snake.getColor())
                 snake.updateHeadColor()
-                add_event(snake.events_queue, 'snake.color = snake.color_unchanged')
-                add_event(snake.events_queue, 'snake.updateHeadColor()')
+                add_event(snake.events_queue,
+                          'snake.color = snake.color_unchanged')
+                add_event(snake.events_queue,
+                          'snake.updateHeadColor()')
         elif bonus_type == 'shrink_map':
             self.shrinkMap()
     
