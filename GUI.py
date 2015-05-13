@@ -10,7 +10,7 @@ from Snake import *
 from Bonus import *
 from InputManager import *
 from MusicManager import *
-from combobox import *
+from ComboColorBox import *
 
 
 class GUI:
@@ -150,10 +150,10 @@ class GUI:
                                          tags='bonus,{}'.format(bonus.name))
             else:
                 self.canvas.create_image(x, y, image=bonus.image,
-                         tags='bonus,{}{}'.format(bonus.name, self.portal_index))
+                        tags='bonus,{}{}'.format(bonus.name, self.portal_index))
                 x2, y2 = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
                 self.canvas.create_image(x2, y2, image=bonus.image,
-                                         tags='bonus,{}{}'.format(bonus.name, self.portal_index))
+                        tags='bonus,{}{}'.format(bonus.name, self.portal_index))
                 self.portal_index += 1
 
     def findRandomFreePosition(self, xmin, xmax, ymin, ymax):
@@ -361,7 +361,6 @@ class GUI:
         # self.color.bind('<<ComboboxSelected>>', self.newSelection)
         colorVal = self.color.getColorVal()
         colorVal.trace('w', lambda n, m, s=s: self.newSelection())
-        self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
         Label(self.window, width=250, text='Player ready to play',
               font=Font(family='Arial Unicode MS')).pack()
@@ -529,6 +528,10 @@ class GUI:
             callback function when 'add player' button is pressed: saves
             config to create a new character for the following play.
         '''
+        if len(self.snakes) == 6:
+            showwarning("can't add another player",
+                        'Maximum number of player is 6')
+            return
         if len(self.player_known.curselection()) > 0:
             if self.regular_player[self.id] in self.snakes_names:
                 showwarning('Added player',
@@ -805,17 +808,18 @@ class GUI:
         elif bonus_type == 'shrink_map':
             self.shrinkMap()
         elif bonus_type == 'swap_position':
-            head_list = list()
-            for snake in self.snakes:
-                head_list.append(snake.head_coord)
-                snake.invincible = True
-                add_event(snake.events_queue, 'snake.invincible = False')
-            save = head_list[:]
-            shuffle(head_list)
-            while head_list == save:
+            if len(self.snakes) > 1:
+                head_list = list()
+                for snake in self.snakes:
+                    head_list.append(snake.head_coord)
+                    snake.invincible = True
+                    add_event(snake.events_queue, 'snake.invincible = False')
+                save = head_list[:]
                 shuffle(head_list)
-            for i in range(len(head_list)):
-                self.snakes[i].head_coord = head_list[i]
+                while head_list == save:
+                    shuffle(head_list)
+                for i in range(len(head_list)):
+                    self.snakes[i].head_coord = head_list[i]
         elif bonus_type[:6] == 'portal':
             el = self.canvas.find_withtag('bonus,'+bonus_type)[0]
             sender.head_coord = self.canvas.coords(el)
@@ -836,8 +840,7 @@ class GUI:
 
     def invertColor(self, color):
         rgb = self.canvas.winfo_rgb(color)
-
-        #  inv_red, inv_green, inv_blue = [255 - c//256 for c in rgb]
+        # inv_red, inv_green, inv_blue = [255 - c//256 for c in rgb]
         return "#{:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
 
     def setCommand(self, e):
