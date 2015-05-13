@@ -893,6 +893,9 @@ class GUI:
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
             self.colors_list = self.color.getListAllColors()
+            for elem in self.regular_colors:
+                if elem not in self.colors_list:
+                    self.colors_list.append(elem)
             selection = e.widget.get(self.selected[0])
             if self.is_regular_list:
                 self.id = self.regular_player.index(selection)
@@ -900,7 +903,7 @@ class GUI:
                 self.button_left.configure(text=text)
                 self.button_right['text'] = self.regular_commands[self.id][1]
                 idx = self.colors_list.index(self.regular_colors[self.id])
-                self.color.set(idx)
+                self.color.set(self.colors_list[idx])
                 self.move_command_left = self.regular_commands[self.id][0]
                 self.move_command_right = self.regular_commands[self.id][1]
             else:
@@ -909,7 +912,7 @@ class GUI:
                 text = self.commands_list[self.id][1]
                 self.button_right.configure(text=text)
                 idx = self.colors_list.index(self.snakes_colors[self.id])
-                self.color.set(idx)
+                self.color.set(self.colors_list[idx])
 
     def removeFocus(self, e):
         '''
