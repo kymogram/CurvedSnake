@@ -12,6 +12,7 @@ class MusicManager(Thread):
     def run(self):
         import pyglet
         self.music_player = pyglet.media.Player()
+        self.music_player.eos_action = pyglet.media.Player.EOS_LOOP
         self.music = pyglet.media.load(self.file)
         self.music_player.queue(self.music)
         if self.must_start:
