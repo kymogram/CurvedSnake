@@ -396,10 +396,10 @@ class GUI:
             add_bonus.grid(row=i % 3, column=i // 3)
         Button(available_bonus_frame,
                text='select all',
-               command=self.selectAll).grid(row=4, column=1)
+               command=self.selectAll).grid(row=4, column=2)
         Button(available_bonus_frame,
                text='unselect all',
-               command=self.unselectAll).grid(row=4, column=3)
+               command=self.unselectAll).grid(row=4, column=4)
         bonus_scale_frame = LabelFrame(self.top_para, text='Bonus probability')
         bonus_scale_frame.grid(row=5)
         self.bonus_scale = Scale(bonus_scale_frame,
@@ -584,7 +584,7 @@ class GUI:
             callback function when play button is pressed
         '''
         if len(self.snakes_names) == 0:
-            showwarning('No player', 'You have do add player to play')
+            showwarning('No player', 'You have to add player to play')
         else:
             self.clearWindow()
             for i in range(len(self.snakes_names)):
@@ -700,8 +700,10 @@ class GUI:
         add_event = lambda l, f, i=0: l.append(self.list_from(f, bonus_type))
         if bonus_type == 'self_speedup':
             sender.speed += 1
+            sender.rotating_angle +=0.02
             sender.addArc(self.bonus_dict[bonus_type])
             add_event(sender.events_queue, 'snake.speed -= 1')
+            add_event(sender.events_queue, 'snake.rotating_angle -= 0.02')
         elif bonus_type == 'all_speedup':
             for snake in others:
                 snake.speed += 1
@@ -833,7 +835,7 @@ class GUI:
         rgb = self.canvas.winfo_rgb(color)
 
         #  inv_red, inv_green, inv_blue = [255 - c//256 for c in rgb]
-        return "# {:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
+        return "#{:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
 
     def setCommand(self, e):
         '''
