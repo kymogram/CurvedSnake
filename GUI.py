@@ -716,7 +716,9 @@ class GUI:
         elif bonus_type == 'all_speedup':
             for snake in others:
                 snake.speed += 1
+                snake.rotating_angle +=0.02
                 add_event(snake.events_queue, 'snake.speed -= 1')
+                add_event(snake.events_queue, 'snake.rotating_angle -= 0.02')
         elif bonus_type == 'self_speeddown':
             if sender.speed > 1:
                 sender.speed /= 1.5
