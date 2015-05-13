@@ -433,7 +433,7 @@ class GUI:
         self.sound_button.configure(text='Sound ' + sound)
 
     def choose_music(self):
-        types = [("WVA files", "*.wav")]
+        types = [("WVA files", "*.wav"), ("MP3 files", "*.mp3")]
         tmp = askopenfilename(filetypes=types)
         if tmp is not None:
             GUI.BACKGROUND_MUSIC = tmp
