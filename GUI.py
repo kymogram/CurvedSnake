@@ -10,6 +10,7 @@ from Snake import *
 from Bonus import *
 from InputManager import *
 from MusicManager import *
+from combobox import *
 
 
 class GUI:
@@ -355,10 +356,11 @@ class GUI:
         self.selectRandomCommands()
         Label(self.window, width=100, text='Choose your color',
               font=Font(family='Arial Unicode MS', size=10)).pack()
-        self.color = Combobox(self.window, state='readonly', exportselection=0)
-        self.color['values'] = GUI.DEFAULT_COLORS
+        self.color = ComboColorBox(self, GUI.DEFAULT_COLORS)
         self.selectRandomColor()
-        self.color.bind('<<ComboboxSelected>>', self.newSelection)
+        # self.color.bind('<<ComboboxSelected>>', self.newSelection)
+        colorVal = self.color.getColorVal()
+        colorVal.trace('w', lambda n, m, s=s: self.newSelection())
         self.color.pack()
         Button(self.window, text='Add player', command=self.addPlayer).pack()
         Label(self.window, width=250, text='Player ready to play',
@@ -464,7 +466,7 @@ class GUI:
                       if color not in self.random_colors_used]
         if len(availables) > 0:
             self.color.set(choice(availables))
-            self.current_color = self.color.get()
+            self.current_color = self.color.getColor().lower()
 
     def selectRandomCommands(self):
         '''
@@ -864,16 +866,15 @@ class GUI:
         self.right_key = False
         self.window.unbind('<Key>')
 
-    def newSelection(self, e):
+    def newSelection(self):
         '''
             callback function when combobox selection changes
         '''
         if len(self.player_ingame.curselection()) > 0:
-            self.snakes_colors[self.id] = self.color.get().lower()
+            self.snakes_colors[self.id] = self.color.getColor()
         elif len(self.player_known.curselection()) > 0:
-            self.regular_colors[self.id] = self.color.get().lower()
-        self.current_color = self.color.get().lower()
-        self.color.selection_clear()
+            self.regular_colors[self.id] = self.color.getColor()
+        self.current_color = self.color.getColor().lower()
 
     def showInfoPlayer(self, e):
         '''
