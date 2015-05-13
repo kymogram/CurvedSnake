@@ -354,13 +354,16 @@ class GUI:
                                    command=lambda: self.modifBgColor('R'))
         self.button_right.pack(side=RIGHT, padx=20)
         self.selectRandomCommands()
-        Label(self.window, width=100, text='Choose your color',
-              font=Font(family='Arial Unicode MS', size=10)).pack()
+        self.color_frame = LabelFrame(self.window,
+                                 width=100,
+                                 text='Choose your color',
+                                 font=Font(family='Arial Unicode MS', size=10))
+        self.color_frame.pack()
         self.color = ComboColorBox(self, GUI.DEFAULT_COLORS)
         self.selectRandomColor()
         # self.color.bind('<<ComboboxSelected>>', self.newSelection)
         colorVal = self.color.getColorVal()
-        colorVal.trace('w', lambda n, m, s=s: self.newSelection())
+        colorVal.trace('w', lambda n, m, s: self.newSelection())
         Button(self.window, text='Add player', command=self.addPlayer).pack()
         Label(self.window, width=250, text='Player ready to play',
               font=Font(family='Arial Unicode MS')).pack()
@@ -528,7 +531,7 @@ class GUI:
             callback function when 'add player' button is pressed: saves
             config to create a new character for the following play.
         '''
-        if len(self.snakes) == 6:
+        if len(self.snakes_names) == 6:
             showwarning("can't add another player",
                         'Maximum number of player is 6')
             return
@@ -756,8 +759,8 @@ class GUI:
                     add_event(self.events_queue, 'self.bonus_proba /= 2')
         elif bonus_type == 'rotation_angle_down':
             for snake in others:
-                snake.rotating_angle /= 2
-                add_event(snake.events_queue, 'snake.rotating_angle *= 2')
+                snake.rotating_angle /= 1.5
+                add_event(snake.events_queue, 'snake.rotating_angle *= 1.5')
         elif bonus_type == 'change_color':
             for snake in others:
                 snake.color = sender.color
@@ -889,7 +892,7 @@ class GUI:
             self.is_regular_list = False
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
-            self.colors_list = list(self.color.cget('values'))
+            self.colors_list = self.color.getListAllColors()
             selection = e.widget.get(self.selected[0])
             if self.is_regular_list:
                 self.id = self.regular_player.index(selection)
@@ -897,7 +900,7 @@ class GUI:
                 self.button_left.configure(text=text)
                 self.button_right['text'] = self.regular_commands[self.id][1]
                 idx = self.colors_list.index(self.regular_colors[self.id])
-                self.color.current(idx)
+                self.color.set(idx)
                 self.move_command_left = self.regular_commands[self.id][0]
                 self.move_command_right = self.regular_commands[self.id][1]
             else:
@@ -906,7 +909,7 @@ class GUI:
                 text = self.commands_list[self.id][1]
                 self.button_right.configure(text=text)
                 idx = self.colors_list.index(self.snakes_colors[self.id])
-                self.color.current(idx)
+                self.color.set(idx)
 
     def removeFocus(self, e):
         '''
