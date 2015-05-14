@@ -23,13 +23,14 @@ class Arc:
         precision = 20
         step = 0.15
         angle = 2*pi*(1-self.val/self.max)
-        for i in range(int(0,int(angle*precision), int(step*precision))):
+        for i in range(0,int(angle*precision), int(step*precision)):
             i /= precision
             self.arc_id = self.snake.canvas.create_line(x+r*cos(i),
                                                         y-r*sin(i),
                                                         x+r*cos(i+step),
                                                         y-r*sin(i+step),
-                                                        width=2, outline=color)
+                                                        width=2,
+                                                        fill=color)
 
     def updateArc(self):
         # move one step further in bonus effect
@@ -40,9 +41,10 @@ class Arc:
         step = 0.15
         precision = 20
         # replace it correctly
-        for i in range(int(0,int(angle*precision), int(step*precision))):
+        for i in range(0,int(angle*precision), int(step*precision)):
             i /= precision
-            self.snake.canvas.coords(x+r*cos(i),
+            self.snake.canvas.coords(self.arc_id,
+                                     x+r*cos(i),
                                      y-r*sin(i),
                                      x+r*cos(i+step),
                                      y-r*sin(i+step))
