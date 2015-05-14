@@ -32,18 +32,18 @@ class ComboColorBox:
         callback = lambda: self.askOther(self.colors_menu, apercu)
         self.colors_menu['menu'].add_command(label="Other...",
                                              command=callback)
-        self.createColorIcon(self.colors_menu)
+        self.createColorIcon()
         self.colors_menu.pack(side=LEFT, pady=5)
         callback = lambda e: apercu.config(bg=self.currentColor.get())
         self.colors_menu.bind('<Configure>', callback)
 
-    def createColorIcon(self, widget):
+    def createColorIcon(self):
         # the color images are garbage collected if not saved
         self.__colorImgs = []
         for i in range(len(self.colors)+1):  # do not forget the separator
             size = 16
             try:
-                c = widget['menu'].entryconfigure(i, 'label')[-1]
+                c = self.colors_menu['menu'].entryconfigure(i, 'label')[-1]
                 img = PhotoImage(name='image_'.join(c),
                                  width=size, height=size)
                 img.put(c, to=(1, 1, size-1, size-1))  # color the image
@@ -53,10 +53,11 @@ class ComboColorBox:
                 img.put('Black', to=(1, size-1, size-1, size-2))
                 self.__colorImgs.append(img)  # save the image
                 # attach the image to its color name
-                widget['menu'].entryconfigure(i, image=img, hidemargin=True)
+                self.colors_menu['menu'].entryconfigure(i, image=img,
+                                                        hidemargin=True)
             except:
                 pass
-        widget.pack(side=RIGHT, padx=25, pady=25)
+        self.colors_menu.pack(side=RIGHT, padx=25, pady=25)
 
     def askOther(self, widget, frame):
         new_col = askcolor()[1]
@@ -65,7 +66,7 @@ class ComboColorBox:
             callback = lambda: self.otherColorSelect(new_col, frame)
             widget['menu'].add_command(label=new_col, command=callback)
             self.currentColor.set(new_col)
-            self.createColorIcon(widget)
+            self.createColorIcon()
 
     def otherColorSelect(self, color, frame):
         self.currentColor.set(color)
