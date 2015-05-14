@@ -151,18 +151,10 @@ class GUI:
                 self.canvas.create_image(x, y, image=bonus.image,
                                          tags='bonus,{}'.format(bonus.name))
             else:
-<<<<<<< HEAD
                 tag = 'bonus,{}{}'.format(bonus.name, self.portal_index)
                 self.canvas.create_image(x, y, image=bonus.image, tags=tag)
                 x2, y2 = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
                 self.canvas.create_image(x2, y2, image=bonus.image, tags=tag)
-=======
-                self.canvas.create_image(x, y, image=bonus.image,
-                        tags='bonus,{}{}'.format(bonus.name, self.portal_index))
-                x2, y2 = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
-                self.canvas.create_image(x2, y2, image=bonus.image,
-                        tags='bonus,{}{}'.format(bonus.name, self.portal_index))
->>>>>>> 3185f46e24e8313ba7a599b6cbd5964bece7b743
                 self.portal_index += 1
 
     def findRandomFreePosition(self, xmin, xmax, ymin, ymax):
