@@ -33,6 +33,7 @@ class GUI:
     MAX_CANVAS_BORDER = 200  # pixels
 
     BACKGROUND_MUSIC = 'data/background_music.wav'
+    SAVE_FILE = 'data/save.txt'
 
     BONUS_TIME = 300  # frames
     BONUS_SPRITES_DIMENSIONS = (32, 32)  # pixels
@@ -1076,7 +1077,7 @@ class GUI:
         '''
             save paramers about players habit
         '''
-        save = open("save.txt", "w")
+        save = open(GUI.SAVE_FILE, "w")
         for i in range(len(self.regular_player)):
             text = '{}\n' \
                    'command left = {}\n' \
@@ -1092,7 +1093,7 @@ class GUI:
             load the parameters saved about players habit
         '''
         try:
-            save = open("save.txt", "r")
+            save = open(GUI.SAVE_FILE, "r")
         except:
             pass
         text = save.readlines()
