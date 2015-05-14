@@ -1,6 +1,8 @@
-from tkinter import *
-from tkinter import ttk
-from tkinter.colorchooser import askcolor
+frameom tkinter import *
+frameom tkinter.font import Font
+frameom tkinter import ttk
+frameom tkinter.colorchooser import askcolor
+
 
 class ComboColorBox:
     def __init__(self, parent, master, colors):
@@ -9,89 +11,74 @@ class ComboColorBox:
         self.colors = colors
         style = ttk.Style()
         style.theme_use('default')
-        """
-        Creér un style pour les bouttons qui seront utilisé dans le jeu
-        """
-        
-        style.configure('default.TMenubutton',
-                        background=self.parent.current_bg,
-                        foreground=self.parent.current_fg,
-                        font=('Arial Rounded MT', 18, 'bold')
-                        )
+        font = Font(family='Arial Rounded MT', size=18, weight='bold')
+        style.configure('default.TMenubutton', bg=self.parent.current_bg,
+                        fg=self.parent.current_fg, font=font)
         style.map('default.TMenubutton',
                   background=[('disabled', 'magenta'),
                               ('pressed', 'gray'),
-                              ('active', 'gray90')]
-                  )
-        # Ajouter les couleurs déjà utilisées avant:
-        # - - - TODO - - -
-        # create the option menu
-        self.__colorVar = StringVar()
-        self.om = ttk.OptionMenu(self.master, self.__colorVar, *self.colors,style="default.TMenubutton")
-        self.__colorVar.set(self.colors[1]) # Par défaut
-        
-        apercu = Frame(self.master, bg=self.__colorVar.get(),relief=RAISED,
-                       borderwidth=2,
-                       width=self.om.winfo_reqheight(),
-                       height=self.om.winfo_reqheight()
-                       )
-        apercu.pack(side=LEFT,padx=5,pady=5)
+                              ('active', 'gray90')])
+        self.currentColor = StringVar()
+        self.colors_menu = ttk.OptionMenu(self.master, self.currentColor,
+                                          *self.colors,
+                                          style="default.TMenubutton")
+        self.currentColor.set(self.colors[1])  # default value
+        apercu = frameame(self.master, bg=self.currentColor.get(), relief=RAISED,
+                       borderwidth=2, width=self.colors_menu.winfo_reqheight(),
+                       height=self.colors_menu.winfo_reqheight())
+        apercu.pack(side=LEFT, padx=5, pady=5)
 
-        self.om['menu'].add_separator()
-        self.om['menu'].add_command(label="Autre...",command=lambda:self.checkAutre(self.om,apercu))
-        self.createColorIcon(self.om)
-        self.om.pack(side=LEFT,pady=5)
+        self.colors_menu['menu'].add_separator()
+        callback = lambda: self.askOther(self.colors_menu, apercu)
+        self.colors_menu['menu'].add_command(label="Other...",
+                                             command=callback)
+        self.createColorIcon(self.colors_menu)
+        self.colors_menu.pack(side=LEFT, pady=5)
+        callback = lambda e: apercu.config(bg=self.currentColor.get())
+        self.colors_menu.bind('<Configure>', callback)
 
-        self.om.bind('<Configure>',lambda e: apercu.config(bg=self.__colorVar.get()))
-
-    def createColorIcon(self,widget):
+    def createColorIcon(self, widget):
         # the color images are garbage collected if not saved
-        self.__colorImgs = []  # Vérifier si ca va pas dans le init
-        
-        for i in range(len(self.colors)+1): # Car on à "le séparateur"
+        self.__colorImgs = []
+        for i in range(len(self.colors)+1):  # do not forget the separator
             size = 16
             try:
                 c = widget['menu'].entryconfigure(i, 'label')[-1]
                 img = PhotoImage(name='image_'.join(c),
                                  width=size, height=size)
-                img.put(c, to=(1,1,size-1,size-1))   # color the image
-                # Cadre
-                img.put('Black', to=(1,1,size-1,2))
-                img.put('Black', to=(1,1,2,size-1))
-                img.put('Black', to=(size-1,1,size-2,size-1))
-                img.put('Black', to=(1,size-1,size-1,size-2))
-                self.__colorImgs.append(img) # save the image
-                 
+                img.put(c, to=(1, 1, size-1, size-1))  # color the image
+                img.put('Black', to=(1, 1, size-1, 2))
+                img.put('Black', to=(1, 1, 2, size-1))
+                img.put('Black', to=(size-1, 1, size-2, size-1))
+                img.put('Black', to=(1, size-1, size-1, size-2))
+                self.__colorImgs.append(img)  # save the image
                 # attach the image to its color name
-                widget['menu'].entryconfigure(i, image=img,
-                                          hidemargin=True)
+                widget['menu'].entryconfigure(i, image=img, hidemargin=True)
             except:
-                # S'applique lors de la lecture du séparateur
-                c = 'Autre...' 
+                pass
         widget.pack(side=RIGHT, padx=25, pady=25)
 
-    def checkAutre(self,widget,fr):
+    def askOther(self, widget, frame):
         new_col = askcolor()[1]
-        if new_col != None:
+        if new_col is not None:
             self.colors.append(new_col)
-            widget['menu'].add_command(label=new_col,
-                                       command=lambda:self.otherColorSelect(new_col,fr))
-            self.__colorVar.set(new_col)
+            callback = lambda: self.otherColorSelect(new_col, frame)
+            widget['menu'].add_command(label=new_col, command=callback)
+            self.currentColor.set(new_col)
             self.createColorIcon(widget)
 
-    def otherColorSelect(self,color,fr):
-        self.__colorVar.set(color)
-        fr.config(bg = color)
-        
+    def otherColorSelect(self, color, frame):
+        self.currentColor.set(color)
+        frame.config(bg=color)
+
     def getColor(self):
-        return self.__colorVar.get()
-    
+        return self.currentColor.get()
+
     def getColorVal(self):
-        return self.__colorVar
-        
+        return self.currentColor
+
     def getListAllColors(self):
         return self.colors
-    
+
     def set(self, elem):
-        self.__colorVar.set(elem)
-    
+        self.currentColor.set(elem)
