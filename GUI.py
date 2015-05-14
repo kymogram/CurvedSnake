@@ -1,5 +1,4 @@
 from tkinter.messagebox import showwarning
-from tkinter.ttk import Combobox
 from tkinter.font import Font
 from tkinter.filedialog import askopenfilename
 
@@ -364,11 +363,10 @@ class GUI:
                                    command=lambda: self.modifBgColor('R'))
         self.button_right.pack(side=RIGHT, padx=20)
         self.selectRandomCommands()
-        self.color_frame = LabelFrame(self.window,
-                                 width=100,
-                                 text='Choose your color',
-                                 font=Font(family='Arial Unicode MS', size=10),
-                                 bg=self.current_bg, fg=self.current_fg)
+        font = Font(family='Arial Unicode MS', size=10)
+        self.color_frame = LabelFrame(self.window, width=100,
+                                      text='Choose your color', font=font,
+                                      bg=self.current_bg, fg=self.current_fg)
         self.color_frame.pack()
         self.color = ComboColorBox(self, self.color_frame, GUI.DEFAULT_COLORS)
         self.selectRandomColor()
@@ -378,7 +376,7 @@ class GUI:
         Button(self.window, text='Add player', command=self.addPlayer,
                bg=self.current_bg, fg=self.current_fg).pack()
         Label(self.window, width=250, text='Player ready to play',
-              font=Font(family='Arial Unicode MS'), bg=self.current_bg,
+              font=font, bg=self.current_bg,
               fg=self.current_fg).pack()
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE,
                                      bg=self.current_bg, fg=self.current_fg)
@@ -391,8 +389,7 @@ class GUI:
                command=self.removePlayer, bg=self.current_bg,
                fg=self.current_fg).pack()
         ready_to_play = LabelFrame(self.window, text='Finally ready to play ?',
-                                   font=Font(family='Arial Unicode MS',
-                                   size=10), bg=self.current_bg,
+                                   font=font, bg=self.current_bg,
                                    fg=self.current_fg)
         ready_to_play.pack()
         b = Button(ready_to_play, text='Parameters', command=self.parameters,
@@ -401,8 +398,9 @@ class GUI:
         b = Button(ready_to_play, text='Play!', command=self.playPressed,
                    bg=self.current_bg, fg=self.current_fg)
         b.pack(padx=5, pady=5)
-        b = Button(self.window, text='Change GUI style', command=self.changeStyle,
-                   bg=self.current_bg, fg=self.current_fg)
+        b = Button(self.window, text='Change GUI style',
+                   command=self.changeStyle, bg=self.current_bg,
+                   fg=self.current_fg)
         b.pack()
 
     def parameters(self):
@@ -413,7 +411,8 @@ class GUI:
         self.top_para.grab_set()
         available_bonus_frame = LabelFrame(self.top_para,
                                            text='Available bonus',
-                                           bg=self.current_bg, fg=self.current_fg)
+                                           bg=self.current_bg,
+                                           fg=self.current_fg)
         available_bonus_frame.grid()
         for i in range(len(self.bonus_dict)):
             bonus = self.bonus_dict[GUI.BONUS_FILES[i]]
@@ -442,7 +441,8 @@ class GUI:
         self.bonus_scale.grid()
         available_map_frame = LabelFrame(self.top_para,
                                          text='Available map size',
-                                         bg=self.current_bg, fg=self.current_fg)
+                                         bg=self.current_bg,
+                                         fg=self.current_fg)
         available_map_frame.grid(row=6)
         Radiobutton(available_map_frame, text='normal',
                     variable=self.mini_map, value=2).grid(row=6, column=2)
@@ -460,24 +460,27 @@ class GUI:
         self.sound_button.grid()
         self.choose_sound_button = Button(sound_frame, text='Choose Music',
                                           command=self.choose_music,
-                                          bg=self.current_bg, fg=self.current_fg)
+                                          bg=self.current_bg,
+                                          fg=self.current_fg)
         self.choose_sound_button.grid()
         b = Button(self.top_para, text='Set', command=self.closeAndGetVal,
                    bg=self.current_bg, fg=self.current_fg)
         b.grid(row=8)
-        
+
     def changeStyle(self):
         self.top_style = Toplevel()
         self.top_style.grab_set()
         choosebg = LabelFrame(self.top_style, text='Background',
                               bg=self.current_bg, fg=self.current_fg)
         choosebg.pack()
-        self.background_color = ComboColorBox(self, choosebg, GUI.DEFAULT_COLORS)
+        self.background_color = ComboColorBox(self, choosebg,
+                                              GUI.DEFAULT_COLORS)
         self.background_color.set(self.current_bg)
         choosefg = LabelFrame(self.top_style, text='Foreground',
                               bg=self.current_bg, fg=self.current_fg)
         choosefg.pack()
-        self.foreground_color = ComboColorBox(self, choosefg, GUI.DEFAULT_COLORS)
+        self.foreground_color = ComboColorBox(self, choosefg,
+                                              GUI.DEFAULT_COLORS)
         self.foreground_color.set(self.current_fg)
         try_set_frame = LabelFrame(self.top_style, text='Test it and Adopt it',
                                    bg=self.current_bg, fg=self.current_fg)
@@ -485,10 +488,11 @@ class GUI:
         try_option = Button(try_set_frame, text='Try', command=self.tryOption,
                             bg=self.current_bg, fg=self.current_fg)
         try_option.pack(side=LEFT, padx=10, pady=5)
-        set_option = Button(try_set_frame, text='Set', command=lambda: self.top_style.destroy(),
+        set_option = Button(try_set_frame, text='Set',
+                            command=lambda: self.top_style.destroy(),
                             bg=self.current_bg, fg=self.current_fg)
         set_option.pack(side=RIGHT, padx=10, pady=5)
-        
+
     def tryOption(self):
         self.current_bg = self.background_color.getColor()
         self.current_fg = self.foreground_color.getColor()
@@ -775,14 +779,14 @@ class GUI:
         add_event = lambda l, f, i=0: l.append(self.list_from(f, bonus_type))
         if bonus_type == 'self_speedup':
             sender.speed += 1
-            sender.rotating_angle +=0.02
+            sender.rotating_angle += 0.02
             sender.addArc(self.bonus_dict[bonus_type])
             add_event(sender.events_queue, 'snake.speed -= 1')
             add_event(sender.events_queue, 'snake.rotating_angle -= 0.02')
         elif bonus_type == 'all_speedup':
             for snake in others:
                 snake.speed += 1
-                snake.rotating_angle +=0.02
+                snake.rotating_angle += 0.02
                 add_event(snake.events_queue, 'snake.speed -= 1')
                 add_event(snake.events_queue, 'snake.rotating_angle -= 0.02')
         elif bonus_type == 'self_speeddown':
