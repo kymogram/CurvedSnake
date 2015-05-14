@@ -1,16 +1,18 @@
 Loan181
-command left = Left
-command right = Right
+command left = a
+command right = z
 color = pink
 Robin
 command left = s
 command right = d
 color = yellow
 Greentears
-command left = o
-command right = p
-color = green
+command left = Left
+command right = Right
+color = #ffffff
 Louis2809
 command left = b
 command right = n
 color = red
+bg = #000000
+fg = red
