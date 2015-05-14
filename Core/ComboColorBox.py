@@ -1,7 +1,7 @@
-frameom tkinter import *
-frameom tkinter.font import Font
-frameom tkinter import ttk
-frameom tkinter.colorchooser import askcolor
+from tkinter import *
+from tkinter.font import Font
+from tkinter import ttk
+from tkinter.colorchooser import askcolor
 
 
 class ComboColorBox:
@@ -23,7 +23,7 @@ class ComboColorBox:
                                           *self.colors,
                                           style="default.TMenubutton")
         self.currentColor.set(self.colors[1])  # default value
-        apercu = frameame(self.master, bg=self.currentColor.get(), relief=RAISED,
+        apercu = Frame(self.master, bg=self.currentColor.get(), relief=RAISED,
                        borderwidth=2, width=self.colors_menu.winfo_reqheight(),
                        height=self.colors_menu.winfo_reqheight())
         apercu.pack(side=LEFT, padx=5, pady=5)
