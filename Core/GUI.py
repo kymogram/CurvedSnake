@@ -339,7 +339,7 @@ class GUI:
             self.play_once_music = True
         l = Label(self.window, width=100, text='Curved Snake',
                   font=Font(family='fixedsys', size=32), bg=self.current_bg,
-              fg=self.current_fg)
+                  fg=self.current_fg)
         l.pack()
         self.tmp_widget.append(l)
         l = Label(self.window, width=250, text='New player',
@@ -406,7 +406,7 @@ class GUI:
         self.tmp_widget.append(b)
         l = Label(self.window, width=250, text='Player ready to play',
                   font=font, bg=self.current_bg,
-              fg=self.current_fg)
+                  fg=self.current_fg)
         l.pack()
         self.tmp_widget.append(l)
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE,
@@ -418,8 +418,8 @@ class GUI:
         self.first_open_game = False
         self.player_ingame.pack()
         b = Button(self.window, text='Remove player',
-               command=self.removePlayer, bg=self.current_bg,
-               fg=self.current_fg)
+                   command=self.removePlayer, bg=self.current_bg,
+                   fg=self.current_fg)
         b.pack()
         self.tmp_widget.append(b)
         ready_to_play = LabelFrame(self.window, text='Finally ready to play ?',
@@ -465,11 +465,9 @@ class GUI:
                    bg=self.current_bg,
                    fg=self.current_fg)
         b.grid(row=4, column=2)
-        b = Button(available_bonus_frame,
-               text='unselect all',
-               command=self.unselectAll,
-               bg=self.current_bg,
-               fg=self.current_fg)
+        b = Button(available_bonus_frame, text='unselect all',
+                   command=self.unselectAll, bg=self.current_bg,
+                   fg=self.current_fg)
         b.grid(row=4, column=4)
         bonus_scale_frame = LabelFrame(self.top_para, text='Bonus probability',
                                        bg=self.current_bg, fg=self.current_fg)
@@ -531,7 +529,8 @@ class GUI:
                                    bg=self.current_bg, fg=self.current_fg)
         self.tmp_widget_top_style.append(try_set_frame)
         try_set_frame.pack()
-        try_option = Button(try_set_frame, text='Try', command=self.updateStyle,
+        try_option = Button(try_set_frame, text='Try',
+                            command=self.updateStyle,
                             bg=self.current_bg, fg=self.current_fg)
         self.tmp_widget_top_style.append(try_option)
         try_option.grid(padx=10, pady=5)
@@ -540,13 +539,15 @@ class GUI:
                             bg=self.current_bg, fg=self.current_fg)
         self.tmp_widget_top_style.append(set_option)
         set_option.grid(row=0, column=1, padx=10, pady=5)
+        callback = lambda: self.updateStyle(save_bg, save_fg)
         cancel_option = Button(try_set_frame, text='Cancel',
-                            command=lambda: self.updateStyle(save_bg, save_fg),
-                            bg=self.current_bg, fg=self.current_fg)
+                               command=callback, bg=self.current_bg,
+                               fg=self.current_fg)
         self.tmp_widget_top_style.append(cancel_option)
         cancel_option.grid(row=0, column=2, padx=10, pady=5)
-        self.top_style.protocol('WM_DELETE_WINDOW', lambda: self.destroyStyle(save_bg, save_fg))
-        
+        self.top_style.protocol('WM_DELETE_WINDOW',
+                                lambda: self.destroyStyle(save_bg, save_fg))
+
     def destroyStyle(self, old_bg, old_fg):
         self.updateStyle(old_bg, old_fg)
         self.top_style.destroy()
@@ -565,7 +566,7 @@ class GUI:
         self.top_style.configure(bg=self.current_bg)
         self.window.configure(bg=self.current_bg)
         # If we don't check icon, it disappears
-        self.background_color.createColorIcon(self.background_color.colors_menu)
+        self.background_color.createColorIcon()
 
     def soundActivation(self):
         self.sound_activate = False if self.sound_activate else True
