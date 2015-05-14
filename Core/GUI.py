@@ -1086,6 +1086,10 @@ class GUI:
                    .format(self.regular_player[i], self.regular_commands[i][0],
                            self.regular_commands[i][1], self.regular_colors[i])
             save.write(text)
+        sec_text = 'bg = {}\n' \
+                  'fg = {}\n' \
+                  .format(self.current_bg, self.current_fg)
+        save.write(sec_text)
         self.window.destroy()
 
     def loadSave(self):
@@ -1097,7 +1101,7 @@ class GUI:
         except:
             pass
         text = save.readlines()
-        for i in range(len(text)):
+        for i in range(len(text)-2):
             x = i % 4
             if x == 0:
                 name = text[i].strip()
@@ -1117,6 +1121,10 @@ class GUI:
                 color = text[i].split()
                 color = color[2]
                 self.regular_colors.append(color)
-
+        current_bg = text[len(text)-2].split('=')
+        self.current_bg = current_bg[1].strip() 
+        current_fg = text[len(text)-1].split('=')
+        self.current_fg = current_fg[1].strip() 
+                
 if __name__ == '__main__':
     GUI()
