@@ -847,19 +847,19 @@ class GUI:
                 sender = snake
             else:
                 others.append(snake)
-        add_event = lambda l, f, i=0: l.append(self.list_from(f, bonus_type))
+        add_event = lambda l, f: l.append(self.list_from(f, bonus_type))
         if bonus_type == 'self_speedup':
             sender.speed += 1
             sender.rotating_angle += 0.02
             sender.addArc(self.bonus_dict[bonus_type])
-            add_event(sender.events_queue, 'snake.speed -= 1')
-            add_event(sender.events_queue, 'snake.rotating_angle -= 0.02')
+            add_event(sender.events_queue, 'snake.speed -= 1; \
+                      snake.rotating_angle -= 0.02')
         elif bonus_type == 'all_speedup':
             for snake in others:
                 snake.speed += 1
                 snake.rotating_angle += 0.02
-                add_event(snake.events_queue, 'snake.speed -= 1')
-                add_event(snake.events_queue, 'snake.rotating_angle -= 0.02')
+                add_event(snake.events_queue, 'snake.speed -= 1; \
+                                               snake.rotating_angle -= 0.02')
         elif bonus_type == 'self_speeddown':
             if sender.speed > 1:
                 sender.speed /= 1.5
@@ -909,9 +909,8 @@ class GUI:
                 snake.color = sender.color
                 snake.updateHeadColor()
                 add_event(snake.events_queue,
-                          'snake.color = snake.color_unchanged')
-                add_event(snake.events_queue,
-                          'snake.updateHeadColor()')
+                          'snake.color = snake.color_unchanged; \
+                          snake.updateHeadColor()')
         elif bonus_type == 'change_chance_hole':
             for snake in others:
                 snake.hole_probability *= 10
@@ -948,9 +947,8 @@ class GUI:
                 snake.color = self.invertColor(snake.getColor())
                 snake.updateHeadColor()
                 add_event(snake.events_queue,
-                          'snake.color = snake.color_unchanged')
-                add_event(snake.events_queue,
-                          'snake.updateHeadColor()')
+                          'snake.color = snake.color_unchanged; \
+                           snake.updateHeadColor()')
         elif bonus_type == 'shrink_map':
             self.shrinkMap()
         elif bonus_type == 'swap_position':
