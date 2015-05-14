@@ -1,5 +1,5 @@
 from tkinter import *
-
+from math import cos, sin, pi
 
 class Arc:
     '''
@@ -20,21 +20,35 @@ class Arc:
         # r stands for radius of arc
         r = (self.snake.thickness + 2*self.offset) * 2
         # create arc which will be edited at each update
-        self.arc_id = self.snake.canvas.create_arc(x-r, y-r, x+r, y+r,
-                                                   style=ARC, extent=360,
-                                                   width=2, outline=color)
+        precision = 20
+        step = 0.15
+        angle = 2*pi*(1-self.val/self.max)
+        for i in range(0,int(angle*precision), int(step*precision)):
+            i /= precision
+            self.arc_id = self.snake.canvas.create_line(x+r*cos(i),
+                                                        y-r*sin(i),
+                                                        x+r*cos(i+step),
+                                                        y-r*sin(i+step),
+                                                        width=2,
+                                                        fill=color)
 
     def updateArc(self):
         # move one step further in bonus effect
         self.val += 1
-        # change angle of arc
-        self.snake.canvas.itemconfig(self.arc_id,
-                                     extent=360*(1-(self.val/self.max)))
         x, y = self.snake.head_coord
         r = (self.snake.thickness + 2*self.offset) * 2
+        angle = 2*pi*(1-self.val/self.max)
+        step = 0.15
+        precision = 20
         # replace it correctly
-        self.snake.canvas.coords(self.arc_id, x-r, y-r, x+r, y+r)
-
+        for i in range(0,int(angle*precision), int(step*precision)):
+            i /= precision
+            self.snake.canvas.coords(self.arc_id,
+                                     x+r*cos(i),
+                                     y-r*sin(i),
+                                     x+r*cos(i+step),
+                                     y-r*sin(i+step))
+    
     def setOffset(self, new_offset):
         self.offset = new_offset
 
