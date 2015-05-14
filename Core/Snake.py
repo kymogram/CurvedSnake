@@ -40,6 +40,8 @@ class Snake:
         self.alive = True
         self.invincible = False
         self.time_before_start = True
+        # boolean to be able to go throught the wall
+        self.penetrate = False
         # used to tag items in canvas
         self.name = str(name)
         # number of frames still to come when snake produces a hole
@@ -121,8 +123,22 @@ class Snake:
         # WARNING: when the snake moves, it always touches its previous
         # position so step of appearance is written as a tag.
         if not self.isInScreen(x, y):
-            self.alive = False
-            Particles(self.canvas, x, y, self.color)
+            if not self.penetrate:
+                self.alive = False
+                Particles(self.canvas, x, y, self.color)
+            else:
+                border_depth = int(self.canvas['bd'])
+                canvas_width = self.canvas.winfo_width()
+                canvas_height = self.canvas.winfo_height()
+                if x < border_depth:
+                    x = canvas_width - border_depth
+                elif x > canvas_width - border_depth:
+                    x = border_depth
+                if y < border_depth:
+                    y = canvas_height - border_depth
+                elif y > canvas_height - border_depth:
+                    y = border_depth
+                self.head_coord = [x, y]
         else:
             r = self.thickness // 2
             # find all items in contact with new position

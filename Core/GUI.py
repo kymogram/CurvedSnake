@@ -48,7 +48,7 @@ class GUI:
                    'clean_map', 'negative',
                    'invincible', 'shrink_map',
                    'self_right_angles', 'swap_position',
-                   'portal']
+                   'portal', 'penetrating_wall']
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -58,7 +58,7 @@ class GUI:
                    300, 300,
                    300, 300,
                    750, 200,
-                   10]
+                   10 , 300]
     BONUS_PROBABILITIES = [1, 1.2,
                            1, 1,
                            1, 1,
@@ -68,7 +68,7 @@ class GUI:
                            1, 1,
                            0.8, 1,
                            1, 1,
-                           1]
+                           1, 1]
 
     def __init__(self):
         # window
@@ -792,7 +792,8 @@ class GUI:
                                       text='Scores')
         self.score_frame.pack(side=LEFT)
         self.canvas_frame = LabelFrame(self.window, relief=RAISED, bd=15,
-                                       cursor='none', text='canvas')
+                                       cursor='none', text='canvas',
+                                       bg=None)
         self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
         self.canvas = Canvas(self.canvas_frame, height=self.canvas_height,
                              width=self.canvas_width,
@@ -970,6 +971,14 @@ class GUI:
             el = self.canvas.find_withtag('bonus,'+bonus_type)[0]
             sender.head_coord = self.canvas.coords(el)
             self.canvas.delete(el)
+        elif bonus_type == 'penetrating_wall':
+            self.canvas_frame.configure(bg='blue')
+            add_event(self.events_queue,
+                      'self.canvas_frame.configure(bg="grey")')
+            for snake in self.snakes:
+                snake.penetrate = True
+                add_event(snake.events_queue,
+                          'snake.penetrate = False')
 
     def shrinkMap(self):
         '''

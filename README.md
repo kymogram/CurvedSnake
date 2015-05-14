@@ -18,8 +18,6 @@ adaptation de CurveFever en Python avec tkinter
 - Faire en sortes que les autres ne peuvent tourner que d'un seul côté
 (ATTENTION: mettre un signe sur la tête des autres joueurs pour qu'ils soient prévenu)
 
-- Passer à travers les murs
-
 - Faire apparaître des obstacles (des bébés chats par exemple)
 
 - Bonus qui fait acquérir des points de classement supplémentaire (points de classement à faire)
