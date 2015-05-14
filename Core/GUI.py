@@ -10,6 +10,7 @@ from .Bonus import *
 from .InputManager import *
 from .MusicManager import *
 from .ComboColorBox import *
+from .RandomBonus import *
 
 
 class GUI:
@@ -57,6 +58,16 @@ class GUI:
                    300, 300,
                    750, 200,
                    10]
+    BONUS_PROBABILITIES = [1, 1,
+                           1, 1,
+                           1, 1,
+                           1, 1,
+                           1, 1,
+                           1, 1,
+                           1, 1,
+                           1, 1,
+                           1, 1,
+                           1]
 
     def __init__(self):
         # window
@@ -144,8 +155,8 @@ class GUI:
         xmin, ymin = GUI.BONUS_SPRITES_DIMENSIONS
         xmax, ymax = self.canvas_width-xmin, self.canvas_height-ymin
         x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
-        if len(self.available_bonus) > 0:
-            bonus = choice(self.available_bonus)
+        if self.available_bonus:
+            bonus = self.bonus_dict[self.bonus_generator.getRandom()]
             if bonus.name != 'portal':
                 self.canvas.create_image(x, y, image=bonus.image,
                                          tags='bonus,{}'.format(bonus.name))
@@ -724,9 +735,7 @@ class GUI:
                     self.regular_player.append(self.snakes_names[i])
                     self.regular_colors.append(self.snakes_colors[i])
                     self.regular_commands.append(self.commands_list[i])
-            self.available_bonus = [self.bonus_dict[GUI.BONUS_FILES[i]]
-                                    for i in range(len(self.bonus_dict))
-                                    if self.add_bonus_bool[i].get() == 1]
+            self.available_bonus = 1 in [b.get() for b in self.add_bonus_bool]
             if self.mini_map.get() == 0:
                 self.canvas_height -= 150
                 self.canvas_width -= 150
@@ -762,10 +771,16 @@ class GUI:
         '''
         self.music_manager.pause()
 
+    def refreshBonusProba(self):
+        l = [b.get() == 1 for b in self.add_bonus_bool]
+        self.bonus_generator = RandomBonus(GUI.BONUS_PROBABILITIES, l,
+                                           GUI.BONUS_FILES)
+
     def play(self):
         '''
             prepares the game
         '''
+        self.refreshBonusProba()
         if self.sound_activate:
             if self.play_once_music:
                 self.playMusic()
