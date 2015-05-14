@@ -5,11 +5,11 @@ from tkinter.filedialog import askopenfilename
 from random import randint, random, choice, shuffle
 from math import pi
 
-from Snake import *
-from Bonus import *
-from InputManager import *
-from MusicManager import *
-from ComboColorBox import *
+from .Snake import *
+from .Bonus import *
+from .InputManager import *
+from .MusicManager import *
+from .ComboColorBox import *
 
 
 class GUI:
