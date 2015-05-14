@@ -59,14 +59,14 @@ class GUI:
                    300, 300,
                    750, 200,
                    10]
-    BONUS_PROBABILITIES = [1, 1,
+    BONUS_PROBABILITIES = [1, 1.2,
                            1, 1,
                            1, 1,
                            1, 1,
+                           0.7, 1,
                            1, 1,
                            1, 1,
-                           1, 1,
-                           1, 1,
+                           0.8, 1,
                            1, 1,
                            1]
 
@@ -565,7 +565,7 @@ class GUI:
         self.top_style.configure(bg=self.current_bg)
         self.window.configure(bg=self.current_bg)
         # If we don't check icon, it disappears
-        self.background_color.createColorIcon(self.background_color.om)
+        self.background_color.createColorIcon(self.background_color.colors_menu)
 
     def soundActivation(self):
         self.sound_activate = False if self.sound_activate else True
