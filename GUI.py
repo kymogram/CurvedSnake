@@ -80,6 +80,8 @@ class GUI:
         self.regular_commands = []
         self.left_key = self.right_key = False
         self.is_regular_list = False
+        self.current_bg = 'black'
+        self.current_fg = 'white'
         # other variables
         self.play_once_music = True
         self.sound_activate = True
@@ -320,99 +322,128 @@ class GUI:
         '''
             sets the whole GUI start menu
         '''
+        self.window.configure(bg=self.current_bg)
+        self.clearWindow()
         if self.sound_activate:
             self.play_once_music = True
-        self.clearWindow()
         Label(self.window, width=100, text='Curved Snake',
-              font=Font(family='fixedsys', size=32)).pack()
+              font=Font(family='fixedsys', size=32), bg=self.current_bg,
+              fg=self.current_fg).pack()
         Label(self.window, width=250, text='New player',
-              font=Font(family='Arial Unicode MS')).pack()
+              font=Font(family='Arial Unicode MS'), bg=self.current_bg,
+              fg=self.current_fg).pack()
         self.current_name = StringVar()
-        self.name = Entry(self.window, textvariable=self.current_name)
+        self.name = Entry(self.window, textvariable=self.current_name,
+                          bg=self.current_bg, fg=self.current_fg)
         self.name.bind('<Button-1>', self.removeFocus)
         self.name.pack()
         self.selectRandomName()
         Label(self.window, width=250, text='Already played ?',
-              font=Font(family='Arial Unicode MS')).pack()
-        self.player_known = Listbox(self.window, selectmode=SINGLE)
+              font=Font(family='Arial Unicode MS'), bg=self.current_bg,
+              fg=self.current_fg).pack()
+        self.player_known = Listbox(self.window, selectmode=SINGLE,
+                                    bg=self.current_bg, fg=self.current_fg)
         self.player_known.insert(END, *self.regular_player)
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
         Button(self.window, text='Remove regular player',
-               command=self.removeRegularPlayer).pack()
+               command=self.removeRegularPlayer, bg=self.current_bg,
+               fg=self.current_fg).pack()
         font = Font(family='Arial Unicode MS', size=10)
         button_frame = LabelFrame(self.window, text='Left and Right commands',
-                                  font=font)
+                                  font=font, bg=self.current_bg,
+                                  fg=self.current_fg)
         button_frame.pack()
-        self.button_left = Button(button_frame, bg='white',
+        self.button_left = Button(button_frame, bg=self.current_bg,
+                                  fg=self.current_fg,
                                   text=GUI.DEFAULT_COMMANDS[0][0],
                                   command=lambda: self.modifBgColor('L'))
         self.button_left.pack(side=LEFT, padx=20)
         self.button_right = Button(button_frame,
                                    text=GUI.DEFAULT_COMMANDS[0][1],
-                                   bg='white',
+                                   bg=self.current_bg, fg=self.current_fg,
                                    command=lambda: self.modifBgColor('R'))
         self.button_right.pack(side=RIGHT, padx=20)
         self.selectRandomCommands()
         self.color_frame = LabelFrame(self.window,
                                  width=100,
                                  text='Choose your color',
-                                 font=Font(family='Arial Unicode MS', size=10))
+                                 font=Font(family='Arial Unicode MS', size=10),
+                                 bg=self.current_bg, fg=self.current_fg)
         self.color_frame.pack()
-        self.color = ComboColorBox(self, GUI.DEFAULT_COLORS)
+        self.color = ComboColorBox(self, self.color_frame, GUI.DEFAULT_COLORS)
         self.selectRandomColor()
         # self.color.bind('<<ComboboxSelected>>', self.newSelection)
         colorVal = self.color.getColorVal()
         colorVal.trace('w', lambda n, m, s: self.newSelection())
-        Button(self.window, text='Add player', command=self.addPlayer).pack()
+        Button(self.window, text='Add player', command=self.addPlayer,
+               bg=self.current_bg, fg=self.current_fg).pack()
         Label(self.window, width=250, text='Player ready to play',
-              font=Font(family='Arial Unicode MS')).pack()
-        self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE)
+              font=Font(family='Arial Unicode MS'), bg=self.current_bg,
+              fg=self.current_fg).pack()
+        self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE,
+                                     bg=self.current_bg, fg=self.current_fg)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         if not self.first_open_game:
             self.player_ingame.insert(END, *self.snakes_names)
         self.first_open_game = False
         self.player_ingame.pack()
         Button(self.window, text='Remove player',
-               command=self.removePlayer).pack()
+               command=self.removePlayer, bg=self.current_bg,
+               fg=self.current_fg).pack()
         ready_to_play = LabelFrame(self.window, text='Finally ready to play ?',
                                    font=Font(family='Arial Unicode MS',
-                                             size=10))
+                                   size=10), bg=self.current_bg,
+                                   fg=self.current_fg)
         ready_to_play.pack()
-        b = Button(ready_to_play, text='Parameters', command=self.parameters)
+        b = Button(ready_to_play, text='Parameters', command=self.parameters,
+                   bg=self.current_bg, fg=self.current_fg)
         b.pack(padx=5, pady=5)
-        b = Button(ready_to_play, text='Play!', command=self.playPressed)
+        b = Button(ready_to_play, text='Play!', command=self.playPressed,
+                   bg=self.current_bg, fg=self.current_fg)
         b.pack(padx=5, pady=5)
+        b = Button(self.window, text='Change GUI style', command=self.changeStyle,
+                   bg=self.current_bg, fg=self.current_fg)
+        b.pack()
 
     def parameters(self):
         '''
             sets powerups and their probability
         '''
-        self.top_para = Toplevel()
+        self.top_para = Toplevel(bg=self.current_bg)
         self.top_para.grab_set()
         available_bonus_frame = LabelFrame(self.top_para,
-                                           text='Available bonus')
+                                           text='Available bonus',
+                                           bg=self.current_bg, fg=self.current_fg)
         available_bonus_frame.grid()
         for i in range(len(self.bonus_dict)):
             bonus = self.bonus_dict[GUI.BONUS_FILES[i]]
             add_bonus = Checkbutton(available_bonus_frame,
                                     image=bonus.image,
-                                    variable=self.add_bonus_bool[i])
+                                    variable=self.add_bonus_bool[i],
+                                    bg=self.current_bg)
             add_bonus.grid(row=i % 3, column=i // 3)
         Button(available_bonus_frame,
                text='select all',
-               command=self.selectAll).grid(row=4, column=2)
+               command=self.selectAll,
+               bg=self.current_bg,
+               fg=self.current_fg).grid(row=4, column=2)
         Button(available_bonus_frame,
                text='unselect all',
-               command=self.unselectAll).grid(row=4, column=4)
-        bonus_scale_frame = LabelFrame(self.top_para, text='Bonus probability')
+               command=self.unselectAll,
+               bg=self.current_bg,
+               fg=self.current_fg).grid(row=4, column=4)
+        bonus_scale_frame = LabelFrame(self.top_para, text='Bonus probability',
+                                       bg=self.current_bg, fg=self.current_fg)
         bonus_scale_frame.grid(row=5)
         self.bonus_scale = Scale(bonus_scale_frame,
-                                 to=100, orient=HORIZONTAL)
+                                 to=100, orient=HORIZONTAL,
+                                 bg=self.current_bg, fg=self.current_fg)
         self.bonus_scale.set(self.bonus_percent)
         self.bonus_scale.grid()
         available_map_frame = LabelFrame(self.top_para,
-                                         text='Available map size')
+                                         text='Available map size',
+                                         bg=self.current_bg, fg=self.current_fg)
         available_map_frame.grid(row=6)
         Radiobutton(available_map_frame, text='normal',
                     variable=self.mini_map, value=2).grid(row=6, column=2)
@@ -420,17 +451,53 @@ class GUI:
                     variable=self.mini_map, value=0).grid(row=6, column=3)
         Radiobutton(available_map_frame, text='1v1',
                     variable=self.mini_map, value=1).grid(row=6, column=1)
-        sound_frame = LabelFrame(self.top_para, text='Music')
+        sound_frame = LabelFrame(self.top_para, text='Music',
+                                 bg=self.current_bg, fg=self.current_fg)
         sound_frame.grid(row=7)
         sound = {True: 'on', False: 'off'}[self.sound_activate]
         self.sound_button = Button(sound_frame, text='Sound ' + sound,
-                                   command=self.soundActivation)
+                                   command=self.soundActivation,
+                                   bg=self.current_bg, fg=self.current_fg)
         self.sound_button.grid()
         self.choose_sound_button = Button(sound_frame, text='Choose Music',
-                                          command=self.choose_music)
+                                          command=self.choose_music,
+                                          bg=self.current_bg, fg=self.current_fg)
         self.choose_sound_button.grid()
-        b = Button(self.top_para, text='Set', command=self.closeAndGetVal)
+        b = Button(self.top_para, text='Set', command=self.closeAndGetVal,
+                   bg=self.current_bg, fg=self.current_fg)
         b.grid(row=8)
+        
+    def changeStyle(self):
+        self.top_style = Toplevel()
+        self.top_style.grab_set()
+        choosebg = LabelFrame(self.top_style, text='Background',
+                              bg=self.current_bg, fg=self.current_fg)
+        choosebg.pack()
+        self.background_color = ComboColorBox(self, choosebg, GUI.DEFAULT_COLORS)
+        self.background_color.set(self.current_bg)
+        choosefg = LabelFrame(self.top_style, text='Foreground',
+                              bg=self.current_bg, fg=self.current_fg)
+        choosefg.pack()
+        self.foreground_color = ComboColorBox(self, choosefg, GUI.DEFAULT_COLORS)
+        self.foreground_color.set(self.current_fg)
+        try_set_frame = LabelFrame(self.top_style, text='Test it and Adopt it',
+                                   bg=self.current_bg, fg=self.current_fg)
+        try_set_frame.pack()
+        try_option = Button(try_set_frame, text='Try', command=self.tryOption,
+                            bg=self.current_bg, fg=self.current_fg)
+        try_option.pack(side=LEFT, padx=10, pady=5)
+        set_option = Button(try_set_frame, text='Set', command=lambda: self.top_style.destroy(),
+                            bg=self.current_bg, fg=self.current_fg)
+        set_option.pack(side=RIGHT, padx=10, pady=5)
+        
+    def tryOption(self):
+        self.current_bg = self.background_color.getColor()
+        self.current_fg = self.foreground_color.getColor()
+        self.top_style.destroy()
+        self.menuStart()
+        self.changeStyle()
+        # If we don't check icon, it disappear
+        self.background_color.createColorIcon(self.background_color.om)
 
     def soundActivation(self):
         self.sound_activate = False if self.sound_activate else True
@@ -861,7 +928,7 @@ class GUI:
                     self.commands_list[self.id][0] = e.keysym
             self.move_command_left = e.keysym
             self.button_left.configure(text=self.move_command_left)
-            self.button_left.configure(bg='white')
+            self.button_left.configure(bg=self.current_bg)
         elif self.right_key:
             if self.is_regular_list:
                 self.regular_commands[self.id][1] = e.keysym
@@ -869,7 +936,7 @@ class GUI:
                 self.commands_list[self.id][1] = e.keysym
             self.move_command_right = e.keysym
             self.button_right.configure(text=self.move_command_right)
-            self.button_right.configure(bg='white')
+            self.button_right.configure(bg=self.current_bg)
         self.left_key = False
         self.right_key = False
         self.window.unbind('<Key>')

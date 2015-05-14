@@ -3,7 +3,8 @@ from tkinter import ttk
 from tkinter.colorchooser import askcolor
 
 class ComboColorBox:
-    def __init__(self, parent, colors):
+    def __init__(self, parent, master, colors):
+        self.master = master
         self.parent = parent
         self.colors = colors
         style = ttk.Style()
@@ -13,8 +14,8 @@ class ComboColorBox:
         """
         
         style.configure('default.TMenubutton',
-                        background='white',
-                        foreground='black',
+                        background=self.parent.current_bg,
+                        foreground=self.parent.current_fg,
                         font=('Arial Rounded MT', 18, 'bold')
                         )
         style.map('default.TMenubutton',
@@ -26,10 +27,10 @@ class ComboColorBox:
         # - - - TODO - - -
         # create the option menu
         self.__colorVar = StringVar()
-        self.om = ttk.OptionMenu(self.parent.color_frame, self.__colorVar, *self.colors,style="default.TMenubutton")
+        self.om = ttk.OptionMenu(self.master, self.__colorVar, *self.colors,style="default.TMenubutton")
         self.__colorVar.set(self.colors[1]) # Par défaut
         
-        apercu = Frame(self.parent.color_frame, bg=self.__colorVar.get(),relief=RAISED,
+        apercu = Frame(self.master, bg=self.__colorVar.get(),relief=RAISED,
                        borderwidth=2,
                        width=self.om.winfo_reqheight(),
                        height=self.om.winfo_reqheight()

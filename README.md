@@ -13,8 +13,6 @@ adaptation de CurveFever en Python avec tkinter
 
 - Éventuels exploit lorsque l'on prend plusieurs bonus à la suite par exemple ou autre
 
-- Mettre un bouton pour permettre à l'utilisateur de changer le style de l'interface (background noir avec front blanc par exemple)
-
 # Idée de bonus:
 
 - Lors du bonus invert_color (négatif), mettre la musique de nyan-cat
