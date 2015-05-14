@@ -331,87 +331,113 @@ class GUI:
         '''
             sets the whole GUI start menu
         '''
+        self.tmp_widget = []
         self.window.configure(bg=self.current_bg)
         self.clearWindow()
         if self.sound_activate:
             self.play_once_music = True
-        Label(self.window, width=100, text='Curved Snake',
-              font=Font(family='fixedsys', size=32), bg=self.current_bg,
-              fg=self.current_fg).pack()
-        Label(self.window, width=250, text='New player',
-              font=Font(family='Arial Unicode MS'), bg=self.current_bg,
-              fg=self.current_fg).pack()
+        l = Label(self.window, width=100, text='Curved Snake',
+                  font=Font(family='fixedsys', size=32), bg=self.current_bg,
+              fg=self.current_fg)
+        l.pack()
+        self.tmp_widget.append(l)
+        l = Label(self.window, width=250, text='New player',
+                  font=Font(family='Arial Unicode MS'), bg=self.current_bg,
+                  fg=self.current_fg)
+        l.pack()
+        self.tmp_widget.append(l)
         self.current_name = StringVar()
         self.name = Entry(self.window, textvariable=self.current_name,
                           bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget.append(self.name)
         self.name.bind('<Button-1>', self.removeFocus)
         self.name.pack()
         self.selectRandomName()
-        Label(self.window, width=250, text='Already played ?',
-              font=Font(family='Arial Unicode MS'), bg=self.current_bg,
-              fg=self.current_fg).pack()
+        l = Label(self.window, width=250, text='Already played ?',
+                  font=Font(family='Arial Unicode MS'), bg=self.current_bg,
+                  fg=self.current_fg)
+        l.pack()
+        self.tmp_widget.append(l)
         self.player_known = Listbox(self.window, selectmode=SINGLE,
                                     bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget.append(self.player_known)
         self.player_known.insert(END, *self.regular_player)
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
-        Button(self.window, text='Remove regular player',
-               command=self.removeRegularPlayer, bg=self.current_bg,
-               fg=self.current_fg).pack()
+        b = Button(self.window, text='Remove regular player',
+                   command=self.removeRegularPlayer, bg=self.current_bg,
+                   fg=self.current_fg)
+        b.pack()
+        self.tmp_widget.append(b)
         font = Font(family='Arial Unicode MS', size=10)
         button_frame = LabelFrame(self.window, text='Left and Right commands',
                                   font=font, bg=self.current_bg,
                                   fg=self.current_fg)
+        self.tmp_widget.append(button_frame)
         button_frame.pack()
         self.button_left = Button(button_frame, bg=self.current_bg,
                                   fg=self.current_fg,
                                   text=GUI.DEFAULT_COMMANDS[0][0],
                                   command=lambda: self.modifBgColor('L'))
+        self.tmp_widget.append(self.button_left)
         self.button_left.pack(side=LEFT, padx=20)
         self.button_right = Button(button_frame,
                                    text=GUI.DEFAULT_COMMANDS[0][1],
                                    bg=self.current_bg, fg=self.current_fg,
                                    command=lambda: self.modifBgColor('R'))
+        self.tmp_widget.append(self.button_right)
         self.button_right.pack(side=RIGHT, padx=20)
         self.selectRandomCommands()
         font = Font(family='Arial Unicode MS', size=10)
         self.color_frame = LabelFrame(self.window, width=100,
                                       text='Choose your color', font=font,
                                       bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget.append(self.color_frame)
         self.color_frame.pack()
         self.color = ComboColorBox(self, self.color_frame, GUI.DEFAULT_COLORS)
         self.selectRandomColor()
         # self.color.bind('<<ComboboxSelected>>', self.newSelection)
         colorVal = self.color.getColorVal()
         colorVal.trace('w', lambda n, m, s: self.newSelection())
-        Button(self.window, text='Add player', command=self.addPlayer,
-               bg=self.current_bg, fg=self.current_fg).pack()
-        Label(self.window, width=250, text='Player ready to play',
-              font=font, bg=self.current_bg,
-              fg=self.current_fg).pack()
+        b = Button(self.window, text='Add player', command=self.addPlayer,
+                   bg=self.current_bg, fg=self.current_fg)
+        b.pack()
+        self.tmp_widget.append(b)
+        l = Label(self.window, width=250, text='Player ready to play',
+                  font=font, bg=self.current_bg,
+              fg=self.current_fg)
+        l.pack()
+        self.tmp_widget.append(l)
         self.player_ingame = Listbox(self.window, height=6, selectmode=SINGLE,
                                      bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget.append(self.player_ingame)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
         if not self.first_open_game:
             self.player_ingame.insert(END, *self.snakes_names)
         self.first_open_game = False
         self.player_ingame.pack()
-        Button(self.window, text='Remove player',
+        b = Button(self.window, text='Remove player',
                command=self.removePlayer, bg=self.current_bg,
-               fg=self.current_fg).pack()
+               fg=self.current_fg)
+        b.pack()
+        self.tmp_widget.append(b)
         ready_to_play = LabelFrame(self.window, text='Finally ready to play ?',
                                    font=font, bg=self.current_bg,
                                    fg=self.current_fg)
+        self.tmp_widget.append(ready_to_play)
         ready_to_play.pack()
         b = Button(ready_to_play, text='Parameters', command=self.parameters,
                    bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget.append(b)
         b.pack(padx=5, pady=5)
         b = Button(ready_to_play, text='Play!', command=self.playPressed,
                    bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget.append(b)
         b.pack(padx=5, pady=5)
         b = Button(self.window, text='Change GUI style',
                    command=self.changeStyle, bg=self.current_bg,
                    fg=self.current_fg)
+        self.tmp_widget.append(b)
         b.pack()
 
     def parameters(self):
@@ -432,16 +458,18 @@ class GUI:
                                     variable=self.add_bonus_bool[i],
                                     bg=self.current_bg)
             add_bonus.grid(row=i % 3, column=i // 3)
-        Button(available_bonus_frame,
-               text='select all',
-               command=self.selectAll,
-               bg=self.current_bg,
-               fg=self.current_fg).grid(row=4, column=2)
-        Button(available_bonus_frame,
+        b = Button(available_bonus_frame,
+                   text='select all',
+                   command=self.selectAll,
+                   bg=self.current_bg,
+                   fg=self.current_fg)
+        b.grid(row=4, column=2)
+        b = Button(available_bonus_frame,
                text='unselect all',
                command=self.unselectAll,
                bg=self.current_bg,
-               fg=self.current_fg).grid(row=4, column=4)
+               fg=self.current_fg)
+        b.grid(row=4, column=4)
         bonus_scale_frame = LabelFrame(self.top_para, text='Bonus probability',
                                        bg=self.current_bg, fg=self.current_fg)
         bonus_scale_frame.grid(row=5)
@@ -481,36 +509,61 @@ class GUI:
     def changeStyle(self):
         self.top_style = Toplevel()
         self.top_style.grab_set()
+        self.tmp_widget_top_style = []
+        save_bg = self.current_bg
+        save_fg = self.current_fg
         choosebg = LabelFrame(self.top_style, text='Background',
                               bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget_top_style.append(choosebg)
         choosebg.pack()
         self.background_color = ComboColorBox(self, choosebg,
                                               GUI.DEFAULT_COLORS)
         self.background_color.set(self.current_bg)
         choosefg = LabelFrame(self.top_style, text='Foreground',
                               bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget_top_style.append(choosefg)
         choosefg.pack()
         self.foreground_color = ComboColorBox(self, choosefg,
                                               GUI.DEFAULT_COLORS)
         self.foreground_color.set(self.current_fg)
         try_set_frame = LabelFrame(self.top_style, text='Test it and Adopt it',
                                    bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget_top_style.append(try_set_frame)
         try_set_frame.pack()
-        try_option = Button(try_set_frame, text='Try', command=self.tryOption,
+        try_option = Button(try_set_frame, text='Try', command=self.updateStyle,
                             bg=self.current_bg, fg=self.current_fg)
-        try_option.pack(side=LEFT, padx=10, pady=5)
+        self.tmp_widget_top_style.append(try_option)
+        try_option.grid(padx=10, pady=5)
         set_option = Button(try_set_frame, text='Set',
                             command=lambda: self.top_style.destroy(),
                             bg=self.current_bg, fg=self.current_fg)
-        set_option.pack(side=RIGHT, padx=10, pady=5)
-
-    def tryOption(self):
-        self.current_bg = self.background_color.getColor()
-        self.current_fg = self.foreground_color.getColor()
+        self.tmp_widget_top_style.append(set_option)
+        set_option.grid(row=0, column=1, padx=10, pady=5)
+        cancel_option = Button(try_set_frame, text='Cancel',
+                            command=lambda: self.updateStyle(save_bg, save_fg),
+                            bg=self.current_bg, fg=self.current_fg)
+        self.tmp_widget_top_style.append(cancel_option)
+        cancel_option.grid(row=0, column=2, padx=10, pady=5)
+        self.top_style.protocol('WM_DELETE_WINDOW', lambda: self.destroyStyle(save_bg, save_fg))
+        
+    def destroyStyle(self, old_bg, old_fg):
+        self.updateStyle(old_bg, old_fg)
         self.top_style.destroy()
-        self.menuStart()
-        self.changeStyle()
-        # If we don't check icon, it disappear
+
+    def updateStyle(self, old_bg=None, old_fg=None):
+        if old_bg is None:  # if old_bg is None, old_fg is None too
+            self.current_bg = self.background_color.getColor()
+            self.current_fg = self.foreground_color.getColor()
+        else:
+            self.current_bg = old_bg
+            self.current_fg = old_fg
+        for w in self.tmp_widget:
+            w.configure(bg=self.current_bg, fg=self.current_fg)
+        for w in self.tmp_widget_top_style:
+            w.configure(bg=self.current_bg, fg=self.current_fg)
+        self.top_style.configure(bg=self.current_bg)
+        self.window.configure(bg=self.current_bg)
+        # If we don't check icon, it disappears
         self.background_color.createColorIcon(self.background_color.om)
 
     def soundActivation(self):
