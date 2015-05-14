@@ -5,8 +5,6 @@ adaptation de CurveFever en Python avec tkinter
 
 - Améliorer arc de cercle
 
-- Lors du bonus swap_position, mettre l'avancement dans la bonne direction
-
 - Tout faire pour éviter les lags ...
 
 - Point de classement

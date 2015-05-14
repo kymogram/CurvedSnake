@@ -956,7 +956,7 @@ class GUI:
             if len(self.snakes) > 1:
                 head_list = list()
                 for snake in self.snakes:
-                    head_list.append(snake.head_coord)
+                    head_list.append((snake.head_coord, snake.angle))
                     snake.invincible = True
                     add_event(snake.events_queue, 'snake.invincible = False')
                 save = head_list[:]
@@ -964,7 +964,8 @@ class GUI:
                 while head_list == save:
                     shuffle(head_list)
                 for i in range(len(head_list)):
-                    self.snakes[i].head_coord = head_list[i]
+                    self.snakes[i].head_coord = head_list[i][0]
+                    self.snakes[i].angle = head_list[i][1]
         elif bonus_type[:6] == 'portal':
             el = self.canvas.find_withtag('bonus,'+bonus_type)[0]
             sender.head_coord = self.canvas.coords(el)
@@ -1088,8 +1089,8 @@ class GUI:
                            self.regular_commands[i][1], self.regular_colors[i])
             save.write(text)
         sec_text = 'bg = {}\n' \
-                  'fg = {}\n' \
-                  .format(self.current_bg, self.current_fg)
+                   'fg = {}\n' \
+                   .format(self.current_bg, self.current_fg)
         save.write(sec_text)
         self.window.destroy()
 
