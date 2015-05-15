@@ -50,7 +50,8 @@ class GUI:
                          ON_GUI, ON_GUI,
                          ON_SELF, ON_GUI,
                          ON_SELF, ON_GUI,
-                         ON_SELF, ON_GUI]
+                         ON_SELF, ON_GUI,
+                         ON_SELF]
     BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'thickness_down', 'all_speeddown',
                    'reversed_commands', 'all_speedup',
@@ -60,7 +61,8 @@ class GUI:
                    'clean_map', 'negative',
                    'invincible', 'shrink_map',
                    'self_right_angles', 'swap_position',
-                   'portal', 'penetrating_wall']
+                   'portal', 'penetrating_wall',
+                   'artic']
     BONUS_EXECUTION = ['sender.speed += 1; sender.rotating_angle += 0.02;' \
                        'sender.addArc(self.bonus_dict[bonus_type])',
                        'if sender.speed > 1: sender.speed /= 1.5',
@@ -85,7 +87,9 @@ class GUI:
                        'e = self.canvas.find_withtag("bonus,"+bonus_type)[0];'\
                        'sender.head_coord = self.canvas.coords(e);' \
                        'self.canvas.delete(e)',
-                       'pass  # gui']
+                       'pass  # gui',
+                       'sender.artic = True; sender.color = "white";' \
+                       'sender.updateHeadColor()']
     BONUS_CODE = ['snake.speed -= 1; snake.rotating_angle -= 0.02',
                   'snake.speed *= 1.5',
                   'snake.thickness *= 2',
@@ -106,7 +110,9 @@ class GUI:
                   'snake.restoreAngle()',
                   '',
                   'pass',
-                  'self.canvas_frame.configure(bg="grey")']
+                  'self.canvas_frame.configure(bg="grey")',
+                  'snake.artic = False; snake.color = snake.color_unchanged;' \
+                  'snake.updateHeadColor()']
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -116,7 +122,8 @@ class GUI:
                    300, 300,
                    300, 300,
                    750, 200,
-                   10,  300]
+                   10,  300,
+                   600]
     BONUS_PROBABILITIES = [1, 1.2,
                            1, 1,
                            1, 1,
@@ -126,7 +133,8 @@ class GUI:
                            1, 1,
                            0.8, 1,
                            1, 1,
-                           1, 1]
+                           1, 1,
+                           0.5]
 
     def __init__(self):
         # window
