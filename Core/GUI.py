@@ -633,7 +633,7 @@ class GUI:
         self.sound_button.configure(text='Sound ' + sound)
 
     def choose_music(self):
-        types = [("WVA files", "*.wav")]
+        types = [("WVA files", "*.wav"), ("MP3 files", "*.mp3")]
         tmp = askopenfilename(filetypes=types,
                               initialdir=GUI.MUSIC_DEFAULT_DIR)
         if tmp is not None:
