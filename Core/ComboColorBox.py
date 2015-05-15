@@ -19,7 +19,7 @@ class ComboColorBox:
                               ('pressed', 'gray'),
                               ('active', 'gray90')])
         self.currentColor = StringVar()
-        self.colors_menu = ttk.OptionMenu(self.master, self.currentColor,
+        self.colors_menu = ttk.OptionMenu(self.master, self.currentColor, None,
                                           *self.colors,
                                           style="default.TMenubutton")
         self.currentColor.set(self.colors[1])  # default value
