@@ -42,6 +42,10 @@ class Snake:
         self.alive = True
         self.invincible = False
         self.time_before_start = True
+        # counter for achievement
+        self.counter_artic = 0
+        self.counter_color = 0
+        self.counter_nega = 0
         # boolean to be able to go throught the wall
         self.penetrate = False
         # used to tag items in canvas
@@ -162,15 +166,7 @@ class Snake:
         '''
             function when the snake is refreshed to make it move.
         '''
-        if self.artic:
-            if step%44 == 0 and not self.changed_artic:
-                self.color = '#00ffff'
-                self.updateHeadColor()
-                self.changed_artic = True
-            elif step%44 == 0 and self.changed_artic:
-                self.color = 'white'
-                self.updateHeadColor()
-                self.changed_artic = False
+        self.checkSpecialColor(step)
         # stop moving if snake is dead
         if not self.alive:
             return
@@ -205,6 +201,17 @@ class Snake:
             else:
                 self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
+        
+    def checkSpecialColor(self, step):
+        if self.artic:
+            if step%44 == 0 and not self.changed_artic:
+                self.color = '#00ffff'
+                self.updateHeadColor()
+                self.changed_artic = True
+            elif step%44 == 0 and self.changed_artic:
+                self.color = 'white'
+                self.updateHeadColor()
+                self.changed_artic = False
 
     def restoreAngle(self):
         self.rotating_angle = self.previous_angles.pop(0)

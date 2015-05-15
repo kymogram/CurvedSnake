@@ -463,7 +463,6 @@ class GUI:
         self.color_frame.pack()
         self.color = ComboColorBox(self, self.color_frame, GUI.DEFAULT_COLORS)
         self.selectRandomColor()
-        # self.color.bind('<<ComboboxSelected>>', self.newSelection)
         colorVal = self.color.getColorVal()
         colorVal.trace('w', lambda n, m, s: self.newSelection())
         b = Button(self.window, text='Add player', command=self.addPlayer,
@@ -906,6 +905,7 @@ class GUI:
         '''
             sets bonus and handles events queues
         '''
+        self.checkSpecialCounter(sender, bonus_type)
         others = [snake for snake in self.snakes_alive if snake is not sender]
         add_event = lambda l, f: l.append(self.list_from(f, bonus_type))
         if bonus_type == 'bonus_chance':
@@ -981,6 +981,14 @@ class GUI:
             for snake in others:
                 exec(GUI.BONUS_EXECUTION[idx])
                 add_event(snake.events_queue, GUI.BONUS_CODE[idx])
+                
+    def checkSpecialCounter(self, snake, bonus_type):
+        if bonus_type == 'negative':
+            snake.counter_nega += 1
+        elif bonus_type == 'change_color':
+            snake.counter_color += 1
+        elif bonus_type == 'artic':
+            snake.counter_artic += 1
 
     def shrinkMap(self):
         '''
