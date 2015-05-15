@@ -12,6 +12,8 @@ from .MusicManager import *
 from .ComboColorBox import *
 from .RandomBonus import *
 
+ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
+
 
 class GUI:
     DEFAULT_WIDTH = 850  # pixels
@@ -39,6 +41,16 @@ class GUI:
     BONUS_SPRITES_DIMENSIONS = (32, 32)  # pixels
     BONUS_DIRECTORY = './sprites/'
     IMAGE_EXTENSION = 'gif'
+    BONUS_APPLICATION = [ON_SELF, ON_SELF,
+                         ON_SELF, ON_OTHERS,
+                         ON_OTHERS, ON_OTHERS,
+                         ON_OTHERS, ON_OTHERS,
+                         ON_OTHERS, ON_GUI,
+                         ON_OTHERS, ON_OTHERS,
+                         ON_GUI, ON_GUI,
+                         ON_SELF, ON_GUI,
+                         ON_SELF, ON_GUI,
+                         ON_SELF, ON_GUI]
     BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'thickness_down', 'all_speeddown',
                    'reversed_commands', 'all_speedup',
@@ -49,6 +61,52 @@ class GUI:
                    'invincible', 'shrink_map',
                    'self_right_angles', 'swap_position',
                    'portal', 'penetrating_wall']
+    BONUS_EXECUTION = ['sender.speed += 1; sender.rotating_angle += 0.02;' \
+                       'sender.addArc(self.bonus_dict[bonus_type])',
+                       'if sender.speed > 1: sender.speed /= 1.5',
+                       'sender.thickness /= 2',
+                       'if snake.speed > 1: snake.speed /= 1.5',
+                       'snake.inversed_commands = True',
+                       'snake.speed += 1; snake.rotating_angle += 0.02',
+                       'snake.previous_angles.append(snake.rotating_angle);' \
+                       'snake.rotating_angle = pi/2',
+                       'snake.thickness *= 2',
+                       'snake.rotating_angle /= 1.5',
+                       'pass  # gui',
+                       'snake.color = sender.color; snake.updateHeadColor()',
+                       'snake.hole_probability *= 10',
+                       'pass  # gui',
+                       'pass  # gui',
+                       'sender.invincible = True',
+                       'pass  # gui',
+                       'sender.previous_angles.append(sender.rotating_angle);'\
+                       'sender.rotating_angle = pi/2',
+                       'pass  # gui',
+                       'e = self.canvas.find_withtag("bonus,"+bonus_type)[0];'\
+                       'sender.head_coord = self.canvas.coords(e);' \
+                       'self.canvas.delete(e)',
+                       'pass  # gui']
+    BONUS_CODE = ['snake.speed -= 1; snake.rotating_angle -= 0.02',
+                  'snake.speed *= 1.5',
+                  'snake.thickness *= 2',
+                  'snake.speed *= 1.5',
+                  'snake.inversed_commands = False',
+                  'snake.speed -= 1; snake.rotating_angle -= 0.02',
+                  'snake.restoreAngle()',
+                  'snake.thickness /= 2',
+                  'snake.rotating_angle *= 1.5',
+                  '',
+                  'snake.color = snake.color_unchanged;' \
+                  'snake.updateHeadColor()',
+                  'snake.hole_probability /= 10',
+                  '',
+                  '',
+                  'snake.invincible = False',
+                  '',
+                  'snake.restoreAngle()',
+                  '',
+                  'pass',
+                  'self.canvas_frame.configure(bg="grey")']
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -58,7 +116,7 @@ class GUI:
                    300, 300,
                    300, 300,
                    750, 200,
-                   10 , 300]
+                   10,  300]
     BONUS_PROBABILITIES = [1, 1.2,
                            1, 1,
                            1, 1,
@@ -836,62 +894,14 @@ class GUI:
     def list_from(self, action, bonus):
         return [action, self.bonus_dict[bonus].length]
 
-    def handleBonus(self, sender_name, bonus_type):
+    def handleBonus(self, sender, bonus_type):
         '''
             sets bonus and handles events queues
         '''
         sender = None
-        others = list()
-        for snake in self.snakes:
-            if snake.name == sender_name:
-                sender = snake
-            else:
-                others.append(snake)
+        others = [snake for snake in self.snakes_alive if snake is not sender]
         add_event = lambda l, f: l.append(self.list_from(f, bonus_type))
-        if bonus_type == 'self_speedup':
-            sender.speed += 1
-            sender.rotating_angle += 0.02
-            sender.addArc(self.bonus_dict[bonus_type])
-            add_event(sender.events_queue, 'snake.speed -= 1; \
-                      snake.rotating_angle -= 0.02')
-        elif bonus_type == 'all_speedup':
-            for snake in others:
-                snake.speed += 1
-                snake.rotating_angle += 0.02
-                add_event(snake.events_queue, 'snake.speed -= 1; \
-                                               snake.rotating_angle -= 0.02')
-        elif bonus_type == 'self_speeddown':
-            if sender.speed > 1:
-                sender.speed /= 1.5
-                add_event(sender.events_queue, 'snake.speed *= 1.5')
-        elif bonus_type == 'all_speeddown':
-            for snake in others:
-                if snake.speed > 1:
-                    snake.speed /= 1.5
-                    add_event(snake.events_queue, 'snake.speed *= 1.5')
-        elif bonus_type == 'reversed_commands':
-            for snake in others:
-                snake.inversed_commands = True
-                add_event(snake.events_queue,
-                          'snake.inversed_commands = False')
-        elif bonus_type == 'right_angles':
-            for snake in others:
-                snake.previous_angles.append(snake.rotating_angle)
-                snake.rotating_angle = pi/2
-                add_event(snake.events_queue, 'snake.restoreAngle()')
-        elif bonus_type == 'self_right_angles':
-            sender.previous_angles.append(sender.rotating_angle)
-            sender.rotating_angle = pi/2
-            add_event(sender.events_queue, 'snake.restoreAngle()')
-        elif bonus_type == 'thickness_up':
-            for snake in others:
-                snake.thickness *= 2
-                add_event(snake.events_queue,
-                          'snake.thickness /= 2')
-        elif bonus_type == 'thickness_down':
-            sender.thickness /= 2
-            add_event(sender.events_queue, 'snake.thickness *= 2')
-        elif bonus_type == 'bonus_chance':
+        if bonus_type == 'bonus_chance':
             # Precaution to not have bonus poping all around the map
             if self.bonus_proba <= 0.16:
                 if self.bonus_proba <= 0.04:
@@ -900,24 +910,6 @@ class GUI:
                 else:
                     self.bonus_proba *= 2
                     add_event(self.events_queue, 'self.bonus_proba /= 2')
-        elif bonus_type == 'rotation_angle_down':
-            for snake in others:
-                snake.rotating_angle /= 1.5
-                add_event(snake.events_queue, 'snake.rotating_angle *= 1.5')
-        elif bonus_type == 'change_color':
-            for snake in others:
-                snake.color = sender.color
-                snake.updateHeadColor()
-                add_event(snake.events_queue,
-                          'snake.color = snake.color_unchanged; \
-                          snake.updateHeadColor()')
-        elif bonus_type == 'change_chance_hole':
-            for snake in others:
-                snake.hole_probability *= 10
-                add_event(snake.events_queue, 'snake.hole_probability /= 10')
-        elif bonus_type == 'invincible':
-            sender.invincible = True
-            add_event(sender.events_queue, 'snake.invincible = False')
         elif bonus_type == 'clean_map':
             heads = [snake.head_coord for snake in self.snakes]
             self.bonus_list = list()
@@ -957,7 +949,6 @@ class GUI:
                 for snake in self.snakes:
                     head_list.append((snake.head_coord, snake.angle))
                     snake.invincible = True
-                    add_event(snake.events_queue, 'snake.invincible = False')
                 save = head_list[:]
                 shuffle(head_list)
                 while head_list == save:
@@ -965,18 +956,23 @@ class GUI:
                 for i in range(len(head_list)):
                     self.snakes[i].head_coord = head_list[i][0]
                     self.snakes[i].angle = head_list[i][1]
-        elif bonus_type[:6] == 'portal':
-            el = self.canvas.find_withtag('bonus,'+bonus_type)[0]
-            sender.head_coord = self.canvas.coords(el)
-            self.canvas.delete(el)
         elif bonus_type == 'penetrating_wall':
             self.canvas_frame.configure(bg='blue')
             add_event(self.events_queue,
                       'self.canvas_frame.configure(bg="grey")')
             for snake in self.snakes:
                 snake.penetrate = True
-                add_event(snake.events_queue,
-                          'snake.penetrate = False')
+
+        bonus_name = bonus_type if bonus_type[:6] != 'portal' else 'portal'
+        add_event = lambda l, f: l.append(self.list_from(f, bonus_name))
+        idx = GUI.BONUS_FILES.index(bonus_name)
+        if GUI.BONUS_APPLICATION[idx] == ON_SELF:
+            exec(GUI.BONUS_EXECUTION[idx])
+            add_event(sender.events_queue, GUI.BONUS_CODE[idx])
+        elif GUI.BONUS_APPLICATION[idx] == ON_OTHERS:
+            for snake in others:
+                exec(GUI.BONUS_EXECUTION[idx])
+                add_event(snake.events_queue, GUI.BONUS_CODE[idx])
 
     def shrinkMap(self):
         '''
@@ -1131,9 +1127,9 @@ class GUI:
                 color = color[2]
                 self.regular_colors.append(color)
         current_bg = text[len(text)-2].split('=')
-        self.current_bg = current_bg[1].strip() 
+        self.current_bg = current_bg[1].strip()
         current_fg = text[len(text)-1].split('=')
-        self.current_fg = current_fg[1].strip() 
-                
+        self.current_fg = current_fg[1].strip()
+
 if __name__ == '__main__':
     GUI()
