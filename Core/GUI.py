@@ -34,6 +34,7 @@ class GUI:
     MAXIMUM_NAME_LENGTH = 16  # chars
     MAX_CANVAS_BORDER = 200  # pixels
 
+    MUSIC_DEFAULT_DIR = 'data/'
     BACKGROUND_MUSIC = 'data/background_music.wav'
     SAVE_FILE = 'data/save.txt'
 
@@ -50,7 +51,8 @@ class GUI:
                          ON_GUI, ON_GUI,
                          ON_SELF, ON_GUI,
                          ON_SELF, ON_GUI,
-                         ON_SELF, ON_GUI]
+                         ON_SELF, ON_GUI,
+                         ON_SELF]
     BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'thickness_down', 'all_speeddown',
                    'reversed_commands', 'all_speedup',
@@ -60,7 +62,8 @@ class GUI:
                    'clean_map', 'negative',
                    'invincible', 'shrink_map',
                    'self_right_angles', 'swap_position',
-                   'portal', 'penetrating_wall']
+                   'portal', 'penetrating_wall',
+                   'artic']
     BONUS_EXECUTION = ['sender.speed += 1; sender.rotating_angle += 0.02;' \
                        'sender.addArc(self.bonus_dict[bonus_type])',
                        'if sender.speed > 1: sender.speed /= 1.5',
@@ -85,7 +88,9 @@ class GUI:
                        'e = self.canvas.find_withtag("bonus,"+bonus_type)[0];'\
                        'sender.head_coord = self.canvas.coords(e);' \
                        'self.canvas.delete(e)',
-                       'pass  # gui']
+                       'pass  # gui',
+                       'sender.artic = True; sender.color = "white";' \
+                       'sender.updateHeadColor()']
     BONUS_CODE = ['snake.speed -= 1; snake.rotating_angle -= 0.02',
                   'snake.speed *= 1.5',
                   'snake.thickness *= 2',
@@ -106,7 +111,9 @@ class GUI:
                   'snake.restoreAngle()',
                   '',
                   'pass',
-                  'self.canvas_frame.configure(bg="grey")']
+                  'self.canvas_frame.configure(bg="grey")',
+                  'snake.artic = False; snake.color = snake.color_unchanged;' \
+                  'snake.updateHeadColor()']
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -116,7 +123,8 @@ class GUI:
                    300, 300,
                    300, 300,
                    750, 200,
-                   10,  300]
+                   10,  300,
+                   600]
     BONUS_PROBABILITIES = [1, 1.2,
                            1, 1,
                            1, 1,
@@ -126,7 +134,8 @@ class GUI:
                            1, 1,
                            0.8, 1,
                            1, 1,
-                           1, 1]
+                           1, 1,
+                           0.5]
 
     def __init__(self):
         # window
@@ -632,8 +641,9 @@ class GUI:
         self.sound_button.configure(text='Sound ' + sound)
 
     def choose_music(self):
-        types = [("WVA files", "*.wav")]
-        tmp = askopenfilename(filetypes=types)
+        types = [("WVA files", "*.wav"), ("MP3 files", "*.mp3")]
+        tmp = askopenfilename(filetypes=types,
+                              initialdir=GUI.MUSIC_DEFAULT_DIR)
         if tmp is not None:
             GUI.BACKGROUND_MUSIC = tmp
             self.music_manager.changeTrack(GUI.BACKGROUND_MUSIC)
@@ -956,10 +966,6 @@ class GUI:
                 for i in range(len(head_angle_list)):
                     self.snakes[i].head_coord = head_angle_list[i][0]
                     self.snakes[i].angle = head_angle_list[i][1]
-        elif bonus_type[:6] == 'portal':
-            el = self.canvas.find_withtag('bonus,'+bonus_type)[0]
-            sender.head_coord = self.canvas.coords(el)
-            self.canvas.delete(el)
         elif bonus_type == 'penetrating_wall':
             self.canvas_frame.configure(bg='blue')
             add_event(self.events_queue,
