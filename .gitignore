@@ -6,3 +6,6 @@ Core/__pycache__/
 
 # result from flake8
 flake8.txt
+
+#tmp windows files
+*.db

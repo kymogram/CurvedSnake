@@ -111,7 +111,7 @@ class Snake:
                 # if snakes catches a bonus delete it from canvas
                 # and ask GUI to handle it
                 self.canvas.delete(first_elem)
-                self.parent.handleBonus(self.name, info[1])
+                self.parent.handleBonus(self, info[1])
 
     def handleMove(self, step):
         '''
