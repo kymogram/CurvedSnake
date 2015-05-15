@@ -944,17 +944,22 @@ class GUI:
             self.shrinkMap()
         elif bonus_type == 'swap_position':
             if len(self.snakes) > 1:
-                head_list = list()
+                head_angle_list = list()
                 for snake in self.snakes:
-                    head_list.append((snake.head_coord, snake.angle))
+                    head_angle_list.append((snake.head_coord, snake.angle))
                     snake.invincible = True
-                save = head_list[:]
-                shuffle(head_list)
-                while head_list == save:
-                    shuffle(head_list)
-                for i in range(len(head_list)):
-                    self.snakes[i].head_coord = head_list[i][0]
-                    self.snakes[i].angle = head_list[i][1]
+                    add_event(snake.events_queue, 'snake.invincible = False')
+                save = head_angle_list[:]
+                shuffle(head_angle_list)
+                while head_angle_list == save:
+                    shuffle(head_angle_list)
+                for i in range(len(head_angle_list)):
+                    self.snakes[i].head_coord = head_angle_list[i][0]
+                    self.snakes[i].angle = head_angle_list[i][1]
+        elif bonus_type[:6] == 'portal':
+            el = self.canvas.find_withtag('bonus,'+bonus_type)[0]
+            sender.head_coord = self.canvas.coords(el)
+            self.canvas.delete(el)
         elif bonus_type == 'penetrating_wall':
             self.canvas_frame.configure(bg='blue')
             add_event(self.events_queue,
