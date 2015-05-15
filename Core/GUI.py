@@ -898,7 +898,6 @@ class GUI:
         '''
             sets bonus and handles events queues
         '''
-        sender = None
         others = [snake for snake in self.snakes_alive if snake is not sender]
         add_event = lambda l, f: l.append(self.list_from(f, bonus_type))
         if bonus_type == 'bonus_chance':
