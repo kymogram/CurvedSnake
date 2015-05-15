@@ -956,10 +956,6 @@ class GUI:
                 for i in range(len(head_angle_list)):
                     self.snakes[i].head_coord = head_angle_list[i][0]
                     self.snakes[i].angle = head_angle_list[i][1]
-        elif bonus_type[:6] == 'portal':
-            el = self.canvas.find_withtag('bonus,'+bonus_type)[0]
-            sender.head_coord = self.canvas.coords(el)
-            self.canvas.delete(el)
         elif bonus_type == 'penetrating_wall':
             self.canvas_frame.configure(bg='blue')
             add_event(self.events_queue,
