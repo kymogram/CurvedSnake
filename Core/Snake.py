@@ -37,6 +37,8 @@ class Snake:
         self.color = color
         # when color is changed by bonus, original color must be kept somewhere
         self.color_unchanged = color
+        self.artic = False
+        self.changed_artic = False
         self.alive = True
         self.invincible = False
         self.time_before_start = True
@@ -160,6 +162,15 @@ class Snake:
         '''
             function when the snake is refreshed to make it move.
         '''
+        if self.artic:
+            if step%44 == 0 and not self.changed_artic:
+                self.color = '#00ffff'
+                self.updateHeadColor()
+                self.changed_artic = True
+            elif step%44 == 0 and self.changed_artic:
+                self.color = 'white'
+                self.updateHeadColor()
+                self.changed_artic = False
         # stop moving if snake is dead
         if not self.alive:
             return
