@@ -34,6 +34,7 @@ class GUI:
     MAXIMUM_NAME_LENGTH = 16  # chars
     MAX_CANVAS_BORDER = 200  # pixels
 
+    MUSIC_DEFAULT_DIR = 'data/'
     BACKGROUND_MUSIC = 'data/background_music.wav'
     SAVE_FILE = 'data/save.txt'
 
@@ -633,7 +634,7 @@ class GUI:
 
     def choose_music(self):
         types = [("WVA files", "*.wav")]
-        tmp = askopenfilename(filetypes=types)
+        tmp = askopenfilename(filetypes=types, initialdir=GUI.MUSIC_DEFAULT_DIR)
         if tmp is not None:
             GUI.BACKGROUND_MUSIC = tmp
             self.music_manager.changeTrack(GUI.BACKGROUND_MUSIC)
