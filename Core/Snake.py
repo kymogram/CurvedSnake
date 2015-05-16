@@ -197,14 +197,14 @@ class Snake:
             else:
                 self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
-        
+
     def checkSpecialColor(self, step):
         if self.artic:
-            if step%44 == 0 and not self.changed_artic:
+            if step % 44 == 0 and not self.changed_artic:
                 self.color = '#00ffff'
                 self.updateHeadColor()
                 self.changed_artic = True
-            elif step%44 == 0 and self.changed_artic:
+            elif step % 44 == 0 and self.changed_artic:
                 self.color = 'white'
                 self.updateHeadColor()
                 self.changed_artic = False
