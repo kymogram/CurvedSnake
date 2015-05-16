@@ -4,9 +4,3 @@ class Profile:
         self.has_artic = has_artic
         self.commands = commands
         self.color = color
-    
-    def __str__(self):
-        return 'name={}, artic={}, commands={}, color={}'.format(self.name, self.has_artic, self.commands, self.color)
-    
-    def __repr__(self):
-        return str(self)
