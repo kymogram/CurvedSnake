@@ -156,6 +156,9 @@ class GUI:
         self.regular_player = []
         self.regular_colors = []
         self.regular_commands = []
+        self.tmp_artic_achiv = []
+        self.artic_achiv = []
+        self.counter_special = []
         self.left_key = self.right_key = False
         self.is_regular_list = False
         self.current_bg = 'white'
@@ -880,6 +883,17 @@ class GUI:
         if self.new_game:
             self.score_snake_list = [[0, self.snakes[i]]
                                      for i in range(len(self.snakes))]
+            self.counter_special = [[0, 0, 0] for i in range(len(self.snakes))]
+            # do not initialize to False if it is True before
+            for i in range(len(self.snakes_names)):
+                if self.snakes_names[i] in self.regular_player:
+                    try:
+                        self.tmp_artic_achiv.append(eval(self.artic_achiv[i]))
+                    except:
+                        self.tmp_artic_achiv.append(False)
+                else:
+                    self.tmp_artic_achiv.append(False)
+            self.tmp_artic_achiv = [False for i in range(len(self.snakes))]
         self.scoreShown()
         self.startInvincible()
         # add create_text with command of each player
@@ -985,12 +999,16 @@ class GUI:
                 add_event(snake.events_queue, GUI.BONUS_CODE[idx])
                 
     def checkSpecialCounter(self, snake, bonus_type):
+        idx = self.snakes.index(snake)
         if bonus_type == 'negative':
-            snake.counter_nega += 1
+            self.counter_special[idx][0] += 1
         elif bonus_type == 'change_color':
-            snake.counter_color += 1
+            self.counter_special[idx][1] += 1
         elif bonus_type == 'artic':
-            snake.counter_artic += 1
+            self.counter_special[idx][2] += 1
+        if self.counter_special[idx][2] >= 2 and self.counter_special[idx][1] >= 5 and \
+                                        self.counter_special[idx][0] >= 5:
+            self.tmp_artic_achiv[idx] = True
 
     def shrinkMap(self):
         '''
@@ -1108,7 +1126,9 @@ class GUI:
                    'color = {}\n' \
                    .format(self.regular_player[i], self.regular_commands[i][0],
                            self.regular_commands[i][1], self.regular_colors[i])
+            text_achiv = 'tmp_artic_achiv = {}\n'.format(self.tmp_artic_achiv[i])
             save.write(text)
+            save.write(text_achiv)
         sec_text = 'bg = {}\n' \
                    'fg = {}\n' \
                    .format(self.current_bg, self.current_fg)
@@ -1125,7 +1145,7 @@ class GUI:
             pass
         text = save.readlines()
         for i in range(len(text)-2):
-            x = i % 4
+            x = i % 5
             if x == 0:
                 name = text[i].strip()
                 self.regular_player.append(name)
@@ -1140,14 +1160,21 @@ class GUI:
                     self.regular_commands.append([Lcommand, Rcommand])
                 except:
                     pass
-            else:
+            elif x == 3:
                 color = text[i].split()
                 color = color[2]
                 self.regular_colors.append(color)
-        current_bg = text[len(text)-2].split('=')
-        self.current_bg = current_bg[1].strip()
-        current_fg = text[len(text)-1].split('=')
-        self.current_fg = current_fg[1].strip()
+            else:
+                artic_achiv = text[i].split('=')
+                artic_achiv = artic_achiv[1].strip()
+                self.tmp_artic_achiv.append(eval(artic_achiv))
+        try:
+            current_bg = text[len(text)-2].split('=')
+            self.current_bg = current_bg[1].strip()
+            current_fg = text[len(text)-1].split('=')
+            self.current_fg = current_fg[1].strip()
+        except:
+            pass
 
 if __name__ == '__main__':
     GUI()

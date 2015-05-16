@@ -42,10 +42,6 @@ class Snake:
         self.alive = True
         self.invincible = False
         self.time_before_start = True
-        # counter for achievement
-        self.counter_artic = 0
-        self.counter_color = 0
-        self.counter_nega = 0
         # boolean to be able to go throught the wall
         self.penetrate = False
         # used to tag items in canvas
