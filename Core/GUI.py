@@ -14,6 +14,7 @@ from .MusicManager import MusicManager
 from .ComboColorBox import ComboColorBox
 from .RandomBonus import RandomBonus
 from .Profile import Profile
+from .BonusManager import BonusManager
 
 ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
 
@@ -51,17 +52,6 @@ class GUI:
     BONUS_SPRITES_DIMENSIONS = (32, 32)  # pixels
     BONUS_DIRECTORY = './sprites/'
     IMAGE_EXTENSION = 'gif'
-    BONUS_APPLICATION = [ON_SELF, ON_SELF,
-                         ON_SELF, ON_OTHERS,
-                         ON_OTHERS, ON_OTHERS,
-                         ON_OTHERS, ON_OTHERS,
-                         ON_OTHERS, ON_GUI,
-                         ON_OTHERS, ON_OTHERS,
-                         ON_GUI, ON_GUI,
-                         ON_SELF, ON_GUI,
-                         ON_SELF, ON_GUI,
-                         ON_SELF, ON_GUI,
-                         ON_SELF]
     BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'thickness_down', 'all_speeddown',
                    'reversed_commands', 'all_speedup',
@@ -73,56 +63,67 @@ class GUI:
                    'self_right_angles', 'swap_position',
                    'portal', 'penetrating_wall',
                    'artic']
-    BONUS_EXECUTION = ['sender.speed += 1; sender.rotating_angle += 0.02;' \
-                       'sender.addArc(self.bonus_dict[bonus_type])',
-                       'if sender.speed > 1: sender.speed /= 1.5',
-                       'sender.thickness /= 2',
-                       'if snake.speed > 1: snake.speed /= 1.5',
-                       'snake.inversed_commands = True',
-                       'snake.speed += 1; snake.rotating_angle += 0.02',
-                       'snake.previous_angles.append(snake.rotating_angle);' \
-                       'snake.rotating_angle = pi/2',
-                       'snake.thickness *= 2',
-                       'snake.rotating_angle /= 1.5',
-                       'pass  # gui',
-                       'snake.color = sender.color; snake.updateHeadColor()',
-                       'snake.hole_probability *= 10',
-                       'pass  # gui',
-                       'pass  # gui',
-                       'sender.invincible = True',
-                       'pass  # gui',
-                       'sender.previous_angles.append(sender.rotating_angle);'\
-                       'sender.rotating_angle = pi/2',
-                       'pass  # gui',
-                       'e = self.canvas.find_withtag("bonus,"+bonus_type)[0];'\
-                       'sender.head_coord = self.canvas.coords(e);' \
-                       'self.canvas.delete(e)',
-                       'pass  # gui',
-                       'sender.artic = True; sender.color = "white";' \
-                       'sender.updateHeadColor()']
-    BONUS_CODE = ['snake.speed -= 1; snake.rotating_angle -= 0.02',
-                  'snake.speed *= 1.5',
-                  'snake.thickness *= 2',
-                  'snake.speed *= 1.5',
-                  'snake.inversed_commands = False',
-                  'snake.speed -= 1; snake.rotating_angle -= 0.02',
-                  'snake.restoreAngle()',
-                  'snake.thickness /= 2',
-                  'snake.rotating_angle *= 1.5',
-                  '',
-                  'snake.color = snake.color_unchanged;' \
-                  'snake.updateHeadColor()',
-                  'snake.hole_probability /= 10',
-                  '',
-                  '',
-                  'snake.invincible = False',
-                  '',
-                  'snake.restoreAngle()',
-                  '',
-                  'pass',
-                  'self.canvas_frame.configure(bg="grey")',
-                  'snake.artic = False; snake.color = snake.color_unchanged;' \
-                  'snake.updateHeadColor()']
+    # BONUS_APPLICATION = [ON_SELF, ON_SELF,
+                         # ON_SELF, ON_OTHERS,
+                         # ON_OTHERS, ON_OTHERS,
+                         # ON_OTHERS, ON_OTHERS,
+                         # ON_OTHERS, ON_GUI,
+                         # ON_OTHERS, ON_OTHERS,
+                         # ON_GUI, ON_GUI,
+                         # ON_SELF, ON_GUI,
+                         # ON_SELF, ON_GUI,
+                         # ON_SELF, ON_GUI,
+                         # ON_SELF]
+    # BONUS_EXECUTION = ['sender.speed += 1; sender.rotating_angle += 0.02;' \
+                       # 'sender.addArc(self.bonus_dict[bonus_type])',
+                       # 'if sender.speed > 1: sender.speed /= 1.5',
+                       # 'sender.thickness /= 2',
+                       # 'if snake.speed > 1: snake.speed /= 1.5',
+                       # 'snake.inversed_commands = True',
+                       # 'snake.speed += 1; snake.rotating_angle += 0.02',
+                       # 'snake.previous_angles.append(snake.rotating_angle);' \
+                       # 'snake.rotating_angle = pi/2',
+                       # 'snake.thickness *= 2',
+                       # 'snake.rotating_angle /= 1.5',
+                       # 'pass  # gui',
+                       # 'snake.color = sender.color; snake.updateHeadColor()',
+                       # 'snake.hole_probability *= 10',
+                       # 'pass  # gui',
+                       # 'pass  # gui',
+                       # 'sender.invincible = True',
+                       # 'pass  # gui',
+                       # 'sender.previous_angles.append(sender.rotating_angle);'\
+                       # 'sender.rotating_angle = pi/2',
+                       # 'pass  # gui',
+                       # 'e = self.canvas.find_withtag("bonus,"+bonus_type)[0];'\
+                       # 'sender.head_coord = self.canvas.coords(e);' \
+                       # 'self.canvas.delete(e)',
+                       # 'pass  # gui',
+                       # 'sender.artic = True; sender.color = "white";' \
+                       # 'sender.updateHeadColor()']
+    # BONUS_CODE = ['snake.speed -= 1; snake.rotating_angle -= 0.02',
+                  # 'snake.speed *= 1.5',
+                  # 'snake.thickness *= 2',
+                  # 'snake.speed *= 1.5',
+                  # 'snake.inversed_commands = False',
+                  # 'snake.speed -= 1; snake.rotating_angle -= 0.02',
+                  # 'snake.restoreAngle()',
+                  # 'snake.thickness /= 2',
+                  # 'snake.rotating_angle *= 1.5',
+                  # '',
+                  # 'snake.color = snake.color_unchanged;' \
+                  # 'snake.updateHeadColor()',
+                  # 'snake.hole_probability /= 10',
+                  # '',
+                  # '',
+                  # 'snake.invincible = False',
+                  # '',
+                  # 'snake.restoreAngle()',
+                  # '',
+                  # 'pass',
+                  # 'self.canvas_frame.configure(bg="grey")',
+                  # 'snake.artic = False; snake.color = snake.color_unchanged;' \
+                  # 'snake.updateHeadColor()']
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -179,6 +180,7 @@ class GUI:
         self.music_manager.start()
         self.portal_index = 0
         self.profiles = dict()
+        self.bonus_manager = BonusManager(self)
         # init
         self.loadBonusImages()
         self.loadSave()
@@ -909,89 +911,90 @@ class GUI:
         for snake in players:
             add_event(snake.events_queue, 'snake.time_before_start = False')
 
-    def list_from(self, action, bonus):
-        return [action, self.bonus_dict[bonus].length]
+    # def list_from(self, action, bonus):
+        # return [action, self.bonus_dict[bonus].length]
 
     def handleBonus(self, sender, bonus_type):
         '''
             sets bonus and handles events queues
         '''
         self.checkSpecialCounter(sender, bonus_type)
-        others = [snake for snake in self.snakes_alive if snake is not sender]
-        add_event = lambda l, f: l.append(self.list_from(f, bonus_type))
-        if bonus_type == 'bonus_chance':
+        self.bonus_manager.handleBonus(sender, bonus_type, self.bonus_proba)
+        # others = [snake for snake in self.snakes_alive if snake is not sender]
+        # add_event = lambda l, f: l.append(self.list_from(f, bonus_type))
+        # if bonus_type == 'bonus_chance':
             # Precaution to not have bonus poping all around the map
-            if self.bonus_proba <= 0.16:
-                if self.bonus_proba <= 0.04:
-                    self.bonus_proba *= 4
-                    add_event(self.events_queue, 'self.bonus_proba /= 4')
-                else:
-                    self.bonus_proba *= 2
-                    add_event(self.events_queue, 'self.bonus_proba /= 2')
-        elif bonus_type == 'clean_map':
-            heads = [snake.head_coord for snake in self.snakes]
-            self.bonus_list = list()
-            for bonus in GUI.BONUS_FILES:
-                for el in self.canvas.find_withtag('bonus,' + bonus):
-                    tmp = list(self.canvas.coords(el)) + [bonus]
-                    self.bonus_list.append(tmp)
-            self.canvas.delete(ALL)
-            for i in range(len(heads)):
-                x, y = heads[i]
-                snake = self.snakes[i]
-                r = snake.thickness//2
-                tag = 'snake,{},-1'.format(snake.name)
-                snake.head_id = self.canvas.create_oval(x-r, y-r, x+r, y+r,
-                                                        fill=snake.color,
-                                                        outline=snake.color,
-                                                        tag=tag)
-            for x, y, name in self.bonus_list:
-                tag = 'bonus,{}'.format(self.bonus_dict[name].name)
-                self.canvas.create_image(x, y,
-                                         image=self.bonus_dict[name].image,
-                                         tags=tag)
-        elif bonus_type == 'negative':
-            self.canvas.configure(bg=self.invertColor('black'))
-            add_event(self.events_queue, 'self.canvas.configure(bg="black")')
-            for snake in self.snakes:
-                snake.color = self.invertColor(snake.getColor())
-                snake.updateHeadColor()
-                add_event(snake.events_queue,
-                          'snake.color = snake.color_unchanged; \
-                           snake.updateHeadColor()')
-        elif bonus_type == 'shrink_map':
-            self.shrinkMap()
-        elif bonus_type == 'swap_position':
-            if len(self.snakes) > 1:
-                head_angle_list = list()
-                for snake in self.snakes:
-                    head_angle_list.append((snake.head_coord, snake.angle))
-                    snake.invincible = True
-                    add_event(snake.events_queue, 'snake.invincible = False')
-                save = head_angle_list[:]
-                shuffle(head_angle_list)
-                while head_angle_list == save:
-                    shuffle(head_angle_list)
-                for i in range(len(head_angle_list)):
-                    self.snakes[i].head_coord = head_angle_list[i][0]
-                    self.snakes[i].angle = head_angle_list[i][1]
-        elif bonus_type == 'penetrating_wall':
-            self.canvas_frame.configure(bg='blue')
-            add_event(self.events_queue,
-                      'self.canvas_frame.configure(bg="grey")')
-            for snake in self.snakes:
-                snake.penetrate = True
+            # if self.bonus_proba <= 0.16:
+                # if self.bonus_proba <= 0.04:
+                    # self.bonus_proba *= 4
+                    # add_event(self.events_queue, 'self.bonus_proba /= 4')
+                # else:
+                    # self.bonus_proba *= 2
+                    # add_event(self.events_queue, 'self.bonus_proba /= 2')
+        # elif bonus_type == 'clean_map':
+            # heads = [snake.head_coord for snake in self.snakes]
+            # self.bonus_list = list()
+            # for bonus in GUI.BONUS_FILES:
+                # for el in self.canvas.find_withtag('bonus,' + bonus):
+                    # tmp = list(self.canvas.coords(el)) + [bonus]
+                    # self.bonus_list.append(tmp)
+            # self.canvas.delete(ALL)
+            # for i in range(len(heads)):
+                # x, y = heads[i]
+                # snake = self.snakes[i]
+                # r = snake.thickness//2
+                # tag = 'snake,{},-1'.format(snake.name)
+                # snake.head_id = self.canvas.create_oval(x-r, y-r, x+r, y+r,
+                                                        # fill=snake.color,
+                                                        # outline=snake.color,
+                                                        # tag=tag)
+            # for x, y, name in self.bonus_list:
+                # tag = 'bonus,{}'.format(self.bonus_dict[name].name)
+                # self.canvas.create_image(x, y,
+                                         # image=self.bonus_dict[name].image,
+                                         # tags=tag)
+        # elif bonus_type == 'negative':
+            # self.canvas.configure(bg=self.invertColor('black'))
+            # add_event(self.events_queue, 'self.canvas.configure(bg="black")')
+            # for snake in self.snakes:
+                # snake.color = self.invertColor(snake.getColor())
+                # snake.updateHeadColor()
+                # add_event(snake.events_queue,
+                          # 'snake.color = snake.color_unchanged; \
+                           # snake.updateHeadColor()')
+        # elif bonus_type == 'shrink_map':
+            # self.shrinkMap()
+        # elif bonus_type == 'swap_position':
+            # if len(self.snakes) > 1:
+                # head_angle_list = list()
+                # for snake in self.snakes:
+                    # head_angle_list.append((snake.head_coord, snake.angle))
+                    # snake.invincible = True
+                    # add_event(snake.events_queue, 'snake.invincible = False')
+                # save = head_angle_list[:]
+                # shuffle(head_angle_list)
+                # while head_angle_list == save:
+                    # shuffle(head_angle_list)
+                # for i in range(len(head_angle_list)):
+                    # self.snakes[i].head_coord = head_angle_list[i][0]
+                    # self.snakes[i].angle = head_angle_list[i][1]
+        # elif bonus_type == 'penetrating_wall':
+            # self.canvas_frame.configure(bg='blue')
+            # add_event(self.events_queue,
+                      # 'self.canvas_frame.configure(bg="grey")')
+            # for snake in self.snakes:
+                # snake.penetrate = True
 
-        bonus_name = bonus_type if bonus_type[:6] != 'portal' else 'portal'
-        add_event = lambda l, f: l.append(self.list_from(f, bonus_name))
-        idx = GUI.BONUS_FILES.index(bonus_name)
-        if GUI.BONUS_APPLICATION[idx] == ON_SELF:
-            exec(GUI.BONUS_EXECUTION[idx])
-            add_event(sender.events_queue, GUI.BONUS_CODE[idx])
-        elif GUI.BONUS_APPLICATION[idx] == ON_OTHERS:
-            for snake in others:
-                exec(GUI.BONUS_EXECUTION[idx])
-                add_event(snake.events_queue, GUI.BONUS_CODE[idx])
+        # bonus_name = bonus_type if bonus_type[:6] != 'portal' else 'portal'
+        # add_event = lambda l, f: l.append(self.list_from(f, bonus_name))
+        # idx = GUI.BONUS_FILES.index(bonus_name)
+        # if GUI.BONUS_APPLICATION[idx] == ON_SELF:
+            # exec(GUI.BONUS_EXECUTION[idx])
+            # add_event(sender.events_queue, GUI.BONUS_CODE[idx])
+        # elif GUI.BONUS_APPLICATION[idx] == ON_OTHERS:
+            # for snake in others:
+                # exec(GUI.BONUS_EXECUTION[idx])
+                # add_event(snake.events_queue, GUI.BONUS_CODE[idx])
 
     def checkSpecialCounter(self, snake, bonus_type):
         idx = self.snakes.index(snake)
