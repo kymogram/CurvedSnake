@@ -159,10 +159,7 @@ class GUI:
         self.timer = GUI.DEFAULT_REFRESH_TIMER
         # GUI variables
         self.first_open_game = True
-        self.snakes_colors = []
-        self.commands_list = []
-        self.snakes_names = []
-        self.artic_achiv = []
+        self.snakes_ingame = []
         self.counter_special = []
         self.left_key = self.right_key = False
         self.is_regular_list = False
@@ -254,13 +251,13 @@ class GUI:
         '''
             updates the snakes direction according to the pressed keys
         '''
-        for i in range(len(self.commands_list)):
-            left, right = self.commands_list[i]
+        for snake in self.snakes:
+            left, right = self.profiles[snake.name].commands
             if self.inputs.isPressed(left):
-                self.snakes[i].turn(TURN_LEFT)
+                snake.turn(TURN_LEFT)
             elif self.inputs.isPressed(right):
-                self.snakes[i].turn(TURN_RIGHT)
-            if abs(self.snakes[i].rotating_angle - pi/2) < 0.0001:
+                snake.turn(TURN_RIGHT)
+            if abs(snake.rotating_angle - pi/2) < 0.0001:
                 self.inputs.release(left if self.inputs.isPressed(left)
                                     else right)
 
@@ -489,8 +486,7 @@ class GUI:
                                      bg=self.current_bg, fg=self.current_fg)
         self.tmp_widget.append(self.player_ingame)
         self.player_ingame.bind('<<ListboxSelect>>', self.showInfoPlayer)
-        if not self.first_open_game:
-            self.player_ingame.insert(END, *self.snakes_names)
+        self.player_ingame.insert(END, *self.snakes_ingame)
         self.first_open_game = False
         self.player_ingame.pack()
         b = Button(self.window, text='Remove player',
@@ -704,7 +700,7 @@ class GUI:
             creates a random name for next player
         '''
         self.current_name.set('{}{}'.format(GUI.DEFAULT_NAME,
-                              '' if len(self.snakes_names) == 0
+                              '' if len(self.snakes_ingame) == 0
                               else '_' + str(randint(0, 666))))
 
     def removePlayer(self):
@@ -715,9 +711,7 @@ class GUI:
         if len(self.player_ingame.curselection()) > 0:
             self.player_ingame.delete(self.selected[0])
             try:
-                del self.snakes_names[self.selected[0]]
-                del self.snakes_colors[self.selected[0]]
-                del self.commands_list[self.selected[0]]
+                del self.snakes_ingame[self.selected[0]]
             except:
                 showwarning('No one to remove', 'You have no one to remove')
         else:
@@ -743,32 +737,35 @@ class GUI:
             callback function when 'add player' button is pressed: saves
             config to create a new character for the following play.
         '''
-        if len(self.snakes_names) == 6:
+        if len(self.snakes_ingame) == 6:
             showwarning("can't add another player",
                         'Maximum number of player is 6')
             return
         if len(self.player_known.curselection()) > 0:
-            if self.tmp_selection in self.snakes_names:
+            if self.name_selection in self.snakes_ingame:
                 showwarning('Added player',
                             'This player is already going to play!')
                 return
-            if self.profiles[self.tmp_selection].color in self.snakes_colors:
-                showwarning('Color', 'The color chosen is already taken')
+            current_color = self.profiles[self.name_selection].color
+            for snake in self.player_ingame.get(0, END):
+                if current_color == self.profiles[snake].color:
+                    showwarning('Color', 'The color chosen is already taken')
                 return
-            for commands in self.commands_list:
+            for snake in self.player_ingame.get(0, END):
+                commands = self.profiles[snake.name].commands
                 if self.move_command_left in commands or \
                    self.move_command_right in commands:
                     showwarning('Commands',
                                 'Another player has already those commands')
                     return
-            self.snakes_colors.append(self.profiles[self.tmp_selection].color)
-            self.commands_list.append(self.profiles[self.tmp_selection].commands)
-            self.snakes_names.append(self.tmp_selection)
-            self.player_ingame.insert(END, self.tmp_selection)
-            self.random_colors_used.append(self.profiles[self.tmp_selection].color)
-            self.random_commands_used.append(self.profiles[self.tmp_selection].commands)
+            self.snakes_ingame.append(self.name_selection)
+            self.player_ingame.insert(END, self.name_selection)
+            color = self.profiles[self.name_selection].color
+            self.random_colors_used.append(color)
+            commands = self.profiles[self.name_selection].commands
+            self.random_commands_used.append(commands)
         else:
-            if self.current_name.get() in self.snakes_names:
+            if self.current_name.get() in self.snakes_ingame:
                 showwarning('Added player',
                             'This player is already going to play!')
                 return
@@ -779,37 +776,36 @@ class GUI:
             if self.current_name.get() in self.profiles:
                 showwarning('Name player', 'This name is already taken')
                 return
-            if self.current_color in self.snakes_colors:
-                showwarning('Color', 'The color chosen is already taken')
+            # for snake in self.snakes_ingame:
+            for snake in self.player_ingame.get(0, END):
+                if self.current_color == self.profiles[snake].color:
+                    showwarning('Color', 'The color chosen is already taken')
                 return
-            for commands in self.commands_list:
+            for snake in self.player_ingame.get(0, END):
+                commands = self.profiles[snake.name].commands
                 if self.move_command_left in commands or \
                    self.move_command_right in commands:
                     showwarning('Commands',
                                 'Another player has already those commands')
                     return
-            self.snakes_names.append(self.current_name.get())
+            self.snakes_ingame.append(self.current_name.get())
             self.player_ingame.insert(END, self.current_name.get())
-            self.snakes_colors.append(self.current_color)
-            self.commands_list.append([self.move_command_left,
-                                       self.move_command_right])
             self.random_colors_used.append(self.current_color)
             self.random_commands_used.append((self.move_command_left,
                                               self.move_command_right))
-            profile = Profile(self.current_name.get(),
-                              False,
-                              self.commands_list[-1],
-                              self.snakes_colors[-1])
-            self.profiles[profile.name] = profile
+            name = self.current_name.get()
+            commands = [self.move_command_left, self.move_command_right]
+            self.profiles[name] = Profile(name, False, commands,
+                                          self.current_color)
             self.selectRandomCommands()
             self.selectRandomColor()
             self.selectRandomName()
-            
+
     def playPressed(self):
         '''
             callback function when play button is pressed
         '''
-        if len(self.snakes_names) == 0:
+        if len(self.snakes_ingame) == 0:
             showwarning('No player', 'You have to add player to play')
         else:
             self.clearWindow()
@@ -817,7 +813,7 @@ class GUI:
             self.checkResizeMap()
             self.geometryMap()
             self.window.after(1000, self.play)
-            
+
     def checkResizeMap(self):
         if self.mini_map.get() == 0:
             self.canvas_height -= 150
@@ -882,10 +878,10 @@ class GUI:
         xmin = ymin = GUI.DEFAULT_SPAWN_OFFSET
         xmax, ymax = self.canvas_width, self.canvas_height
         self.snakes = list()
-        for i in range(len(self.snakes_names)):
-            snake = Snake(self, self.snakes_names[i],
-                          randint(xmin, xmax-xmin), randint(ymin, ymax-ymin),
-                          random()*2*pi, self.snakes_colors[i])
+        for name in self.snakes_ingame:
+            snake = Snake(self, name, randint(xmin, xmax-xmin),
+                          randint(ymin, ymax-ymin), random()*2*pi,
+                          self.profiles[name].color)
             self.snakes.append(snake)
         self.snakes_alive = self.snakes[:]
         # self.new_game will be used only to initialize the score
@@ -1035,17 +1031,17 @@ class GUI:
             if len(self.player_ingame.curselection()) > 0 or \
                len(self.player_known.curselection()) > 0:
                 if self.is_regular_list:
-                    self.profiles[self.tmp_selection].commands[0] = e.keysym
+                    self.profiles[self.name_selection].commands[0] = e.keysym
                 else:
-                    self.profiles[self.tmp_selection].commands[0] = e.keysym
+                    self.profiles[self.name_selection].commands[0] = e.keysym
             self.move_command_left = e.keysym
             self.button_left.configure(text=self.move_command_left)
             self.button_left.configure(bg=self.current_bg)
         elif self.right_key:
             if self.is_regular_list:
-                self.profiles[self.tmp_selection].commands[1] = e.keysym
+                self.profiles[self.name_selection].commands[1] = e.keysym
             if len(self.player_ingame.curselection()) > 0:
-                self.profiles[self.tmp_selection].commands[1] = e.keysym
+                self.profiles[self.name_selection].commands[1] = e.keysym
             self.move_command_right = e.keysym
             self.button_right.configure(text=self.move_command_right)
             self.button_right.configure(bg=self.current_bg)
@@ -1057,11 +1053,8 @@ class GUI:
         '''
             callback function when combobox selection changes
         '''
-        if len(self.player_ingame.curselection()) > 0:
-            self.profiles[self.tmp_selection].color = self.color.getColor()
-        elif len(self.player_known.curselection()) > 0:
-            self.profiles[self.tmp_selection].color = self.color.getColor()
-        self.current_color = self.color.getColor().lower()
+        self.profiles[self.name_selection].color = self.color.getColor()
+        self.current_color = self.color.getColor()
 
     def showInfoPlayer(self, e):
         '''
@@ -1078,22 +1071,21 @@ class GUI:
                 if self.profiles[profile].color not in self.colors_list:
                     self.colors_list.append(self.profiles[profile].color)
             selection = e.widget.get(self.selected[0])
-            self.tmp_selection = selection
+            self.name_selection = selection
             if self.is_regular_list:
-                text = self.profiles[self.tmp_selection].commands[0]
-                self.button_left.configure(text=text)
-                self.button_right['text'] = self.profiles[self.tmp_selection].commands[1]
-                idx = self.colors_list.index(self.profiles[self.tmp_selection].color)
-                self.color.set(self.colors_list[idx])
-                self.move_command_left = self.profiles[self.tmp_selection].commands[0]
-                self.move_command_right = self.profiles[self.tmp_selection].commands[1]
+                left = self.profiles[self.name_selection].commands[0]
+                self.button_left['text'] = text
+                right = self.profiles[self.name_selection].commands[1]
+                self.button_right['text'] = text
+                self.color.set(self.profiles[self.name_selection].color)
+                self.move_command_left = left
+                self.move_command_right = right
             else:
-                self.id = self.snakes_names.index(selection)
-                self.button_left.configure(text=self.commands_list[self.id][0])
-                text = self.commands_list[self.id][1]
+                self.id = self.snakes_ingame.index(selection)
+                self.button_left.configure(text=self.profiles[selection].commands[0])
+                text = self.profiles[selection].commands[1]
                 self.button_right.configure(text=text)
-                idx = self.colors_list.index(self.snakes_colors[self.id])
-                self.color.set(self.colors_list[idx])
+                self.color.set(self.profiles[selection].color)
 
     def removeFocus(self, e):
         '''
