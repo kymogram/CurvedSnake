@@ -580,7 +580,7 @@ class GUI:
         b.grid(row=8)
 
     def changeStyle(self):
-        self.top_style = Toplevel()
+        self.top_style = Toplevel(bg=self.current_bg)
         self.top_style.grab_set()
         self.tmp_widget_top_style = []
         save_bg = self.current_bg
@@ -609,7 +609,7 @@ class GUI:
         self.tmp_widget_top_style.append(try_option)
         try_option.grid(padx=10, pady=5)
         set_option = Button(try_set_frame, text='Set',
-                            command=lambda: self.top_style.destroy(),
+                            command=self.setStyle,
                             bg=self.current_bg, fg=self.current_fg)
         self.tmp_widget_top_style.append(set_option)
         set_option.grid(row=0, column=1, padx=10, pady=5)
@@ -624,6 +624,10 @@ class GUI:
 
     def destroyStyle(self, old_bg, old_fg):
         self.updateStyle(old_bg, old_fg)
+        self.top_style.destroy()
+        
+    def setStyle(self):
+        self.updateStyle()
         self.top_style.destroy()
 
     def updateStyle(self, old_bg=None, old_fg=None):
@@ -752,9 +756,9 @@ class GUI:
             for snake in self.player_ingame.get(0, END):
                 if current_color == self.profiles[snake].color:
                     showwarning('Color', 'The color chosen is already taken')
-                return
+                    return
             for snake in self.player_ingame.get(0, END):
-                commands = self.profiles[snake.name].commands
+                commands = self.profiles[snake].commands
                 if self.move_command_left in commands or \
                    self.move_command_right in commands:
                     showwarning('Commands',
@@ -904,12 +908,9 @@ class GUI:
         '''
             set invincible at the beggining of the game to situate yourself
         '''
-        players = list()
-        for snake in self.snakes:
-            players.append(snake)
         add_event = lambda l, f: l.append([f, 150])
-        for snake in players:
-            add_event(snake.events_queue, 'snake.time_before_start = False')
+        for snake in self.snakes:
+            add_event(snake.events_queue, 'snake.in_time_before_start = False')
 
     # def list_from(self, action, bonus):
         # return [action, self.bonus_dict[bonus].length]

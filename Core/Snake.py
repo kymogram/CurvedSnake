@@ -41,7 +41,7 @@ class Snake:
         self.changed_artic = False
         self.alive = True
         self.invincible = False
-        self.time_before_start = True
+        self.in_time_before_start = True
         # boolean to be able to go throught the wall
         self.penetrate = False
         # used to tag items in canvas
@@ -184,7 +184,7 @@ class Snake:
             i += 1
         # radius of oval
         r = self.thickness // 2
-        if not self.invincible and not self.time_before_start:
+        if not self.invincible and not self.in_time_before_start:
             self.handleMove(step)
             if self.hole == 0:
                 tag = 'snake,{},{}'.format(self.name, step)
