@@ -332,6 +332,7 @@ class GUI:
         self.stopRefreshing()
         self.canvas_height = self.window_height - 200
         self.canvas_width = self.window_width - 200
+        self.checkResizeMap()
         for elem in self.score_snake_list:
             if elem[0] >= (len(self.snakes)-1)*10:
                 self.finish_game = True
@@ -813,14 +814,17 @@ class GUI:
                     self.regular_colors.append(self.snakes_colors[i])
                     self.regular_commands.append(self.commands_list[i])
             self.available_bonus = 1 in [b.get() for b in self.add_bonus_bool]
-            if self.mini_map.get() == 0:
-                self.canvas_height -= 150
-                self.canvas_width -= 150
-            elif self.mini_map.get() == 1:
-                self.canvas_height -= 300
-                self.canvas_width -= 300
+            self.checkResizeMap()
             self.geometryMap()
             self.window.after(1000, self.play)
+            
+    def checkResizeMap(self):
+        if self.mini_map.get() == 0:
+            self.canvas_height -= 150
+            self.canvas_width -= 150
+        elif self.mini_map.get() == 1:
+            self.canvas_height -= 300
+            self.canvas_width -= 300
 
     def modifBgColor(self, side):
         '''
