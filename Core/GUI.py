@@ -42,6 +42,7 @@ class GUI:
                   'command right = {}\n' \
                   'color = {}\n' \
                   'tmp_artic_achiv = {}\n'
+    NB_DATA_IN_SAVE = 5
 
     BONUS_TIME = 300  # frames
     BONUS_SPRITES_DIMENSIONS = (32, 32)  # pixels
@@ -1140,40 +1141,25 @@ class GUI:
         '''
         try:
             save = open(GUI.SAVE_FILE, "r")
-        except:
-            pass
-        text = save.readlines()
-        for i in range(len(text)-2):
-            x = i % 5
-            if x == 0:
-                name = text[i].strip()
-                self.regular_player.append(name)
-            elif x == 1:
-                Lcommand = text[i].split('=')
-                Lcommand = Lcommand[1].strip()
-
-            elif x == 2:
-                Rcommand = text[i].split('=')
-                Rcommand = Rcommand[1].strip()
-                try:
-                    self.regular_commands.append([Lcommand, Rcommand])
-                except:
-                    pass
-            elif x == 3:
-                color = text[i].split()
-                color = color[2]
-                self.regular_colors.append(color)
-            else:
-                artic_achiv = text[i].split('=')
-                artic_achiv = artic_achiv[1].strip()
-                self.tmp_artic_achiv.append(eval(artic_achiv))
-        try:
-            current_bg = text[len(text)-2].split('=')
-            self.current_bg = current_bg[1].strip()
-            current_fg = text[len(text)-1].split('=')
-            self.current_fg = current_fg[1].strip()
-        except:
-            pass
+            text = save.readlines()
+            nb_data = GUI.NB_DATA_IN_SAVE
+            get_data = lambda s: s.split('=')[1].strip()
+            for i in range((len(text)-2)//nb_data):
+                self.regular_player.append(text[nb_data*i].strip())
+                commands = [get_data(text[nb_data*i + 1]),
+                            get_data(text[nb_data*i + 2])]
+                self.regular_commands.append(commands)
+                self.regular_colors.append(get_data(text[nb_data*i + 3]))
+                has_artic = get_data(text[nb_data*i + 4]) == 'True'
+                self.tmp_artic_achiv.append(has_artic)
+            self.current_bg = get_data(text[-2])
+            self.current_fg = get_data(text[-1])
+        except Exception as e:
+            showwarning("Load error", "Error loading save file")
+            self.regular_commands = []
+            self.regular_colors = []
+            self.regular_player = []
+            self.tmp_artic_achiv = []
 
 if __name__ == '__main__':
     GUI()
