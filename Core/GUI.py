@@ -6,11 +6,11 @@ from random import randint, random, choice, shuffle
 from math import pi
 
 from .Snake import *
-from .Bonus import *
-from .InputManager import *
-from .MusicManager import *
-from .ComboColorBox import *
-from .RandomBonus import *
+from .Bonus import Bonus
+from .InputManager import InputManager
+from .MusicManager import MusicManager
+from .ComboColorBox import ComboColorBox
+from .RandomBonus import RandomBonus
 
 ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
 
@@ -897,13 +897,14 @@ class GUI:
             # do not initialize to False if it is True before
             for i in range(len(self.snakes_names)):
                 if self.snakes_names[i] in self.regular_player:
+                    idx = self.regular_player.index(self.snakes_names[i])
                     try:
-                        self.tmp_artic_achiv.append(eval(self.artic_achiv[i]))
+                        self.tmp_artic_achiv[idx] = self.artic_achiv[i]
                     except:
                         self.tmp_artic_achiv.append(False)
                 else:
                     self.tmp_artic_achiv.append(False)
-            self.tmp_artic_achiv = [False for i in range(len(self.snakes))]
+            # self.tmp_artic_achiv = [False for i in range(len(self.snakes))]
         self.scoreShown()
         self.startInvincible()
         # add create_text with command of each player
@@ -1129,6 +1130,11 @@ class GUI:
             save paramers about players habit
         '''
         save = open(GUI.SAVE_FILE, "w")
+        print(self.regular_player,
+              self.regular_commands,
+              self.regular_commands,
+              self.regular_colors,
+              self.tmp_artic_achiv, sep='\n')
         text = ''.join([GUI.SAVE_FORMAT.format(self.regular_player[i],
                                                self.regular_commands[i][0],
                                                self.regular_commands[i][1],

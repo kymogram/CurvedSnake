@@ -2,8 +2,8 @@ from tkinter import *
 from math import cos, sin
 from random import random, randint
 
-from .Arc import *
-from .Particles import *
+from .Arc import Arc
+from .Particles import Particles
 
 DEFAULT_SPEED = 1.6
 DEFAULT_THICKNESS = 6
