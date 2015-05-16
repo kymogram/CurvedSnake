@@ -37,6 +37,11 @@ class GUI:
     MUSIC_DEFAULT_DIR = 'data/'
     BACKGROUND_MUSIC = 'data/background_music.wav'
     SAVE_FILE = 'data/save.txt'
+    SAVE_FORMAT = '{}\n' \
+                  'command left = {}\n' \
+                  'command right = {}\n' \
+                  'color = {}\n' \
+                  'tmp_artic_achiv = {}\n'
 
     BONUS_TIME = 300  # frames
     BONUS_SPRITES_DIMENSIONS = (32, 32)  # pixels
@@ -997,7 +1002,7 @@ class GUI:
             for snake in others:
                 exec(GUI.BONUS_EXECUTION[idx])
                 add_event(snake.events_queue, GUI.BONUS_CODE[idx])
-                
+
     def checkSpecialCounter(self, snake, bonus_type):
         idx = self.snakes.index(snake)
         if bonus_type == 'negative':
@@ -1006,8 +1011,9 @@ class GUI:
             self.counter_special[idx][1] += 1
         elif bonus_type == 'artic':
             self.counter_special[idx][2] += 1
-        if self.counter_special[idx][2] >= 2 and self.counter_special[idx][1] >= 5 and \
-                                        self.counter_special[idx][0] >= 5:
+        if self.counter_special[idx][2] >= 2 and \
+           self.counter_special[idx][1] >= 5 and \
+           self.counter_special[idx][0] >= 5:
             self.tmp_artic_achiv[idx] = True
 
     def shrinkMap(self):
@@ -1119,20 +1125,14 @@ class GUI:
             save paramers about players habit
         '''
         save = open(GUI.SAVE_FILE, "w")
-        for i in range(len(self.regular_player)):
-            text = '{}\n' \
-                   'command left = {}\n' \
-                   'command right = {}\n' \
-                   'color = {}\n' \
-                   .format(self.regular_player[i], self.regular_commands[i][0],
-                           self.regular_commands[i][1], self.regular_colors[i])
-            text_achiv = 'tmp_artic_achiv = {}\n'.format(self.tmp_artic_achiv[i])
-            save.write(text)
-            save.write(text_achiv)
-        sec_text = 'bg = {}\n' \
-                   'fg = {}\n' \
-                   .format(self.current_bg, self.current_fg)
-        save.write(sec_text)
+        text = ''.join([GUI.SAVE_FORMAT.format(self.regular_player[i],
+                                               self.regular_commands[i][0],
+                                               self.regular_commands[i][1],
+                                               self.regular_colors[i],
+                                               self.tmp_artic_achiv[i])
+                        for i in range(len(self.regular_player))]) + \
+               ('bg = {}\nfg = {}\n'.format(self.current_bg, self.current_fg))
+        save.write(text)
         self.window.destroy()
 
     def loadSave(self):
