@@ -4,7 +4,7 @@ from tkinter.filedialog import askopenfilename
 
 import shelve
 
-from random import randint, random, choice, shuffle
+from random import randint, random, choice
 from math import pi
 
 from .Snake import *
@@ -63,67 +63,7 @@ class GUI:
                    'self_right_angles', 'swap_position',
                    'portal', 'penetrating_wall',
                    'artic']
-    # BONUS_APPLICATION = [ON_SELF, ON_SELF,
-                         # ON_SELF, ON_OTHERS,
-                         # ON_OTHERS, ON_OTHERS,
-                         # ON_OTHERS, ON_OTHERS,
-                         # ON_OTHERS, ON_GUI,
-                         # ON_OTHERS, ON_OTHERS,
-                         # ON_GUI, ON_GUI,
-                         # ON_SELF, ON_GUI,
-                         # ON_SELF, ON_GUI,
-                         # ON_SELF, ON_GUI,
-                         # ON_SELF]
-    # BONUS_EXECUTION = ['sender.speed += 1; sender.rotating_angle += 0.02;' \
-                       # 'sender.addArc(self.bonus_dict[bonus_type])',
-                       # 'if sender.speed > 1: sender.speed /= 1.5',
-                       # 'sender.thickness /= 2',
-                       # 'if snake.speed > 1: snake.speed /= 1.5',
-                       # 'snake.inversed_commands = True',
-                       # 'snake.speed += 1; snake.rotating_angle += 0.02',
-                       # 'snake.previous_angles.append(snake.rotating_angle);' \
-                       # 'snake.rotating_angle = pi/2',
-                       # 'snake.thickness *= 2',
-                       # 'snake.rotating_angle /= 1.5',
-                       # 'pass  # gui',
-                       # 'snake.color = sender.color; snake.updateHeadColor()',
-                       # 'snake.hole_probability *= 10',
-                       # 'pass  # gui',
-                       # 'pass  # gui',
-                       # 'sender.invincible = True',
-                       # 'pass  # gui',
-                       # 'sender.previous_angles.append(sender.rotating_angle);'\
-                       # 'sender.rotating_angle = pi/2',
-                       # 'pass  # gui',
-                       # 'e = self.canvas.find_withtag("bonus,"+bonus_type)[0];'\
-                       # 'sender.head_coord = self.canvas.coords(e);' \
-                       # 'self.canvas.delete(e)',
-                       # 'pass  # gui',
-                       # 'sender.artic = True; sender.color = "white";' \
-                       # 'sender.updateHeadColor()']
-    # BONUS_CODE = ['snake.speed -= 1; snake.rotating_angle -= 0.02',
-                  # 'snake.speed *= 1.5',
-                  # 'snake.thickness *= 2',
-                  # 'snake.speed *= 1.5',
-                  # 'snake.inversed_commands = False',
-                  # 'snake.speed -= 1; snake.rotating_angle -= 0.02',
-                  # 'snake.restoreAngle()',
-                  # 'snake.thickness /= 2',
-                  # 'snake.rotating_angle *= 1.5',
-                  # '',
-                  # 'snake.color = snake.color_unchanged;' \
-                  # 'snake.updateHeadColor()',
-                  # 'snake.hole_probability /= 10',
-                  # '',
-                  # '',
-                  # 'snake.invincible = False',
-                  # '',
-                  # 'snake.restoreAngle()',
-                  # '',
-                  # 'pass',
-                  # 'self.canvas_frame.configure(bg="grey")',
-                  # 'snake.artic = False; snake.color = snake.color_unchanged;' \
-                  # 'snake.updateHeadColor()']
+    
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,

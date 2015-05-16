@@ -1,4 +1,6 @@
 from tkinter import *
+from random import shuffle
+from math import pi
 
 ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
 
@@ -37,9 +39,9 @@ class BonusManager:
                  'sender.previous_angles.append(sender.rotating_angle);'\
                   'sender.rotating_angle = pi/2',
                  'pass  # gui',
-                 'e = self.canvas.find_withtag("bonus,"+bonus_ref)[0];'\
-                  'sender.head_coord = self.canvas.coords(e);' \
-                  'self.canvas.delete(e)',
+                 'e = canvas.find_withtag("bonus,"+bonus_ref)[0];'\
+                  'sender.head_coord = canvas.coords(e);' \
+                  'canvas.delete(e)',
                  'snake.penetrate = True',
                  'sender.artic = True; sender.color = "white";' \
                   'sender.updateHeadColor()']
@@ -67,18 +69,6 @@ class BonusManager:
                  'snake.penetrate = False',
                  'snake.artic = False; snake.color = snake.color_unchanged;' \
                   'snake.updateHeadColor()']
-
-    DURATIONS = [300, 600,
-                 500, 250,
-                 300, 250,
-                 300, 300,
-                 300,  50,
-                 350, 750,
-                 300, 300,
-                 300, 300,
-                 750, 200,
-                 10,  300,
-                 600]
     
     ON_ACTION = [ON_SELF, ON_SELF,
                  ON_SELF, ON_OTHERS,
@@ -142,7 +132,6 @@ class BonusManager:
                                              tags=tag)
         elif bonus_ref == 'negative':
             canvas.configure(bg='white')
-            # canvas.configure(bg=self.invertColor('black'))
             add_event(self.gui.events_queue, 'self.canvas.configure(bg="black")')
             for snake in self.gui.snakes:
                 snake.color = self.invertColor(snake.getColor())
