@@ -1031,7 +1031,6 @@ class GUI:
 
     def invertColor(self, color):
         rgb = self.canvas.winfo_rgb(color)
-        # inv_red, inv_green, inv_blue = [255 - c//256 for c in rgb]
         return "#{:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
 
     def setCommand(self, e):
