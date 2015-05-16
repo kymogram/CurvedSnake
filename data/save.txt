@@ -3,26 +3,20 @@ command left = a
 command right = z
 color = pink
 tmp_artic_achiv = False
-bg = white
-fg = black
 Robin
 command left = s
 command right = d
 color = yellow
 tmp_artic_achiv = False
-bg = white
-fg = black
 Greentears
 command left = Left
 command right = Right
 color = #ffffff
 tmp_artic_achiv = False
-bg = white
-fg = black
 Louis2809
 command left = b
 command right = n
 color = red
 tmp_artic_achiv = False
-bg = #000000
-fg = red
+bg = white
+fg = black
