@@ -4,8 +4,8 @@ from math import pi
 
 ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
 
-
-BONUS_FILES = ['self_speedup', 'self_speeddown',
+class BonusManager:
+    BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'thickness_down', 'all_speeddown',
                    'reversed_commands', 'all_speedup',
                    'right_angles', 'thickness_up',
@@ -17,7 +17,6 @@ BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'portal', 'penetrating_wall',
                    'artic']
 
-class BonusManager:
     EXEC_CODE = ['sender.speed += 1; sender.rotating_angle += 0.02;' \
                   'sender.addArc(self.gui.bonus_dict[bonus_ref])',
                  'if sender.speed > 1: sender.speed /= 1.5',
@@ -164,7 +163,7 @@ class BonusManager:
 
         bonus_name = bonus_ref if bonus_ref[:6] != 'portal' else 'portal'
         add_event = lambda l, f: l.append(self.listFrom(f, bonus_name))
-        idx = BONUS_FILES.index(bonus_name)
+        idx = BonusManager.BONUS_FILES.index(bonus_name)
         if self.ON_ACTION[idx] == ON_SELF:
             exec(self.EXEC_CODE[idx])
             add_event(sender.events_queue, self.TODO_CODE[idx])

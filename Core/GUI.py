@@ -75,6 +75,7 @@ class GUI:
                    750, 200,
                    10,  300,
                    600]
+
     BONUS_PROBABILITIES = [1, 1.2,
                            1, 1,
                            1, 1,
@@ -156,11 +157,13 @@ class GUI:
             loads all the bonus image
         '''
         self.bonus_dict = dict()
-        for i in range(len(GUI.BONUS_FILES)):
-            path = '{}{}.{}'.format(GUI.BONUS_DIRECTORY, GUI.BONUS_FILES[i],
+        for i in range(len(BonusManager.BONUS_FILES)):
+            path = '{}{}.{}'.format(GUI.BONUS_DIRECTORY,
+                                    BonusManager.BONUS_FILES[i],
                                     GUI.IMAGE_EXTENSION)
-            bonus = Bonus(GUI.BONUS_FILES[i], path, GUI.BONUS_TIMES[i])
-            self.bonus_dict[GUI.BONUS_FILES[i]] = bonus
+            bonus = Bonus(BonusManager.BONUS_FILES[i],
+                          path, GUI.BONUS_TIMES[i])
+            self.bonus_dict[BonusManager.BONUS_FILES[i]] = bonus
         self.add_bonus_bool = [IntVar(value=1) for
                                i in range(len(self.bonus_dict))]
 
@@ -467,7 +470,7 @@ class GUI:
                                            fg=self.current_fg)
         available_bonus_frame.grid()
         for i in range(len(self.bonus_dict)):
-            bonus = self.bonus_dict[GUI.BONUS_FILES[i]]
+            bonus = self.bonus_dict[BonusManager.BONUS_FILES[i]]
             add_bonus = Checkbutton(available_bonus_frame,
                                     image=bonus.image,
                                     variable=self.add_bonus_bool[i],
@@ -797,7 +800,7 @@ class GUI:
     def refreshBonusProba(self):
         l = [b.get() == 1 for b in self.add_bonus_bool]
         self.bonus_generator = RandomBonus(GUI.BONUS_PROBABILITIES, l,
-                                           GUI.BONUS_FILES)
+                                           BonusManager.BONUS_FILES)
 
     def play(self):
         '''
