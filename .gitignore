@@ -12,4 +12,4 @@ flake8.txt
 sprites/*.db
 
 #no need to push the save file each time it is modified
-/data/save.txt
+save/data.shelf.*

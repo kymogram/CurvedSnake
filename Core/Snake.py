@@ -2,8 +2,8 @@ from tkinter import *
 from math import cos, sin
 from random import random, randint
 
-from .Arc import *
-from .Particles import *
+from .Arc import Arc
+from .Particles import Particles
 
 DEFAULT_SPEED = 1.6
 DEFAULT_THICKNESS = 6
@@ -162,15 +162,7 @@ class Snake:
         '''
             function when the snake is refreshed to make it move.
         '''
-        if self.artic:
-            if step%44 == 0 and not self.changed_artic:
-                self.color = '#00ffff'
-                self.updateHeadColor()
-                self.changed_artic = True
-            elif step%44 == 0 and self.changed_artic:
-                self.color = 'white'
-                self.updateHeadColor()
-                self.changed_artic = False
+        self.checkSpecialColor(step)
         # stop moving if snake is dead
         if not self.alive:
             return
@@ -205,6 +197,17 @@ class Snake:
             else:
                 self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
+
+    def checkSpecialColor(self, step):
+        if self.artic:
+            if step % 44 == 0 and not self.changed_artic:
+                self.color = '#00ffff'
+                self.updateHeadColor()
+                self.changed_artic = True
+            elif step % 44 == 0 and self.changed_artic:
+                self.color = 'white'
+                self.updateHeadColor()
+                self.changed_artic = False
 
     def restoreAngle(self):
         self.rotating_angle = self.previous_angles.pop(0)
