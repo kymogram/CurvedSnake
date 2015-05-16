@@ -2,6 +2,8 @@ from tkinter.messagebox import showwarning
 from tkinter.font import Font
 from tkinter.filedialog import askopenfilename
 
+import shelve
+
 from random import randint, random, choice, shuffle
 from math import pi
 
@@ -11,6 +13,7 @@ from .InputManager import InputManager
 from .MusicManager import MusicManager
 from .ComboColorBox import ComboColorBox
 from .RandomBonus import RandomBonus
+from .Profile import Profile
 
 ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
 
@@ -36,7 +39,7 @@ class GUI:
 
     MUSIC_DEFAULT_DIR = 'data/'
     BACKGROUND_MUSIC = 'data/background_music.wav'
-    SAVE_FILE = 'data/save.txt'
+    SAVE_FILE = 'save/data.shelf'
     SAVE_FORMAT = '{}\n' \
                   'command left = {}\n' \
                   'command right = {}\n' \
@@ -159,10 +162,6 @@ class GUI:
         self.snakes_colors = []
         self.commands_list = []
         self.snakes_names = []
-        self.regular_player = []
-        self.regular_colors = []
-        self.regular_commands = []
-        self.tmp_artic_achiv = []
         self.artic_achiv = []
         self.counter_special = []
         self.left_key = self.right_key = False
@@ -182,6 +181,7 @@ class GUI:
         self.music_manager = MusicManager(GUI.BACKGROUND_MUSIC)
         self.music_manager.start()
         self.portal_index = 0
+        self.profiles = dict()
         # init
         self.loadBonusImages()
         self.loadSave()
@@ -439,7 +439,7 @@ class GUI:
         self.player_known = Listbox(self.window, selectmode=SINGLE,
                                     bg=self.current_bg, fg=self.current_fg)
         self.tmp_widget.append(self.player_known)
-        self.player_known.insert(END, *self.regular_player)
+        self.player_known.insert(END, *list(self.profiles.keys()))
         self.player_known.bind('<<ListboxSelect>>', self.showInfoPlayer)
         self.player_known.pack()
         b = Button(self.window, text='Remove regular player',
@@ -729,12 +729,11 @@ class GUI:
             selection from current lists
         '''
         if len(self.player_known.curselection()) > 0:
+            name = self.player_known.get(self.selected[0])
             self.player_known.delete(self.selected[0])
-            try:
-                del self.regular_player[self.selected[0]]
-                del self.regular_colors[self.selected[0]]
-                del self.regular_commands[self.selected[0]]
-            except:
+            if name in self.profiles:
+                del self.profiles[name]
+            else:
                 showwarning('No one to remove', 'You have no one to remove')
         else:
             showwarning('No one chosen', 'Choose a player to remove')
@@ -749,11 +748,11 @@ class GUI:
                         'Maximum number of player is 6')
             return
         if len(self.player_known.curselection()) > 0:
-            if self.regular_player[self.id] in self.snakes_names:
+            if self.tmp_selection in self.snakes_names:
                 showwarning('Added player',
                             'This player is already going to play!')
                 return
-            if self.regular_colors[self.id] in self.snakes_colors:
+            if self.profiles[self.tmp_selection].color in self.snakes_colors:
                 showwarning('Color', 'The color chosen is already taken')
                 return
             for commands in self.commands_list:
@@ -762,12 +761,12 @@ class GUI:
                     showwarning('Commands',
                                 'Another player has already those commands')
                     return
-            self.snakes_colors.append(self.regular_colors[self.id])
-            self.commands_list.append(self.regular_commands[self.id])
-            self.snakes_names.append(self.regular_player[self.id])
-            self.player_ingame.insert(END, self.regular_player[self.id])
-            self.random_colors_used.append(self.regular_colors[self.id])
-            self.random_commands_used.append(self.regular_commands[self.id])
+            self.snakes_colors.append(self.profiles[self.tmp_selection].color)
+            self.commands_list.append(self.profiles[self.tmp_selection].commands)
+            self.snakes_names.append(self.tmp_selection)
+            self.player_ingame.insert(END, self.tmp_selection)
+            self.random_colors_used.append(self.profiles[self.tmp_selection].color)
+            self.random_commands_used.append(self.profiles[self.tmp_selection].commands)
         else:
             if self.current_name.get() in self.snakes_names:
                 showwarning('Added player',
@@ -777,7 +776,7 @@ class GUI:
                 showwarning('Name player',
                             'Your name is too long. Pick a new one')
                 return
-            if self.current_name.get() in self.regular_player:
+            if self.current_name.get() in self.profiles:
                 showwarning('Name player', 'This name is already taken')
                 return
             if self.current_color in self.snakes_colors:
@@ -797,10 +796,15 @@ class GUI:
             self.random_colors_used.append(self.current_color)
             self.random_commands_used.append((self.move_command_left,
                                               self.move_command_right))
+            profile = Profile(self.current_name.get(),
+                              False,
+                              self.commands_list[-1],
+                              self.snakes_colors[-1])
+            self.profiles[profile.name] = profile
             self.selectRandomCommands()
             self.selectRandomColor()
             self.selectRandomName()
-
+            
     def playPressed(self):
         '''
             callback function when play button is pressed
@@ -809,11 +813,6 @@ class GUI:
             showwarning('No player', 'You have to add player to play')
         else:
             self.clearWindow()
-            for i in range(len(self.snakes_names)):
-                if self.snakes_names[i] not in self.regular_player:
-                    self.regular_player.append(self.snakes_names[i])
-                    self.regular_colors.append(self.snakes_colors[i])
-                    self.regular_commands.append(self.commands_list[i])
             self.available_bonus = 1 in [b.get() for b in self.add_bonus_bool]
             self.checkResizeMap()
             self.geometryMap()
@@ -889,22 +888,11 @@ class GUI:
                           random()*2*pi, self.snakes_colors[i])
             self.snakes.append(snake)
         self.snakes_alive = self.snakes[:]
-        # self.new_game will be used only to initialiate the score
+        # self.new_game will be used only to initialize the score
         if self.new_game:
             self.score_snake_list = [[0, self.snakes[i]]
                                      for i in range(len(self.snakes))]
             self.counter_special = [[0, 0, 0] for i in range(len(self.snakes))]
-            # do not initialize to False if it is True before
-            for i in range(len(self.snakes_names)):
-                if self.snakes_names[i] in self.regular_player:
-                    idx = self.regular_player.index(self.snakes_names[i])
-                    try:
-                        self.tmp_artic_achiv[idx] = self.artic_achiv[i]
-                    except:
-                        self.tmp_artic_achiv.append(False)
-                else:
-                    self.tmp_artic_achiv.append(False)
-            # self.tmp_artic_achiv = [False for i in range(len(self.snakes))]
         self.scoreShown()
         self.startInvincible()
         # add create_text with command of each player
@@ -1020,7 +1008,7 @@ class GUI:
         if self.counter_special[idx][2] >= 2 and \
            self.counter_special[idx][1] >= 5 and \
            self.counter_special[idx][0] >= 5:
-            self.tmp_artic_achiv[idx] = True
+            self.profiles[snake.name].has_artic = True
 
     def shrinkMap(self):
         '''
@@ -1047,17 +1035,17 @@ class GUI:
             if len(self.player_ingame.curselection()) > 0 or \
                len(self.player_known.curselection()) > 0:
                 if self.is_regular_list:
-                    self.regular_commands[self.id][0] = e.keysym
+                    self.profiles[self.tmp_selection].commands[0] = e.keysym
                 else:
-                    self.commands_list[self.id][0] = e.keysym
+                    self.profiles[self.tmp_selection].commands[0] = e.keysym
             self.move_command_left = e.keysym
             self.button_left.configure(text=self.move_command_left)
             self.button_left.configure(bg=self.current_bg)
         elif self.right_key:
             if self.is_regular_list:
-                self.regular_commands[self.id][1] = e.keysym
+                self.profiles[self.tmp_selection].commands[1] = e.keysym
             if len(self.player_ingame.curselection()) > 0:
-                self.commands_list[self.id][1] = e.keysym
+                self.profiles[self.tmp_selection].commands[1] = e.keysym
             self.move_command_right = e.keysym
             self.button_right.configure(text=self.move_command_right)
             self.button_right.configure(bg=self.current_bg)
@@ -1070,9 +1058,9 @@ class GUI:
             callback function when combobox selection changes
         '''
         if len(self.player_ingame.curselection()) > 0:
-            self.snakes_colors[self.id] = self.color.getColor()
+            self.profiles[self.tmp_selection].color = self.color.getColor()
         elif len(self.player_known.curselection()) > 0:
-            self.regular_colors[self.id] = self.color.getColor()
+            self.profiles[self.tmp_selection].color = self.color.getColor()
         self.current_color = self.color.getColor().lower()
 
     def showInfoPlayer(self, e):
@@ -1086,19 +1074,19 @@ class GUI:
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
             self.colors_list = self.color.getListAllColors()
-            for elem in self.regular_colors:
-                if elem not in self.colors_list:
-                    self.colors_list.append(elem)
+            for profile in self.profiles:
+                if self.profiles[profile].color not in self.colors_list:
+                    self.colors_list.append(self.profiles[profile].color)
             selection = e.widget.get(self.selected[0])
+            self.tmp_selection = selection
             if self.is_regular_list:
-                self.id = self.regular_player.index(selection)
-                text = self.regular_commands[self.id][0]
+                text = self.profiles[self.tmp_selection].commands[0]
                 self.button_left.configure(text=text)
-                self.button_right['text'] = self.regular_commands[self.id][1]
-                idx = self.colors_list.index(self.regular_colors[self.id])
+                self.button_right['text'] = self.profiles[self.tmp_selection].commands[1]
+                idx = self.colors_list.index(self.profiles[self.tmp_selection].color)
                 self.color.set(self.colors_list[idx])
-                self.move_command_left = self.regular_commands[self.id][0]
-                self.move_command_right = self.regular_commands[self.id][1]
+                self.move_command_left = self.profiles[self.tmp_selection].commands[0]
+                self.move_command_right = self.profiles[self.tmp_selection].commands[1]
             else:
                 self.id = self.snakes_names.index(selection)
                 self.button_left.configure(text=self.commands_list[self.id][0])
@@ -1129,20 +1117,11 @@ class GUI:
         '''
             save paramers about players habit
         '''
-        save = open(GUI.SAVE_FILE, "w")
-        print(self.regular_player,
-              self.regular_commands,
-              self.regular_commands,
-              self.regular_colors,
-              self.tmp_artic_achiv, sep='\n')
-        text = ''.join([GUI.SAVE_FORMAT.format(self.regular_player[i],
-                                               self.regular_commands[i][0],
-                                               self.regular_commands[i][1],
-                                               self.regular_colors[i],
-                                               self.tmp_artic_achiv[i])
-                        for i in range(len(self.regular_player))]) + \
-               ('bg = {}\nfg = {}\n'.format(self.current_bg, self.current_fg))
-        save.write(text)
+        db = shelve.open(GUI.SAVE_FILE, flag='n', writeback=True)
+        for profile in self.profiles:
+            db[profile] = self.profiles[profile]
+        db.sync()
+        db.close()
         self.window.destroy()
 
     def loadSave(self):
@@ -1150,26 +1129,12 @@ class GUI:
             load the parameters saved about players habit
         '''
         try:
-            save = open(GUI.SAVE_FILE, "r")
-            text = save.readlines()
-            nb_data = GUI.NB_DATA_IN_SAVE
-            get_data = lambda s: s.split('=')[1].strip()
-            for i in range((len(text)-2)//nb_data):
-                self.regular_player.append(text[nb_data*i].strip())
-                commands = [get_data(text[nb_data*i + 1]),
-                            get_data(text[nb_data*i + 2])]
-                self.regular_commands.append(commands)
-                self.regular_colors.append(get_data(text[nb_data*i + 3]))
-                has_artic = get_data(text[nb_data*i + 4]) == 'True'
-                self.tmp_artic_achiv.append(has_artic)
-            self.current_bg = get_data(text[-2])
-            self.current_fg = get_data(text[-1])
-        except Exception as e:
-            showwarning("Load error", "Error loading save file")
-            self.regular_commands = []
-            self.regular_colors = []
-            self.regular_player = []
-            self.tmp_artic_achiv = []
+            db = shelve.open(GUI.SAVE_FILE, flag='r')
+        except:
+            showwarning('Load error', 'Unable to find a save file')
+        else:
+            for profile in db:
+                self.profiles[profile] = db[profile]
 
 if __name__ == '__main__':
     GUI()

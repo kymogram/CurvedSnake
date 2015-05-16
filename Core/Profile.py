@@ -1,0 +1,12 @@
+class Profile:
+    def __init__(self, name, has_artic, commands, color):
+        self.name = name
+        self.has_artic = has_artic
+        self.commands = commands
+        self.color = color
+    
+    def __str__(self):
+        return 'name={}, artic={}, commands={}, color={}'.format(self.name, self.has_artic, self.commands, self.color)
+    
+    def __repr__(self):
+        return str(self)
