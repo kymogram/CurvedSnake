@@ -1074,9 +1074,9 @@ class GUI:
             self.name_selection = selection
             if self.is_regular_list:
                 left = self.profiles[self.name_selection].commands[0]
-                self.button_left['text'] = text
+                self.button_left['text'] = left
                 right = self.profiles[self.name_selection].commands[1]
-                self.button_right['text'] = text
+                self.button_right['text'] = right
                 self.color.set(self.profiles[self.name_selection].color)
                 self.move_command_left = left
                 self.move_command_right = right
