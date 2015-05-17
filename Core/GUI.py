@@ -193,7 +193,7 @@ class GUI:
         self.canvas_height = self.window_height - 200
         self.canvas_width = self.window_width - 200
         self.checkResizeMap()
-        # to be sur, we reinitialize bonus_proba (in case a player take a 
+        # to be sur, we reinitialize bonus_proba (in case a player take a
         # bonus_chance bonus just before the round end)
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100) * self.bonus_percent
         for elem in self.score_snake_list:
@@ -833,10 +833,11 @@ class GUI:
             callback function when combobox selection changes
         '''
         try:
+            color = self.color.getColor()
+            self.current_color = color
             if len(self.player_ingame.curselection()) > 0 or \
                len(self.player_known.curselection()) > 0:
-                self.profiles[self.name_selection].color = self.color.getColor()
-            self.current_color = self.color.getColor()
+                self.profiles[self.name_selection].color = color
         except:
             pass
 
@@ -868,7 +869,6 @@ class GUI:
         '''
         self.player_ingame.selection_clear(0, END)
         self.player_known.selection_clear(0, END)
-        
 
     def keyPressed(self, e):
         '''
