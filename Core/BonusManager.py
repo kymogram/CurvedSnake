@@ -4,6 +4,7 @@ from math import pi
 
 ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
 
+
 class BonusManager:
     BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'thickness_down', 'all_speeddown',
@@ -17,15 +18,15 @@ class BonusManager:
                    'portal', 'penetrating_wall',
                    'artic']
 
-    EXEC_CODE = ['sender.speed += 1; sender.rotating_angle += 0.02;' \
-                  'sender.addArc(self.gui.bonus_dict[bonus_ref])',
+    EXEC_CODE = ['sender.speed += 1; sender.rotating_angle += 0.02; \
+                  sender.addArc(self.gui.bonus_dict[bonus_ref])',
                  'if sender.speed > 1: sender.speed /= 1.5',
                  'sender.thickness /= 2',
                  'if snake.speed > 1: snake.speed /= 1.5',
                  'snake.inversed_commands = True',
                  'snake.speed += 1; snake.rotating_angle += 0.02',
-                 'snake.previous_angles.append(snake.rotating_angle);' \
-                  'snake.rotating_angle = pi/2',
+                 'snake.previous_angles.append(snake.rotating_angle); \
+                  snake.rotating_angle = pi/2',
                  'snake.thickness *= 2',
                  'snake.rotating_angle /= 1.5',
                  'pass  # gui',
@@ -35,15 +36,15 @@ class BonusManager:
                  'pass  # gui',
                  'sender.invincible = True',
                  'pass  # gui',
-                 'sender.previous_angles.append(sender.rotating_angle);'\
-                  'sender.rotating_angle = pi/2',
+                 'sender.previous_angles.append(sender.rotating_angle); \
+                  sender.rotating_angle = pi/2',
                  'pass  # gui',
-                 'e = canvas.find_withtag("bonus,"+bonus_ref)[0];'\
-                  'sender.head_coord = canvas.coords(e);' \
-                  'canvas.delete(e)',
+                 'e = canvas.find_withtag("bonus,"+bonus_ref)[0]; \
+                  sender.head_coord = canvas.coords(e); \
+                  canvas.delete(e)',
                  'snake.penetrate = True',
-                 'sender.artic = True; sender.color = "white";' \
-                  'sender.updateHeadColor()']
+                 'sender.artic = True; sender.color = "white"; \
+                  sender.updateHeadColor()']
 
     TODO_CODE = ['snake.speed -= 1; snake.rotating_angle -= 0.02',
                  'snake.speed *= 1.5',
@@ -55,8 +56,8 @@ class BonusManager:
                  'snake.thickness /= 2',
                  'snake.rotating_angle *= 1.5',
                  '',
-                 'snake.color = snake.color_unchanged;' \
-                 'snake.updateHeadColor()',
+                 'snake.color = snake.color_unchanged; \
+                  snake.updateHeadColor()',
                  'snake.hole_probability /= 10',
                  '',
                  '',
@@ -66,9 +67,9 @@ class BonusManager:
                  '',
                  'pass',
                  'snake.penetrate = False',
-                 'snake.artic = False; snake.color = snake.color_unchanged;' \
-                  'snake.updateHeadColor()']
-    
+                 'snake.artic = False; snake.color = snake.color_unchanged; \
+                  snake.updateHeadColor()']
+
     ON_ACTION = [ON_SELF, ON_SELF,
                  ON_SELF, ON_OTHERS,
                  ON_OTHERS, ON_OTHERS,
@@ -82,7 +83,7 @@ class BonusManager:
                  ON_SELF]
 
     MAX_PROBA = 0.16
- 
+
     def __init__(self, parent):
         self.gui = parent
         # self.canvas = parent.canvas
@@ -95,7 +96,8 @@ class BonusManager:
         return "#{:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
 
     def handleBonus(self, sender, bonus_ref, bonus_proba):
-        others = [snake for snake in self.gui.snakes_alive if snake is not sender]
+        others = [snake for snake in self.gui.snakes_alive
+                  if snake is not sender]
         add_event = lambda l, f: l.append(self.listFrom(f, bonus_ref))
         canvas = self.gui.canvas
         if bonus_ref == 'bonus_chance':
@@ -106,7 +108,7 @@ class BonusManager:
                 self.gui.bonus_proba *= coeff
                 add_event(self.gui.events_queue, action)
         elif bonus_ref == 'clean_map':
-            #save head coordinates
+            # save head coordinates
             heads = [snake.head_coord for snake in self.gui.snakes]
             bonus_dict = dict()
             for bonus in self.gui.bonus_dict:
@@ -120,18 +122,17 @@ class BonusManager:
                 r = snake.thickness//2
                 tag = 'snake,{},-1'.format(snake.name)
                 snake.head_id = canvas.create_oval(x-r, y-r, x+r, y+r,
-                                                        fill=snake.color,
-                                                        outline=snake.color,
-                                                        tag=tag)
+                                                   fill=snake.color, tag=tag,
+                                                   outline=snake.color)
             for name in bonus_dict:
                 for x, y in bonus_dict[name]:
                     tag = 'bonus,{}'.format(self.gui.bonus_dict[name].name)
-                    canvas.create_image(x, y,
-                                             image=self.gui.bonus_dict[name].image,
-                                             tags=tag)
+                    canvas.create_image(x, y, tags=tag,
+                                        image=self.gui.bonus_dict[name].image)
         elif bonus_ref == 'negative':
             canvas.configure(bg='white')
-            add_event(self.gui.events_queue, 'self.canvas.configure(bg="black")')
+            add_event(self.gui.events_queue,
+                      'self.canvas.configure(bg="black")')
             for snake in self.gui.snakes:
                 snake.color = self.invertColor(snake.getColor())
                 snake.updateHeadColor()

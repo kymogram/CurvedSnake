@@ -63,7 +63,7 @@ class GUI:
                    'self_right_angles', 'swap_position',
                    'portal', 'penetrating_wall',
                    'artic']
-    
+
     BONUS_TIMES = [300, 600,
                    500, 250,
                    300, 250,
@@ -568,7 +568,7 @@ class GUI:
     def destroyStyle(self, old_bg, old_fg):
         self.updateStyle(old_bg, old_fg)
         self.top_style.destroy()
-        
+
     def setStyle(self):
         self.updateStyle()
         self.top_style.destroy()
@@ -954,9 +954,10 @@ class GUI:
                 self.move_command_right = right
             else:
                 self.id = self.snakes_ingame.index(selection)
-                self.button_left.configure(text=self.profiles[selection].commands[0])
-                text = self.profiles[selection].commands[1]
-                self.button_right.configure(text=text)
+                left = self.profiles[selection].commands[0]
+                self.button_left.configure['text'] = left
+                right = self.profiles[selection].commands[1]
+                self.button_right.configure['text'] = right
                 self.color.set(self.profiles[selection].color)
 
     def removeFocus(self, e):
