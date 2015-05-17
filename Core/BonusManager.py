@@ -13,6 +13,7 @@ class Bonus:
         self.image = PhotoImage(file=path)
         self.length = length
 
+
 class BonusManager:
     BONUS_FILES = ['self_speedup',
                    'self_speeddown',
@@ -26,7 +27,7 @@ class BonusManager:
                    'bonus_chance',
                    'change_color',
                    'change_chance_hole',
-                   'clean_map', 
+                   'clean_map',
                    'negative',
                    'invincible',
                    'shrink_map',
@@ -110,35 +111,55 @@ class BonusManager:
                  ON_SELF,
                  ON_SELF]
 
-    BONUS_TIMES = [300, 600,
-               500, 250,
-               300, 250,
-               300, 300,
-               300,  50,
-               350, 750,
-               300, 300,
-               300, 300,
-               750, 200,
-               10,  300,
-               600]
+    BONUS_TIMES = [300,
+                   600,
+                   500,
+                   250,
+                   300,
+                   250,
+                   300,
+                   300,
+                   300,
+                   50,
+                   350,
+                   750,
+                   300,
+                   300,
+                   300,
+                   300,
+                   750,
+                   200,
+                   10,
+                   300,
+                   600]
 
-    PROBABILITY = [1, 1.2,
-                   1, 1,
-                   1, 1,
-                   1, 1,
-                   0.7, 1,
-                   1, 1,
-                   1, 1,
-                   0.8, 1,
-                   1, 1,
-                   1, 1,
+    PROBABILITY = [1,
+                   1.2,
+                   1,
+                   1,
+                   1,
+                   1,
+                   1,
+                   1,
+                   0.7,
+                   1,
+                   1,
+                   1,
+                   1,
+                   1,
+                   0.8,
+                   1,
+                   1,
+                   1,
+                   1,
+                   1,
                    0.5]
 
     MAX_PROBA = 0.16
 
     BONUS_DIRECTORY = './data/sprites/'
     IMAGE_EXTENSION = 'gif'
-    
+
     BONUS_SPRITES_DIMENSIONS = (32, 32)
 
     def __init__(self, parent):
@@ -172,7 +193,8 @@ class BonusManager:
             # xmin, ymin = BonusManager.BONUS_SPRITES_DIMENSIONS
             xmin, ymin = list(map(lambda e: e + int(canvas['bd']),
                               BonusManager.BONUS_SPRITES_DIMENSIONS))
-            xmax, ymax = self.gui.canvas_width-xmin, self.gui.canvas_height-ymin
+            xmax = self.gui.canvas_width - xmin
+            ymax = self.gui.canvas_height - ymin
             x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
             bonus = self.bonus_dict[self.bonus_generator.getRandom()]
             if bonus.name != 'portal':

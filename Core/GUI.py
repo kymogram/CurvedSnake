@@ -11,7 +11,6 @@ from .Snake import *
 from .InputManager import InputManager
 from .MusicManager import MusicManager
 from .ComboColorBox import ComboColorBox
-from .RandomBonus import RandomBonus
 from .Profile import Profile
 from .BonusManager import BonusManager
 
@@ -294,7 +293,8 @@ class GUI:
         self.name.pack()
         self.selectRandomName()
         l = Label(self.window, width=250, text='Already played ?',
-                  font=Font(family='Arial Unicode MS'), bg=self.current_bg,
+                  font=Font(family='Arial Unicode MS'),
+                  bg=self.current_bg,
                   fg=self.current_fg)
         l.pack()
         self.tmp_widget.append(l)
