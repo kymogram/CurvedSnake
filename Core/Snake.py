@@ -115,6 +115,20 @@ class Snake:
                 self.canvas.delete(first_elem)
                 self.parent.handleBonus(self, info[1])
 
+    def replaceInScreen(self):
+        border_depth = int(self.canvas['bd'])
+        canvas_width = self.canvas.winfo_width()
+        canvas_height = self.canvas.winfo_height()
+        if x < border_depth:
+            x = canvas_width - border_depth
+        elif x > canvas_width - border_depth:
+            x = border_depth
+        if y < border_depth:
+            y = canvas_height - border_depth
+        elif y > canvas_height - border_depth:
+            y = border_depth
+        self.head_coord = [x, y]
+
     def handleMove(self, step):
         '''
             moves the snake to the new (x, y) computed according
@@ -129,18 +143,7 @@ class Snake:
                 self.alive = False
                 Particles(self.canvas, x, y, self.color)
             else:
-                border_depth = int(self.canvas['bd'])
-                canvas_width = self.canvas.winfo_width()
-                canvas_height = self.canvas.winfo_height()
-                if x < border_depth:
-                    x = canvas_width - border_depth
-                elif x > canvas_width - border_depth:
-                    x = border_depth
-                if y < border_depth:
-                    y = canvas_height - border_depth
-                elif y > canvas_height - border_depth:
-                    y = border_depth
-                self.head_coord = [x, y]
+                self.replaceInScreen()
         else:
             r = self.thickness // 2
             # find all items in contact with new position
@@ -189,8 +192,7 @@ class Snake:
             if self.hole == 0:
                 tag = 'snake,{},{}'.format(self.name, step)
                 self.canvas.create_oval(x-r, y-r, x+r, y+r, fill=self.color,
-                                        outline=self.color,
-                                        tag=tag)
+                                        outline=self.color, tag=tag)
                 if random() < self.hole_probability:
                     self.hole = randint(self.min_hole_length,
                                         self.max_hole_length)
@@ -201,14 +203,9 @@ class Snake:
 
     def checkSpecialColor(self, step):
         if self.artic:
-            if step % 44 == 0 and not self.changed_artic:
-                self.color = '#00ffff'
+            if step % 44 == 0:
+                self.color = 'white' if self.color != 'white' else '#00ffff'
                 self.updateHeadColor()
-                self.changed_artic = True
-            elif step % 44 == 0 and self.changed_artic:
-                self.color = 'white'
-                self.updateHeadColor()
-                self.changed_artic = False
 
     def restoreAngle(self):
         self.rotating_angle = self.previous_angles.pop(0)

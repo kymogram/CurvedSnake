@@ -32,6 +32,8 @@ class GUI:
                         ('1', '2'),
                         ('asterisk', 'minus')]
 
+    ACHIEVEMENTS_BONUS = ['negative', 'change_color', 'artic']
+
     MAXIMUM_NAME_LENGTH = 16  # chars
     MAX_CANVAS_BORDER = 200  # pixels
 
@@ -743,7 +745,9 @@ class GUI:
         # self.new_game will be used only to initialize the score
         if self.new_game:
             self.scores = {snake.name: 0 for snake in self.snakes}
-            self.counter_special = [[0, 0, 0] for i in range(len(self.snakes))]
+            self.counter_special = {snake.name: {bonus: 0 for bonus
+                                                 in GUI.ACHIEVEMENTS_BONUS}
+                                    for snake in self.snakes}
         self.scoreShown()
         self.startInvincible()
         # add create_text with command of each player
@@ -769,16 +773,11 @@ class GUI:
         self.bonus_manager.handleBonus(sender, bonus_type, self.bonus_proba)
 
     def checkSpecialCounter(self, snake, bonus_type):
-        idx = self.snakes.index(snake)
-        if bonus_type == 'negative':
-            self.counter_special[idx][0] += 1
-        elif bonus_type == 'change_color':
-            self.counter_special[idx][1] += 1
-        elif bonus_type == 'artic':
-            self.counter_special[idx][2] += 1
-        if self.counter_special[idx][2] >= 2 and \
-           self.counter_special[idx][1] >= 5 and \
-           self.counter_special[idx][0] >= 5:
+        if bonus_type in GUI.ACHIEVEMENTS_BONUS:
+            self.counter_special[snake.name][bonus_type] += 1
+        if self.counter_special[snake.name]['artic'] >= 2 and \
+           self.counter_special[snake.name]['change_color'] >= 5 and \
+           self.counter_special[snake.name]['negative'] >= 5:
             self.profiles[snake.name].has_artic = True
 
     def shrinkMap(self):
