@@ -38,12 +38,6 @@ class GUI:
     MUSIC_DEFAULT_DIR = 'data/'
     BACKGROUND_MUSIC = 'data/background_music.wav'
     SAVE_FILE = 'save/data.shelf'
-    SAVE_FORMAT = '{}\n' \
-                  'command left = {}\n' \
-                  'command right = {}\n' \
-                  'color = {}\n' \
-                  'tmp_artic_achiv = {}\n'
-    NB_DATA_IN_SAVE = 5
 
     BONUS_TIME = 300  # frames
 
