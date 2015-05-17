@@ -98,15 +98,15 @@ class GUI:
         '''
             updates the snakes direction according to the pressed keys
         '''
-        #for each snake
+        # for each snake
         for snake in self.snakes:
             left, right = self.profiles[snake.name].commands
-            #check if it must turn (if the related key is pressed)
+            # check if it must turn (if the related key is pressed)
             if self.inputs.isPressed(left):
                 snake.turn(TURN_LEFT)
             elif self.inputs.isPressed(right):
                 snake.turn(TURN_RIGHT)
-            #if snake has right angle bonus, key-repeat is disabled
+            # if snake has right angle bonus, key-repeat is disabled
             if abs(snake.rotating_angle - pi/2) < 0.0001:
                 self.inputs.release(left if self.inputs.isPressed(left)
                                     else right)
@@ -123,12 +123,12 @@ class GUI:
             refreshes the window every $self.timer seconds
         '''
         self.changeDirections()
-        #purge GUI events queue
+        # purge GUI events queue
         self.purgeEventsQueue(self.events_queue)
         for snake in self.snakes_alive:
-            #purge snakes' events queues
+            # purge snakes' events queues
             self.purgeEventsQueue(snake.events_queue, snake)
-        #if a bonus needs to be generated at current frame
+        # if a bonus needs to be generated at current frame
         if random() < self.bonus_proba:
             self.bonus_manager.generateBonus()
         for snake in self.snakes_alive:
@@ -872,7 +872,6 @@ class GUI:
         db['profiles'] = self.profiles
         db['(bg, fg)'] = (self.current_bg, self.current_fg)
         db['sound'] = self.sound_activate
-        # db.sync()
         db.close()
         self.window.destroy()
 
@@ -889,6 +888,3 @@ class GUI:
             self.current_bg, self.current_fg = db['(bg, fg)']
             self.sound_activate = db['sound']
             self.profiles = db['profiles']
-
-if __name__ == '__main__':
-    GUI()
