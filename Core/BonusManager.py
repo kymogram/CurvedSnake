@@ -86,7 +86,6 @@ class BonusManager:
 
     def __init__(self, parent):
         self.gui = parent
-        # self.canvas = parent.canvas
 
     def listFrom(self, action, bonus):
         return [action, self.gui.bonus_dict[bonus].length]
@@ -149,7 +148,6 @@ class BonusManager:
                     snake.invincible = True
                     add_event(snake.events_queue, 'snake.invincible = False')
                 save = head_angle_list[:]
-                # shuffle(head_angle_list)
                 while head_angle_list == save:
                     shuffle(head_angle_list)
                 for i in range(len(head_angle_list)):

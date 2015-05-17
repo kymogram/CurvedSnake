@@ -854,9 +854,6 @@ class GUI:
         for snake in self.snakes:
             add_event(snake.events_queue, 'snake.in_time_before_start = False')
 
-    # def list_from(self, action, bonus):
-        # return [action, self.bonus_dict[bonus].length]
-
     def handleBonus(self, sender, bonus_type):
         '''
             sets bonus and handles events queues
