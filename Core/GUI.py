@@ -802,10 +802,6 @@ class GUI:
                                       width=self.canvas_width)
                 self.window.after(100, self.shrinkMap)
 
-    def invertColor(self, color):
-        rgb = self.canvas.winfo_rgb(color)
-        return "#{:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
-
     def setCommand(self, e):
         '''
             callback function when new command (left/right) is chosen
