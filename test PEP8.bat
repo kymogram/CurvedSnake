@@ -1,6 +1,5 @@
 @echo off
 SET files=Core/Arc.py ^
-          Core/Bonus.py ^
           Core/GUI.py ^
           Core/InputManager.py ^
           Core/MusicManager.py ^
