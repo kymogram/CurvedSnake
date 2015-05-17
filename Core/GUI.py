@@ -587,14 +587,16 @@ class GUI:
 
     def removeRegularPlayer(self):
         '''
-            callback fucntion when 'remove player' button is pressed: removes
+            callback function when 'remove player' button is pressed: removes
             selection from current lists
         '''
         if len(self.player_known.curselection()) > 0:
             name = self.player_known.get(self.selected[0])
             self.player_known.delete(self.selected[0])
+            print(name)
             if name in self.profiles:
                 del self.profiles[name]
+                print(self.profiles)
             else:
                 showwarning('No one to remove', 'You have no one to remove')
         else:
@@ -882,11 +884,12 @@ class GUI:
         '''
             save paramers about players habit
         '''
-        db = shelve.open(GUI.SAVE_FILE, flag='n', writeback=True)
+        db = shelve.open(GUI.SAVE_FILE, flag='n')
         for profile in self.profiles:
+            print('saving ' + profile)
             db[profile] = self.profiles[profile]
         db['(bg, fg)'] = (self.current_bg, self.current_fg)
-        db.sync()
+        # db.sync()
         db.close()
         self.window.destroy()
 
