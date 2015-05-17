@@ -3,6 +3,7 @@ from tkinter.font import Font
 from tkinter.filedialog import askopenfilename
 
 import shelve
+from os import remove, listdir
 
 from random import randint, random, choice
 from math import pi
@@ -885,10 +886,10 @@ class GUI:
         '''
             save paramers about players habit
         '''
+        for file in listdir('save'):
+            remove('save/' + file)
         db = shelve.open(GUI.SAVE_FILE, flag='n')
-        for profile in self.profiles:
-            print('saving ' + profile)
-            db[profile] = self.profiles[profile]
+        db['profiles'] = self.profiles
         db['(bg, fg)'] = (self.current_bg, self.current_fg)
         db['sound'] = self.sound_activate
         # db.sync()
@@ -905,18 +906,9 @@ class GUI:
             # showwarning('Load error', 'Unable to find a save file')
             pass
         else:
-            if '(bg, fg)' in db:
-                self.current_bg, self.current_fg = db['(bg, fg)']
-                del db['(bg, fg)']
-            else:
-                self.current_bg, self.current_fg = 'white', 'black'
-            if 'sound' in db:
-                self.sound_activate = db['sound']
-                del db['sound']
-            else:
-                self.sound_activate = True
-            for profile in db:
-                self.profiles[profile] = db[profile]
+            self.current_bg, self.current_fg = db['(bg, fg)']
+            self.sound_activate = db['sound']
+            self.profiles = db['profiles']
 
 if __name__ == '__main__':
     GUI()
