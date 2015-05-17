@@ -38,7 +38,7 @@ class BonusManager:
                    'artic']
 
     EXEC_CODE = ['sender.speed += 1; sender.rotating_angle += 0.02; \
-                  sender.addArc(self.gui.bonus_dict[bonus_ref])',
+                  sender.addArc(self.bonus_dict[bonus_ref])',
                  'if sender.speed > 1: sender.speed /= 1.5',
                  'sender.thickness /= 2',
                  'if snake.speed > 1: snake.speed /= 1.5',
@@ -191,11 +191,11 @@ class BonusManager:
         '''
         if self.gui.available_bonus:
             canvas = self.gui.canvas
-            # xmin, ymin = BonusManager.BONUS_SPRITES_DIMENSIONS
-            xmin, ymin = list(map(lambda e: e + int(canvas['bd']),
+            borderwidth = int(canvas['bd'])
+            xmin, ymin = list(map(lambda e: e + borderwidth,
                               BonusManager.BONUS_SPRITES_DIMENSIONS))
-            xmax = self.gui.canvas_width - xmin
-            ymax = self.gui.canvas_height - ymin
+            xmax = xmin + self.gui.canvas_width
+            ymax = ymin + self.gui.canvas_height
             x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
             bonus = self.bonus_dict[self.bonus_generator.getRandom()]
             if bonus.name != 'portal':
