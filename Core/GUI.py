@@ -16,8 +16,6 @@ from .RandomBonus import RandomBonus
 from .Profile import Profile
 from .BonusManager import BonusManager
 
-ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
-
 
 class GUI:
     DEFAULT_WIDTH = 850  # pixels
