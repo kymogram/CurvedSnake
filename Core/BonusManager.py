@@ -165,6 +165,7 @@ class BonusManager:
     def __init__(self, parent):
         self.gui = parent
         self.bonus_dict = dict()
+        self.portal_index = 0
 
     def listFrom(self, action, bonus):
         return [action, self.bonus_dict[bonus].length]
