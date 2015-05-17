@@ -117,6 +117,7 @@ class Snake:
                 self.parent.handleBonus(self, info[1])
 
     def replaceInScreen(self):
+        x, y = self.head_coord
         border_depth = int(self.canvas['bd'])
         canvas_width = self.canvas.winfo_width()
         canvas_height = self.canvas.winfo_height()

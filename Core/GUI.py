@@ -325,7 +325,7 @@ class GUI:
         colorVal = self.color.getColorVal()
         colorVal.trace('w', lambda n, m, s: self.newSelection())
         # Have to call this function with trace_variable without bug ...
-        # colorVal.trace_variable('w', self.backgroundComboBox)
+        # colorVal.trace('w', lambda n, m, s: self.backgroundComboBox())
         b = Button(self.window, text='Add player', command=self.addPlayer,
                    bg=self.current_bg, fg=self.current_fg)
         b.pack()
@@ -366,12 +366,11 @@ class GUI:
         self.tmp_widget.append(b)
         b.pack()
 
-    def backgroundComboBox(self, index, mode):
+    def backgroundComboBox(self):
         color = self.color.getColor()
-        self.color.colors_menu['menu'].configure(bg=self.color.getColor(),
-                                                 fg=self.color.getColor(),
-                                                 activebackground=color,
-                                                 activeforeground=color)
+        self.color.colors_menu.configure(bg=color, fg=color,
+                                         activebackground=color,
+                                         activeforeground=color)
 
     def parameters(self):
         '''
@@ -863,6 +862,8 @@ class GUI:
     def chooseArtic(self):
         if self.artic_checked.get():
             self.artic_chosen = self.name_selection
+        elif self.artic_checked.get() == 0:
+            self.artic_chosen = ''
 
     def removeFocus(self, e):
         '''
