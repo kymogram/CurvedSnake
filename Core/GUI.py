@@ -974,6 +974,7 @@ class GUI:
         db = shelve.open(GUI.SAVE_FILE, flag='n', writeback=True)
         for profile in self.profiles:
             db[profile] = self.profiles[profile]
+        db['(bg, fg)'] = (self.current_bg, self.current_fg)
         db.sync()
         db.close()
         self.window.destroy()
@@ -987,6 +988,8 @@ class GUI:
         except:
             showwarning('Load error', 'Unable to find a save file')
         else:
+            self.current_bg, self.current_fg = db['(bg, fg)']
+            del db['(bg, fg)']
             for profile in db:
                 self.profiles[profile] = db[profile]
 
