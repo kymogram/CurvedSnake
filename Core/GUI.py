@@ -900,8 +900,11 @@ class GUI:
         except:
             showwarning('Load error', 'Unable to find a save file')
         else:
-            self.current_bg, self.current_fg = db['(bg, fg)']
-            del db['(bg, fg)']
+            if '(bg, fg)' in db:
+                self.current_bg, self.current_fg = db['(bg, fg)']
+                del db['(bg, fg)']
+            else:
+                self.current_bg, self.current_fg = 'white', 'black'
             for profile in db:
                 self.profiles[profile] = db[profile]
 
