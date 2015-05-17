@@ -377,7 +377,11 @@ class GUI:
         b.pack()
 
     def backgroundComboBox(self, index, mode):
-        self.color.colors_menu['menu'].configure(bg=self.color.getColor(), fg=self.color.getColor(), activebackground=self.color.getColor(), activeforeground=self.color.getColor())
+        color = self.color.getColor()
+        self.color.colors_menu['menu'].configure(bg=self.color.getColor(),
+                                                 fg=self.color.getColor(),
+                                                 activebackground=color,
+                                                 activeforeground=color)
 
     def parameters(self):
         '''

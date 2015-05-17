@@ -214,7 +214,7 @@ class BonusManager:
         add_event = lambda l, f: l.append(self.listFrom(f, bonus_ref))
         canvas = self.gui.canvas
         if bonus_ref == 'bonus_chance':
-            # Precaution to not have bonus poping all around the map
+            # Precaution to not have bonus popping all around the map
             if bonus_proba <= BonusManager.MAX_PROBA:
                 coeff = 2 if bonus_proba > BonusManager.MAX_PROBA/4 else 4
                 action = 'self.bonus_proba /= ' + str(coeff)
