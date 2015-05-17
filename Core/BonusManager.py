@@ -1,21 +1,40 @@
 from tkinter import *
-from random import shuffle
+from random import shuffle, randint
 from math import pi
+
+from .RandomBonus import RandomBonus
 
 ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
 
 
+class Bonus:
+    def __init__(self, name, path, length):
+        self.name = name
+        self.image = PhotoImage(file=path)
+        self.length = length
+
+
 class BonusManager:
-    BONUS_FILES = ['self_speedup', 'self_speeddown',
-                   'thickness_down', 'all_speeddown',
-                   'reversed_commands', 'all_speedup',
-                   'right_angles', 'thickness_up',
-                   'rotation_angle_down', 'bonus_chance',
-                   'change_color', 'change_chance_hole',
-                   'clean_map', 'negative',
-                   'invincible', 'shrink_map',
-                   'self_right_angles', 'swap_position',
-                   'portal', 'penetrating_wall',
+    BONUS_FILES = ['self_speedup',
+                   'self_speeddown',
+                   'thickness_down',
+                   'all_speeddown',
+                   'reversed_commands',
+                   'all_speedup',
+                   'right_angles',
+                   'thickness_up',
+                   'rotation_angle_down',
+                   'bonus_chance',
+                   'change_color',
+                   'change_chance_hole',
+                   'clean_map',
+                   'negative',
+                   'invincible',
+                   'shrink_map',
+                   'self_right_angles',
+                   'swap_position',
+                   'portal',
+                   'penetrating_wall',
                    'artic']
 
     EXEC_CODE = ['sender.speed += 1; sender.rotating_angle += 0.02; \
@@ -70,29 +89,123 @@ class BonusManager:
                  'snake.artic = False; snake.color = snake.color_unchanged; \
                   snake.updateHeadColor()']
 
-    ON_ACTION = [ON_SELF, ON_SELF,
-                 ON_SELF, ON_OTHERS,
-                 ON_OTHERS, ON_OTHERS,
-                 ON_OTHERS, ON_OTHERS,
-                 ON_OTHERS, ON_GUI,
-                 ON_OTHERS, ON_OTHERS,
-                 ON_GUI, ON_GUI,
-                 ON_SELF, ON_GUI,
-                 ON_SELF, ON_GUI,
-                 ON_SELF, ON_SELF,
+    ON_ACTION = [ON_SELF,
+                 ON_SELF,
+                 ON_SELF,
+                 ON_OTHERS,
+                 ON_OTHERS,
+                 ON_OTHERS,
+                 ON_OTHERS,
+                 ON_OTHERS,
+                 ON_OTHERS,
+                 ON_GUI,
+                 ON_OTHERS,
+                 ON_OTHERS,
+                 ON_GUI,
+                 ON_GUI,
+                 ON_SELF,
+                 ON_GUI,
+                 ON_SELF,
+                 ON_GUI,
+                 ON_SELF,
+                 ON_SELF,
                  ON_SELF]
+
+    BONUS_TIMES = [300,
+                   600,
+                   500,
+                   250,
+                   300,
+                   250,
+                   300,
+                   300,
+                   300,
+                   50,
+                   350,
+                   750,
+                   300,
+                   300,
+                   300,
+                   300,
+                   750,
+                   200,
+                   10,
+                   300,
+                   600]
+
+    PROBABILITY = [1,
+                   1.2,
+                   1,
+                   1,
+                   1,
+                   1,
+                   1,
+                   1,
+                   0.7,
+                   1,
+                   1,
+                   1,
+                   1,
+                   1,
+                   0.8,
+                   1,
+                   1,
+                   1,
+                   1,
+                   1,
+                   0.5]
 
     MAX_PROBA = 0.16
 
+    BONUS_DIRECTORY = './data/sprites/'
+    IMAGE_EXTENSION = 'gif'
+
+    BONUS_SPRITES_DIMENSIONS = (32, 32)
+
     def __init__(self, parent):
         self.gui = parent
+        self.bonus_dict = dict()
 
     def listFrom(self, action, bonus):
-        return [action, self.gui.bonus_dict[bonus].length]
+        return [action, self.bonus_dict[bonus].length]
 
     def invertColor(self, color):
         rgb = self.gui.canvas.winfo_rgb(color)
         return "#{:02x}{:02x}{:02x}".format(*[255 - c//256 for c in rgb])
+
+    def refreshBonusProba(self):
+        l = [b.get() == 1 for b in self.gui.add_bonus_bool]
+        self.bonus_generator = RandomBonus(BonusManager.PROBABILITY, l,
+                                           BonusManager.BONUS_FILES)
+
+    def findRandomFreePosition(self, xmin, xmax, ymin, ymax):
+        '''
+            returns a (X, Y) coordinate on canvas
+        '''
+        return randint(xmin, xmax), randint(ymin, ymax)
+
+    def generateBonus(self):
+        '''
+            generates a random bonus and puts it on canvas
+        '''
+        if self.gui.available_bonus:
+            canvas = self.gui.canvas
+            # xmin, ymin = BonusManager.BONUS_SPRITES_DIMENSIONS
+            xmin, ymin = list(map(lambda e: e + int(canvas['bd']),
+                              BonusManager.BONUS_SPRITES_DIMENSIONS))
+            xmax = self.gui.canvas_width - xmin
+            ymax = self.gui.canvas_height - ymin
+            x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
+            bonus = self.bonus_dict[self.bonus_generator.getRandom()]
+            if bonus.name != 'portal':
+                canvas.create_image(x, y, image=bonus.image,
+                                    tags='bonus,{}'.format(bonus.name))
+            else:
+                tag = 'bonus,{}{}'.format(bonus.name, self.portal_index)
+                canvas.create_image(x, y, image=bonus.image, tags=tag)
+                x2, y2 = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
+                canvas.create_image(x2, y2, image=bonus.image, tags=tag)
+                self.portal_index += 1
 
     def handleBonus(self, sender, bonus_ref, bonus_proba):
         others = [snake for snake in self.gui.snakes_alive
@@ -110,7 +223,7 @@ class BonusManager:
             # save head coordinates
             heads = [snake.head_coord for snake in self.gui.snakes]
             bonus_dict = dict()
-            for bonus in self.gui.bonus_dict:
+            for bonus in self.bonus_dict:
                 bonus_dict[bonus] = []
                 for el in canvas.find_withtag('bonus,' + bonus):
                     bonus_dict[bonus].append(canvas.coords(el))
@@ -125,9 +238,9 @@ class BonusManager:
                                                    outline=snake.color)
             for name in bonus_dict:
                 for x, y in bonus_dict[name]:
-                    tag = 'bonus,{}'.format(self.gui.bonus_dict[name].name)
+                    tag = 'bonus,{}'.format(self.bonus_dict[name].name)
                     canvas.create_image(x, y, tags=tag,
-                                        image=self.gui.bonus_dict[name].image)
+                                        image=self.bonus_dict[name].image)
         elif bonus_ref == 'negative':
             canvas.configure(bg='white')
             add_event(self.gui.events_queue,
@@ -170,3 +283,19 @@ class BonusManager:
             for snake in others:
                 exec(self.EXEC_CODE[idx])
                 add_event(snake.events_queue, self.TODO_CODE[idx])
+
+    def loadBonus(self):
+        '''
+            loads all the bonus image
+        '''
+        self.bonus_dict = dict()
+        for i in range(len(BonusManager.BONUS_FILES)):
+            file = BonusManager.BONUS_FILES[i]
+            path = '{}{}.{}'.format(self.BONUS_DIRECTORY, file,
+                                    self.IMAGE_EXTENSION)
+            self.bonus_dict[file] =  Bonus(file, path, self.BONUS_TIMES[i])
+        self.gui.add_bonus_bool = [IntVar(value=1)
+                                   for i in range(len(self.bonus_dict))]
+
+    def getBonusDict(self):
+        return self.bonus_dict
