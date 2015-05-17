@@ -50,7 +50,7 @@ class GUI:
 
     BONUS_TIME = 300  # frames
     BONUS_SPRITES_DIMENSIONS = (32, 32)  # pixels
-    BONUS_DIRECTORY = './sprites/'
+    BONUS_DIRECTORY = './data/sprites/'
     IMAGE_EXTENSION = 'gif'
     BONUS_FILES = ['self_speedup', 'self_speeddown',
                    'thickness_down', 'all_speeddown',
