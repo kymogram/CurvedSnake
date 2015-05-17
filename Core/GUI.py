@@ -751,7 +751,8 @@ class GUI:
         for name in self.snakes_ingame:
             snake = Snake(self, name, randint(xmin, xmax-xmin),
                           randint(ymin, ymax-ymin), random()*2*pi,
-                          self.profiles[name].color)
+                          self.profiles[name].color,
+                          self.profiles[name].artic_var)
             self.snakes.append(snake)
         self.snakes_alive = self.snakes[:]
         # self.new_game will be used only to initialize the score
@@ -868,6 +869,26 @@ class GUI:
                 self.color.set(self.profiles[self.name_selection].color)
                 self.move_command_left = left
                 self.move_command_right = right
+                if self.profiles[self.name_selection].has_artic:
+                    bonus_dict = self.bonus_manager.getBonusDict()
+                    bonus = bonus_dict['artic']
+                    artic_var = self.profiles[self.name_selection].getArticVar()
+                    artic_color = Checkbutton(self.color_frame,
+                                              image=bonus.image,
+                                              variable=artic_var,
+                                              command=self.setArticColor,
+                                              bg=self.current_bg,
+                                              fg=self.current_fg,
+                                              tags='artic_color')
+                    artic_color.pack()
+                else:
+                    try:
+                        # delete artic_color checkbutton
+                    except:
+                        pass
+                        
+    def setArticColor(self):
+        self.profiles[self.name_selection].color = 'white'
 
     def removeFocus(self, e):
         '''

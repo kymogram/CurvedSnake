@@ -18,6 +18,7 @@ TURN_RIGHT = 1
 
 class Snake:
     def __init__(self, parent, name, x_head, y_head, angle, color,
+                 special_artic=0,
                  hole_proba=DEFAULT_CHANCE_HOLE,
                  max_hole_length=DEFAULT_MAX_HOLE_LENGTH,
                  min_hole_length=DEFAULT_MIN_HOLE_LENGTH,
@@ -39,6 +40,7 @@ class Snake:
         self.color_unchanged = color
         self.artic = False
         self.changed_artic = False
+        self.sepcial_artic = special_artic
         self.alive = True
         self.invincible = False
         self.in_time_before_start = True
@@ -199,7 +201,7 @@ class Snake:
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
 
     def checkSpecialColor(self, step):
-        if self.artic:
+        if self.artic or self.sepcial_artic.get() == 1:
             if step % 44 == 0 and not self.changed_artic:
                 self.color = '#00ffff'
                 self.updateHeadColor()
