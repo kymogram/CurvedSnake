@@ -8,7 +8,6 @@ from random import randint, random, choice
 from math import pi
 
 from .Snake import *
-from .Bonus import Bonus
 from .InputManager import InputManager
 from .MusicManager import MusicManager
 from .ComboColorBox import ComboColorBox
@@ -49,44 +48,6 @@ class GUI:
     NB_DATA_IN_SAVE = 5
 
     BONUS_TIME = 300  # frames
-    BONUS_SPRITES_DIMENSIONS = (32, 32)  # pixels
-    BONUS_DIRECTORY = './data/sprites/'
-    IMAGE_EXTENSION = 'gif'
-    BONUS_FILES = ['self_speedup', 'self_speeddown',
-                   'thickness_down', 'all_speeddown',
-                   'reversed_commands', 'all_speedup',
-                   'right_angles', 'thickness_up',
-                   'rotation_angle_down', 'bonus_chance',
-                   'change_color', 'change_chance_hole',
-                   'clean_map', 'negative',
-                   'invincible', 'shrink_map',
-                   'self_right_angles', 'swap_position',
-                   'portal', 'penetrating_wall',
-                   'artic']
-
-    BONUS_TIMES = [300, 600,
-                   500, 250,
-                   300, 250,
-                   300, 300,
-                   300,  50,
-                   350, 750,
-                   300, 300,
-                   300, 300,
-                   750, 200,
-                   10,  300,
-                   600]
-
-    BONUS_PROBABILITIES = [1, 1.2,
-                           1, 1,
-                           1, 1,
-                           1, 1,
-                           0.7, 1,
-                           1, 1,
-                           1, 1,
-                           0.8, 1,
-                           1, 1,
-                           1, 1,
-                           0.5]
 
     def __init__(self):
         # window
@@ -122,7 +83,7 @@ class GUI:
         self.profiles = dict()
         self.bonus_manager = BonusManager(self)
         # init
-        self.loadBonusImages()
+        self.bonus_manager.loadBonus()
         self.loadSave()
         self.menuStart()
         self.window.protocol("WM_DELETE_WINDOW", self.saveParameters)
@@ -150,46 +111,6 @@ class GUI:
             path = '{}{}.{}'.format('./curves/curveideasnake',
                                     i, GUI.IMAGE_EXTENSION)
             self.images_curves.append(PhotoImage(file=path))
-
-    def loadBonusImages(self):
-        '''
-            loads all the bonus image
-        '''
-        self.bonus_dict = dict()
-        for i in range(len(BonusManager.BONUS_FILES)):
-            path = '{}{}.{}'.format(GUI.BONUS_DIRECTORY,
-                                    BonusManager.BONUS_FILES[i],
-                                    GUI.IMAGE_EXTENSION)
-            bonus = Bonus(BonusManager.BONUS_FILES[i],
-                          path, GUI.BONUS_TIMES[i])
-            self.bonus_dict[BonusManager.BONUS_FILES[i]] = bonus
-        self.add_bonus_bool = [IntVar(value=1) for
-                               i in range(len(self.bonus_dict))]
-
-    def generateBonus(self):
-        '''
-            generates a random bonus and puts it on canvas
-        '''
-        xmin, ymin = GUI.BONUS_SPRITES_DIMENSIONS
-        xmax, ymax = self.canvas_width-xmin, self.canvas_height-ymin
-        x, y = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
-        if self.available_bonus:
-            bonus = self.bonus_dict[self.bonus_generator.getRandom()]
-            if bonus.name != 'portal':
-                self.canvas.create_image(x, y, image=bonus.image,
-                                         tags='bonus,{}'.format(bonus.name))
-            else:
-                tag = 'bonus,{}{}'.format(bonus.name, self.portal_index)
-                self.canvas.create_image(x, y, image=bonus.image, tags=tag)
-                x2, y2 = self.findRandomFreePosition(xmin, xmax, ymin, ymax)
-                self.canvas.create_image(x2, y2, image=bonus.image, tags=tag)
-                self.portal_index += 1
-
-    def findRandomFreePosition(self, xmin, xmax, ymin, ymax):
-        '''
-            returns a (X, Y) coordinate on canvas
-        '''
-        return randint(xmin, xmax), randint(ymin, ymax)
 
     def changeDirections(self):
         '''
@@ -227,7 +148,7 @@ class GUI:
                         i -= 1
                     i += 1
         if random() < self.bonus_proba:
-            self.generateBonus()
+            self.bonus_manager.generateBonus()
         for snake in self.snakes_alive:
             snake.move(self.step)
             if not snake.getAlive():
@@ -796,16 +717,11 @@ class GUI:
         '''
         self.music_manager.pause()
 
-    def refreshBonusProba(self):
-        l = [b.get() == 1 for b in self.add_bonus_bool]
-        self.bonus_generator = RandomBonus(GUI.BONUS_PROBABILITIES, l,
-                                           BonusManager.BONUS_FILES)
-
     def play(self):
         '''
             prepares the game
         '''
-        self.refreshBonusProba()
+        self.bonus_manager.refreshBonusProba()
         if self.sound_activate:
             if self.play_once_music:
                 self.playMusic()
