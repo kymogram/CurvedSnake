@@ -193,6 +193,9 @@ class GUI:
         self.canvas_height = self.window_height - 200
         self.canvas_width = self.window_width - 200
         self.checkResizeMap()
+        # to be sur, we reinitialize bonus_proba (in case a player take a 
+        # bonus_chance bonus just before the round end)
+        self.bonus_proba = (GUI.BONUS_PROBABILITY/100) * self.bonus_percent
         for elem in self.score_snake_list:
             if elem[0] >= (len(self.snakes)-1)*10:
                 self.finish_game = True
@@ -888,6 +891,7 @@ class GUI:
         for profile in self.profiles:
             db[profile] = self.profiles[profile]
         db['(bg, fg)'] = (self.current_bg, self.current_fg)
+        db['sound'] = self.sound_activate
         db.sync()
         db.close()
         self.window.destroy()
@@ -907,6 +911,11 @@ class GUI:
                 del db['(bg, fg)']
             else:
                 self.current_bg, self.current_fg = 'white', 'black'
+            if 'sound' in db:
+                self.sound_activate = db['sound']
+                del db['sound']
+            else:
+                self.sound_activate = True
             for profile in db:
                 self.profiles[profile] = db[profile]
 
