@@ -94,58 +94,47 @@ class GUI:
         self.new_game = True
         self.finish_game = False
 
-    def loadCurveImages(self):
-        '''
-            not used yet/anymore (to load images)
-        '''
-        self.images_curves = []
-        for i in range(1, 4):
-            path = '{}{}.{}'.format('./curves/curveideasnake',
-                                    i, GUI.IMAGE_EXTENSION)
-            self.images_curves.append(PhotoImage(file=path))
-
     def changeDirections(self):
         '''
             updates the snakes direction according to the pressed keys
         '''
+        #for each snake
         for snake in self.snakes:
             left, right = self.profiles[snake.name].commands
+            #check if it must turn (if the related key is pressed)
             if self.inputs.isPressed(left):
                 snake.turn(TURN_LEFT)
             elif self.inputs.isPressed(right):
                 snake.turn(TURN_RIGHT)
+            #if snake has right angle bonus, key-repeat is disabled
             if abs(snake.rotating_angle - pi/2) < 0.0001:
                 self.inputs.release(left if self.inputs.isPressed(left)
                                     else right)
+
+    def purgeEventsQueue(self, queue, snake=None):
+        while queue != [] and queue[0][1] == 1:
+            exec(queue[0][0])
+            del queue[0]
+        for event in queue:
+            event[1] -= 1
 
     def refresh(self):
         '''
             refreshes the window every $self.timer seconds
         '''
         self.changeDirections()
-        if len(self.events_queue) != 0:
-            for event in self.events_queue:
-                event[1] -= 1
-            if self.events_queue[0][1] == 0:
-                exec(self.events_queue[0][0])
-                del self.events_queue[0]
+        #purge GUI events queue
+        self.purgeEventsQueue(self.events_queue)
         for snake in self.snakes_alive:
-            if len(snake.events_queue) != 0:
-                i = 0
-                while i < len(snake.events_queue):
-                    snake.events_queue[i][1] -= 1
-                    if snake.events_queue[i][1] == 0:
-                        exec(snake.events_queue[i][0])
-                        del snake.events_queue[i]
-                        i -= 1
-                    i += 1
+            #purge snakes' events queues
+            self.purgeEventsQueue(snake.events_queue, snake)
+        #if a bonus needs to be generated at current frame
         if random() < self.bonus_proba:
             self.bonus_manager.generateBonus()
         for snake in self.snakes_alive:
-            snake.move(self.step)
-            if not snake.getAlive():
-                self.updateScore(snake)
+            if not snake.move(self.step):
                 self.snakes_alive.remove(snake)
+                self.updateScore()
         if len(self.snakes_alive) == 1 and \
            len(self.snakes) != 1 and not self.finished:
             self.save_name_winner = self.snakes_alive[0].getName()
@@ -160,7 +149,7 @@ class GUI:
         '''
             manage the timer to prevent for the next round
         '''
-        if time != 0:
+        if time > 0:
             text = '{} won this round! {} seconds remaining' \
                    .format(self.save_name_winner, time)
             if not self.text_id:
@@ -181,18 +170,18 @@ class GUI:
 
     def finishRound(self):
         '''
-            each end of round, this function will be called and check score +
+            each end of round, this function will be called to check score +
             refresh some variable
         '''
         self.stopRefreshing()
         self.canvas_height = self.window_height - 200
         self.canvas_width = self.window_width - 200
         self.checkResizeMap()
-        # to be sur, we reinitialize bonus_proba (in case a player take a
+        # to be sure, we reinitialize bonus_proba (in case a player take a
         # bonus_chance bonus just before the round end)
         self.bonus_proba = (GUI.BONUS_PROBABILITY/100) * self.bonus_percent
-        for elem in self.score_snake_list:
-            if elem[0] >= (len(self.snakes)-1)*10:
+        for name, score in self.scores.items():
+            if score >= (len(self.snakes)-1)*10:
                 self.finish_game = True
         self.new_game = False
         if not self.finish_game:
@@ -202,30 +191,26 @@ class GUI:
         else:
             self.quitCurrentPlay()
 
-    def updateScore(self, snake):
+    def updateScore(self):
         '''
             update the score
         '''
-        for i in range(len(self.snakes)):
-            if self.snakes[i].getAlive():
-                snakeName = self.snakes[i].getName()
-                for j in range(len(self.snakes)):
-                    if snakeName == self.score_snake_list[j][1].getName():
-                        self.score_snake_list[j][0] += 1
-        self.score_snake_list = sorted(self.score_snake_list,
-                                       key=lambda i: i[0])
-        self.score_snake_list = list(reversed(self.score_snake_list))
+        for snake in self.snakes:
+            if snake in self.snakes_alive:
+                self.scores[snake.name] += 1
         self.updateScoreShown()
 
     def scoreShown(self):
         '''
             show the score
         '''
-        for i in range(len(self.snakes)):
+        sorted_names = list(map(lambda i: i[0],
+                                sorted(self.scores.items(),
+                                       key=lambda i: i[1], reverse=True)))
+        for name in sorted_names:
             score_text = Label(self.score_frame,
-                               text=self.score_snake_list[i][1].getName() +
-                               ' : ' + str(self.score_snake_list[i][0]),
-                               bg=self.score_snake_list[i][1].getColor(),
+                               text=name + ' : ' + str(self.scores[name]),
+                               bg=self.profiles[name].color,
                                font=Font(family='fixedsys', size=12))
             score_text.pack(padx=5, pady=5)
 
@@ -757,8 +742,7 @@ class GUI:
         self.snakes_alive = self.snakes[:]
         # self.new_game will be used only to initialize the score
         if self.new_game:
-            self.score_snake_list = [[0, self.snakes[i]]
-                                     for i in range(len(self.snakes))]
+            self.scores = {snake.name: 0 for snake in self.snakes}
             self.counter_special = [[0, 0, 0] for i in range(len(self.snakes))]
         self.scoreShown()
         self.startInvincible()
@@ -837,11 +821,8 @@ class GUI:
             callback function when combobox selection changes
         '''
         try:
-            color = self.color.getColor()
-            self.current_color = color
-            if len(self.player_ingame.curselection()) > 0 or \
-               len(self.player_known.curselection()) > 0:
-                self.profiles[self.name_selection].color = color
+            self.current_color = self.color.getColor()
+            self.profiles[self.name_selection].color = self.color.getColor()
         except:
             pass
 
@@ -851,10 +832,6 @@ class GUI:
         '''
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
-            # self.colors_list = self.color.getListAllColors()
-            # for profile in self.profiles:
-                # if self.profiles[profile].color not in self.colors_list:
-                    # self.colors_list.append(self.profiles[profile].color)
             selection = e.widget.get(self.selected[0])
             self.name_selection = selection
             if len(self.player_known.curselection()) > 0 or \

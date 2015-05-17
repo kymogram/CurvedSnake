@@ -197,6 +197,7 @@ class Snake:
             else:
                 self.hole -= 1
         self.canvas.coords(self.head_id, x-r, y-r, x+r, y+r)
+        return self.alive
 
     def checkSpecialColor(self, step):
         if self.artic:
@@ -211,9 +212,6 @@ class Snake:
 
     def restoreAngle(self):
         self.rotating_angle = self.previous_angles.pop(0)
-
-    def getAlive(self):
-        return self.alive
 
     def getName(self):
         return self.name
