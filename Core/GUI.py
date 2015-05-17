@@ -644,13 +644,12 @@ class GUI:
             if self.current_name.get() in self.profiles:
                 showwarning('Name player', 'This name is already taken')
                 return
-            # for snake in self.snakes_ingame:
             for snake in self.player_ingame.get(0, END):
                 if self.current_color == self.profiles[snake].color:
                     showwarning('Color', 'The color chosen is already taken')
-                return
+                    return
             for snake in self.player_ingame.get(0, END):
-                commands = self.profiles[snake.name].commands
+                commands = self.profiles[snake].commands
                 if self.move_command_left in commands or \
                    self.move_command_right in commands:
                     showwarning('Commands',
@@ -818,7 +817,9 @@ class GUI:
             self.button_left.configure(text=self.move_command_left)
             self.button_left.configure(bg=self.current_bg)
         elif self.right_key:
-            self.profiles[self.name_selection].commands[1] = e.keysym
+            if len(self.player_ingame.curselection()) > 0 or \
+               len(self.player_known.curselection()) > 0:
+                self.profiles[self.name_selection].commands[1] = e.keysym
             self.move_command_right = e.keysym
             self.button_right.configure(text=self.move_command_right)
             self.button_right.configure(bg=self.current_bg)
@@ -831,7 +832,9 @@ class GUI:
             callback function when combobox selection changes
         '''
         try:
-            self.profiles[self.name_selection].color = self.color.getColor()
+            if len(self.player_ingame.curselection()) > 0 or \
+               len(self.player_known.curselection()) > 0:
+                self.profiles[self.name_selection].color = self.color.getColor()
             self.current_color = self.color.getColor()
         except:
             pass
@@ -842,13 +845,14 @@ class GUI:
         '''
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
-            self.colors_list = self.color.getListAllColors()
-            for profile in self.profiles:
-                if self.profiles[profile].color not in self.colors_list:
-                    self.colors_list.append(self.profiles[profile].color)
+            # self.colors_list = self.color.getListAllColors()
+            # for profile in self.profiles:
+                # if self.profiles[profile].color not in self.colors_list:
+                    # self.colors_list.append(self.profiles[profile].color)
             selection = e.widget.get(self.selected[0])
             self.name_selection = selection
-            if len(self.player_known.curselection()) > 0:
+            if len(self.player_known.curselection()) > 0 or \
+               len(self.player_ingame.curselection()) > 0:
                 left = self.profiles[self.name_selection].commands[0]
                 self.button_left['text'] = left
                 right = self.profiles[self.name_selection].commands[1]
@@ -856,13 +860,6 @@ class GUI:
                 self.color.set(self.profiles[self.name_selection].color)
                 self.move_command_left = left
                 self.move_command_right = right
-            else:
-                self.id = self.snakes_ingame.index(selection)
-                left = self.profiles[selection].commands[0]
-                self.button_left['text'] = left
-                right = self.profiles[selection].commands[1]
-                self.button_right['text'] = right
-                self.color.set(self.profiles[selection].color)
 
     def removeFocus(self, e):
         '''
@@ -870,6 +867,7 @@ class GUI:
         '''
         self.player_ingame.selection_clear(0, END)
         self.player_known.selection_clear(0, END)
+        
 
     def keyPressed(self, e):
         '''
@@ -901,7 +899,8 @@ class GUI:
         try:
             db = shelve.open(GUI.SAVE_FILE, flag='r')
         except:
-            showwarning('Load error', 'Unable to find a save file')
+            # showwarning('Load error', 'Unable to find a save file')
+            pass
         else:
             if '(bg, fg)' in db:
                 self.current_bg, self.current_fg = db['(bg, fg)']
