@@ -61,6 +61,7 @@ class GUI:
         self.left_key = self.right_key = False
         self.current_bg = 'white'
         self.current_fg = 'black'
+        self.artic_check = None
         # other variables
         self.play_once_music = True
         self.sound_activate = True
@@ -76,6 +77,8 @@ class GUI:
         self.portal_index = 0
         self.profiles = dict()
         self.bonus_manager = BonusManager(self)
+        self.artic_chosen = ''  # stores person who is artic
+        self.artic_checked = IntVar(value=0)
         # init
         self.bonus_manager.loadBonus()
         self.loadSave()
@@ -739,7 +742,8 @@ class GUI:
         for name in self.snakes_ingame:
             snake = Snake(self, name, randint(xmin, xmax-xmin),
                           randint(ymin, ymax-ymin), random()*2*pi,
-                          self.profiles[name].color)
+                          self.profiles[name].color,
+                          1 if name == self.artic_chosen else 0)
             self.snakes.append(snake)
         self.snakes_alive = self.snakes[:]
         # self.new_game will be used only to initialize the score
@@ -831,8 +835,9 @@ class GUI:
         '''
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
-            selection = e.widget.get(self.selected[0])
-            self.name_selection = selection
+            if self.artic_check:
+                self.artic_check.pack_forget()
+            self.name_selection = e.widget.get(self.selected[0])
             if len(self.player_known.curselection()) > 0 or \
                len(self.player_ingame.curselection()) > 0:
                 left = self.profiles[self.name_selection].commands[0]
@@ -842,6 +847,22 @@ class GUI:
                 self.color.set(self.profiles[self.name_selection].color)
                 self.move_command_left = left
                 self.move_command_right = right
+                if self.profiles[self.name_selection].has_artic:
+                    if self.name_selection != self.artic_chosen:
+                        self.artic_checked.set(0)
+                    bonus_dict = self.bonus_manager.getBonusDict()
+                    bonus = bonus_dict['artic']
+                    self.artic_check = Checkbutton(self.color_frame,
+                                                   image=bonus.image,
+                                                   variable=self.artic_checked,
+                                                   command=self.chooseArtic,
+                                                   bg=self.current_bg,
+                                                   fg=self.current_fg)
+                    self.artic_check.pack()
+
+    def chooseArtic(self):
+        if self.artic_checked.get():
+            self.artic_chosen = self.name_selection
 
     def removeFocus(self, e):
         '''

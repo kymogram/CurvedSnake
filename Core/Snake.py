@@ -17,7 +17,7 @@ TURN_RIGHT = 1
 
 
 class Snake:
-    def __init__(self, parent, name, x_head, y_head, angle, color,
+    def __init__(self, parent, name, x_head, y_head, angle, color, is_artic=0,
                  hole_proba=DEFAULT_CHANCE_HOLE,
                  max_hole_length=DEFAULT_MAX_HOLE_LENGTH,
                  min_hole_length=DEFAULT_MIN_HOLE_LENGTH,
@@ -34,11 +34,12 @@ class Snake:
         # must be linked to GUI to handle bonuses
         self.parent = parent
         self.thickness = thickness
-        self.color = color
+        self.color = 'white' if is_artic else color
         # when color is changed by bonus, original color must be kept somewhere
         self.color_unchanged = color
         self.artic = False
         self.changed_artic = False
+        self.is_artic = is_artic
         self.alive = True
         self.invincible = False
         self.in_time_before_start = True
@@ -202,7 +203,7 @@ class Snake:
         return self.alive
 
     def checkSpecialColor(self, step):
-        if self.artic:
+        if self.artic or self.is_artic:
             if step % 44 == 0:
                 self.color = 'white' if self.color != 'white' else '#00ffff'
                 self.updateHeadColor()
