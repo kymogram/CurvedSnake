@@ -955,9 +955,9 @@ class GUI:
             else:
                 self.id = self.snakes_ingame.index(selection)
                 left = self.profiles[selection].commands[0]
-                self.button_left.configure['text'] = left
+                self.button_left['text'] = left
                 right = self.profiles[selection].commands[1]
-                self.button_right.configure['text'] = right
+                self.button_right['text'] = right
                 self.color.set(self.profiles[selection].color)
 
     def removeFocus(self, e):
