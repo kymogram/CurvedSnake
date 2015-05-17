@@ -49,4 +49,4 @@ CurvedSnake requiert les modules (packages) suiavnts :
 
 - Pour Windows : copier le fichier avbin.dll dans C:/Windows/System32
 
-- Pour mac : installer la version AVbin 10 (les autres ne fonctionnent pas)
+- Pour OS X et Linux : installer la version AVbin 10 (les autres ne fonctionnent pas)
