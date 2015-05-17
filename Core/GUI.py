@@ -104,7 +104,6 @@ class GUI:
         self.snakes_ingame = []
         self.counter_special = []
         self.left_key = self.right_key = False
-        self.is_regular_list = False
         self.current_bg = 'white'
         self.current_fg = 'black'
         # other variables
@@ -902,18 +901,12 @@ class GUI:
         if self.left_key:
             if len(self.player_ingame.curselection()) > 0 or \
                len(self.player_known.curselection()) > 0:
-                if self.is_regular_list:
-                    self.profiles[self.name_selection].commands[0] = e.keysym
-                else:
-                    self.profiles[self.name_selection].commands[0] = e.keysym
+                self.profiles[self.name_selection].commands[0] = e.keysym
             self.move_command_left = e.keysym
             self.button_left.configure(text=self.move_command_left)
             self.button_left.configure(bg=self.current_bg)
         elif self.right_key:
-            if self.is_regular_list:
-                self.profiles[self.name_selection].commands[1] = e.keysym
-            if len(self.player_ingame.curselection()) > 0:
-                self.profiles[self.name_selection].commands[1] = e.keysym
+            self.profiles[self.name_selection].commands[1] = e.keysym
             self.move_command_right = e.keysym
             self.button_right.configure(text=self.move_command_right)
             self.button_right.configure(bg=self.current_bg)
@@ -932,10 +925,6 @@ class GUI:
         '''
             resets informations about selected user
         '''
-        if len(self.player_known.curselection()) > 0:
-            self.is_regular_list = True
-        elif len(self.player_ingame.curselection()) > 0:
-            self.is_regular_list = False
         self.selected = list(map(int, e.widget.curselection()))
         if self.selected:
             self.colors_list = self.color.getListAllColors()
@@ -944,7 +933,7 @@ class GUI:
                     self.colors_list.append(self.profiles[profile].color)
             selection = e.widget.get(self.selected[0])
             self.name_selection = selection
-            if self.is_regular_list:
+            if len(self.player_known.curselection()) > 0:
                 left = self.profiles[self.name_selection].commands[0]
                 self.button_left['text'] = left
                 right = self.profiles[self.name_selection].commands[1]
