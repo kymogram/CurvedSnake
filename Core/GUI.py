@@ -830,8 +830,11 @@ class GUI:
         '''
             callback function when combobox selection changes
         '''
-        self.profiles[self.name_selection].color = self.color.getColor()
-        self.current_color = self.color.getColor()
+        try:
+            self.profiles[self.name_selection].color = self.color.getColor()
+            self.current_color = self.color.getColor()
+        except:
+            pass
 
     def showInfoPlayer(self, e):
         '''
