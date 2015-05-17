@@ -22,7 +22,17 @@ CurvedSnake requiert les modules (packages) suiavnts :
 
 - Points de classement ;
 
-- Éventuels exploits lorsque l'on prend plusieurs bonus à la suite (par exemple).
+- Éventuels exploits lorsque l'on prend plusieurs bonus à la suite (par exemple) ;
+
+- Améliorer la ComboColorBox ;
+
+- Mettre à jour les sprites ;
+
+- Ajouter une image avec la direction et les touches de l'utilisateur lors du spawn, à la tête du snake, au début de chaque round ;
+
+- Clean map ne doit pas effacer les portails... Or il le fait! ;
+
+- Replacer correctement le texte du winner et relai avant la partie suivant lors d'un rétrécissement de la map.
 
 # Idées de bonus:
 
