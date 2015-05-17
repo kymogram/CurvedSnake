@@ -389,8 +389,9 @@ class GUI:
                                            bg=self.current_bg,
                                            fg=self.current_fg)
         available_bonus_frame.grid()
-        for i in range(len(self.bonus_dict)):
-            bonus = self.bonus_dict[BonusManager.BONUS_FILES[i]]
+        bonus_dict = self.bonus_manager.getBonusDict()
+        for i in range(len(bonus_dict)):
+            bonus = bonus_dict[BonusManager.BONUS_FILES[i]]
             add_bonus = Checkbutton(available_bonus_frame,
                                     image=bonus.image,
                                     variable=self.add_bonus_bool[i],

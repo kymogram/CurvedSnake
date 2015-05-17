@@ -296,3 +296,6 @@ class BonusManager:
             self.bonus_dict[file] =  Bonus(file, path, self.BONUS_TIMES[i])
         self.gui.add_bonus_bool = [IntVar(value=1)
                                    for i in range(len(self.bonus_dict))]
+
+    def getBonusDict(self):
+        return self.bonus_dict
