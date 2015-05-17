@@ -334,6 +334,8 @@ class GUI:
         self.selectRandomColor()
         colorVal = self.color.getColorVal()
         colorVal.trace('w', lambda n, m, s: self.newSelection())
+        # Have to call this function with trace_variable without bug ...
+        # colorVal.trace_variable('w', self.backgroundComboBox)
         b = Button(self.window, text='Add player', command=self.addPlayer,
                    bg=self.current_bg, fg=self.current_fg)
         b.pack()
@@ -373,6 +375,9 @@ class GUI:
                    fg=self.current_fg)
         self.tmp_widget.append(b)
         b.pack()
+
+    def backgroundComboBox(self, index, mode):
+        self.color.colors_menu['menu'].configure(bg=self.color.getColor(), fg=self.color.getColor(), activebackground=self.color.getColor(), activeforeground=self.color.getColor())
 
     def parameters(self):
         '''
