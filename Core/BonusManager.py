@@ -3,6 +3,7 @@ from random import shuffle, randint
 from math import pi
 
 from .RandomBonus import RandomBonus
+from .Particles import Particles
 
 ON_SELF, ON_OTHERS, ON_GUI = 0, 1, 2
 
@@ -35,7 +36,8 @@ class BonusManager:
                    'swap_position',
                    'portal',
                    'penetrating_wall',
-                   'artic']
+                   'artic',
+                   'death']
 
     EXEC_CODE = ['sender.speed += 1; sender.rotating_angle += 0.02; \
                   sender.addArc(self.bonus_dict[bonus_ref])',
@@ -63,7 +65,8 @@ class BonusManager:
                   canvas.delete(e)',
                  'snake.penetrate = True',
                  'sender.artic = True; sender.color = "white"; \
-                  sender.updateHeadColor()']
+                  sender.updateHeadColor()',
+                  'sender.alive = False']
 
     TODO_CODE = ['snake.speed -= 1; snake.rotating_angle -= 0.02',
                  'snake.speed *= 1.5',
@@ -87,7 +90,8 @@ class BonusManager:
                  'pass',
                  'snake.penetrate = False',
                  'snake.artic = False; snake.color = snake.color_unchanged; \
-                  snake.updateHeadColor()']
+                  snake.updateHeadColor()',
+                  '# snake dies, nothing to do']
 
     ON_ACTION = [ON_SELF,
                  ON_SELF,
@@ -107,6 +111,7 @@ class BonusManager:
                  ON_GUI,
                  ON_SELF,
                  ON_GUI,
+                 ON_SELF,
                  ON_SELF,
                  ON_SELF,
                  ON_SELF]
@@ -131,7 +136,8 @@ class BonusManager:
                    200,
                    10,
                    300,
-                   600]
+                   600,
+                   10]
 
     PROBABILITY = [1,
                    1.2,
@@ -153,7 +159,8 @@ class BonusManager:
                    1,
                    1,
                    1,
-                   0.5]
+                   0.5,
+                   0.7]
 
     MAX_PROBA = 0.16
 
@@ -273,6 +280,9 @@ class BonusManager:
                       'self.canvas_frame.configure(bg="grey")')
             for snake in self.gui.snakes:
                 snake.penetrate = True
+        elif bonus_ref == 'death':
+            x, y = sender.head_coord
+            Particles(canvas, x, y, sender.color)
 
         bonus_name = bonus_ref if bonus_ref[:6] != 'portal' else 'portal'
         add_event = lambda l, f: l.append(self.listFrom(f, bonus_name))
