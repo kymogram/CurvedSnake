@@ -725,7 +725,7 @@ class GUI:
         self.finished = False
         self.score_frame = LabelFrame(self.window, relief=GROOVE, bd=2,
                                       text='Scores')
-        self.score_frame.pack(side=LEFT, anchor=E, padx=25)
+        self.score_frame.pack(side=LEFT, padx=25)
         self.canvas_frame = LabelFrame(self.window, relief=RAISED, bd=15,
                                        cursor='none', text='canvas',
                                        bg=None)
@@ -778,9 +778,9 @@ class GUI:
     def checkSpecialCounter(self, snake, bonus_type):
         if bonus_type in GUI.ACHIEVEMENTS_BONUS:
             self.counter_special[snake.name][bonus_type] += 1
-        if self.counter_special[snake.name]['artic'] >= 0 and \
-           self.counter_special[snake.name]['change_color'] >= 0 and \
-           self.counter_special[snake.name]['negative'] >= 1:
+        if self.counter_special[snake.name]['artic'] >= 2 and \
+           self.counter_special[snake.name]['change_color'] >= 5 and \
+           self.counter_special[snake.name]['negative'] >= 5:
             if self.profiles[snake.name].has_artic == False:
                 achivement = LabelFrame(self.score_frame, relief=GROOVE, bd=2,
                                         text='Achivement done !')
