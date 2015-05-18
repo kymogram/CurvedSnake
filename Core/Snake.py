@@ -38,7 +38,6 @@ class Snake:
         # when color is changed by bonus, original color must be kept somewhere
         self.color_unchanged = color
         self.artic = False
-        self.changed_artic = False
         self.is_artic = is_artic
         self.alive = True
         self.invincible = False
@@ -206,7 +205,9 @@ class Snake:
     def checkSpecialColor(self, step):
         if self.artic or self.is_artic:
             if step % 44 == 0:
-                self.color = 'white' if self.color != 'white' else '#00ffff'
+                self.color = 'white' if self.color == '#00ffff' else \
+                             '#0080ff' if self.color == 'white' else \
+                             '#00ffff'
                 self.updateHeadColor()
 
     def restoreAngle(self):
