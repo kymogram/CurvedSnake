@@ -32,8 +32,6 @@ CurvedSnake requiert les modules (packages) suiavnts :
 
 - Clean map ne doit pas effacer les portails... Or il le fait! ;
 
-- Replacer correctement le texte du winner et relai avant la partie suivant lors d'un rétrécissement de la map.
-
 # Idées de bonus:
 
 - Lors du bonus invert_color (négatif), mettre la musique de nyan-cat ;

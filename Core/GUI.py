@@ -158,8 +158,10 @@ class GUI:
             text = '{} won this round! {} seconds remaining' \
                    .format(self.save_name_winner, time)
             if not self.text_id:
-                self.text_id = self.canvas.create_text(self.canvas_height//2,
-                                                       self.canvas_width//2,
+                self.text_id = self.canvas.create_text(self.canvas_height//2 + \
+                                                       int(self.canvas['bd']),
+                                                       self.canvas_width//2 + \
+                                                       int(self.canvas['bd']),
                                                        text=text,
                                                        fill='white',
                                                        tags='text_win')
