@@ -591,10 +591,8 @@ class GUI:
         if len(self.player_known.curselection()) > 0:
             name = self.player_known.get(self.selected[0])
             self.player_known.delete(self.selected[0])
-            print(name)
             if name in self.profiles:
                 del self.profiles[name]
-                print(self.profiles)
             else:
                 showwarning('No one to remove', 'You have no one to remove')
         else:
@@ -731,7 +729,7 @@ class GUI:
         self.canvas_frame = LabelFrame(self.window, relief=RAISED, bd=15,
                                        cursor='none', text='canvas',
                                        bg=None)
-        self.canvas_frame.pack(side=RIGHT, padx=25, pady=25)
+        self.canvas_frame.pack(side=RIGHT, padx=15, pady=15)
         self.canvas = Canvas(self.canvas_frame, height=self.canvas_height,
                              width=self.canvas_width,
                              bg='black', highlightthickness=0,
@@ -783,6 +781,13 @@ class GUI:
         if self.counter_special[snake.name]['artic'] >= 2 and \
            self.counter_special[snake.name]['change_color'] >= 5 and \
            self.counter_special[snake.name]['negative'] >= 5:
+            if self.profiles[snake.name].has_artic == False:
+                # WARNING -> it changes canva's proportion
+                achivement = LabelFrame(self.score_frame, relief=GROOVE, bd=2,
+                                        text='Achivement done !')
+                achivement.pack()
+                Label(achivement, text='Congratulation ' + str(snake.name) + \
+                      ' you unlock artic color').pack()
             self.profiles[snake.name].has_artic = True
 
     def shrinkMap(self):
